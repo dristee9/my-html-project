@@ -1,0 +1,195 @@
+/* Card Component */
+.card {
+    background-color: var(--white);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.card-image {
+    width: 100%;
+    height: 12rem;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 0.75rem;
+}
+
+.card-description {
+    color: var(--gray-600);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.card-progress {
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 0.5rem;
+    background-color: var(--gray-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-blue-light), var(--primary-blue));
+    border-radius: var(--border-radius-full);
+    transition: width var(--transition-normal);
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-100);
+}
+
+.card-meta {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.card-button {
+    background-color: var(--primary-blue-light);
+    color: var(--white);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color var(--transition-fast);
+    display: inline-block;
+}
+
+.card-button:hover {
+    background-color: var(--primary-blue);
+}
+
+/* Campaign Card Specific Styles */
+.campaign-card {
+    composes: card;
+}
+
+.campaign-card .card-badge {
+    display: inline-block;
+    padding: 0.25rem 1rem;
+    border-radius: var(--border-radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+.badge-active {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.badge-category {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.campaign-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.campaign-author {
+    color: var(--gray-600);
+    font-size: 1.125rem;
+    margin-bottom: 1.5rem;
+}
+
+.funding-summary {
+    background-color: var(--gray-50);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 1.5rem;
+}
+
+.funding-amount {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Dashboard Cards */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.dashboard-card {
+    composes: card;
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.dashboard-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-label {
+    color: var(--gray-600);
+    font-size: 1rem;
+}
+
+.dashboard-blue { color: var(--primary-blue-light); }
+.dashboard-green { color: var(--secondary-green); }
+.dashboard-purple { color: var(--secondary-purple); }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card-content {
+        padding: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.125rem;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+}
