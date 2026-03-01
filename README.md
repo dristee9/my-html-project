@@ -173,7 +173,6 @@ We love contributions! Here's how you can help:
 ![GitHub last commit](https://img.shields.io/github/last-commit/dristee9/my-html-project)
 ![GitHub issues](https://img.shields.io/github/issues/dristee9/my-html-project)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/dristee9/my-html-project)
-https://github.com/
 
 ## 🛡 Security
 
