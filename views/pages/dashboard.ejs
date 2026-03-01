@@ -29,7 +29,7 @@
         <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
             <% campaigns.forEach(campaign => { %>
             <div class="campaign-card">
-                <img src="<%= campaign.imageUrl %>" alt="<%= campaign.title %>" class="campaign-image">
+                <img src="<%= campaign.imageUrl || 'https://via.placeholder.com/400x200/f3f4f6/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20)) %>" alt="<%= campaign.title %>" class="campaign-image">
                 <div class="campaign-details">
                     <div class="campaign-header">
                         <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
@@ -47,7 +47,10 @@
                     </div>
                     <div class="campaign-footer">
                         <span class="time-remaining"><%= campaign.daysLeftText %></span>
-                        <a href="/campaigns/<%= campaign._id %>" class="view-button">View Details</a>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
+                            <a href="/campaigns/<%= campaign._id %>/edit" class="secondary-button" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Edit</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -56,7 +59,7 @@
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
                 <h3 style="color: var(--gray-600); margin-bottom: 1rem;">No campaigns yet</h3>
                 <p style="color: var(--gray-500); margin-bottom: 2rem;">Start your first campaign to bring your ideas to life!</p>
-                <a href="/create-campaign" class="primary-button">Create Your First Campaign</a>
+                <a href="/dashboard/create-campaign" class="primary-button">Create Your First Campaign</a>
             </div>
         <% } %>
     </div>
