@@ -1,0 +1,98 @@
+const mongoose = require('mongoose');
+
+const campaignSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: [true, 'Campaign title is required'],
+        trim: true,
+        maxlength: [100, 'Title cannot exceed 100 characters']
+    },
+    description: {
+        type: String,
+        required: [true, 'Campaign description is required'],
+        trim: true,
+        maxlength: [2000, 'Description cannot exceed 2000 characters']
+    },
+    category: {
+        type: String,
+        required: [true, 'Category is required'],
+        enum: ['Technology', 'Education', 'Social Impact', 'Arts & Culture', 'Research', 'Other']
+    },
+    fundingGoal: {
+        type: Number,
+        required: [true, 'Funding goal is required'],
+        min: [1000, 'Minimum funding goal is 1000 BDT'],
+        max: [1000000, 'Maximum funding goal is 1,000,000 BDT']
+    },
+    currentFunding: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+    deadline: {
+        type: Date,
+        required: [true, 'Deadline is required'],
+        validate: {
+            validator: function(date) {
+                return date > Date.now();
+            },
+            message: 'Deadline must be in the future'
+        }
+    },
+    creator: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    imageUrl: {
+        type: String,
+        default: '/images/default-campaign.jpg'
+    },
+    status: {
+        type: String,
+        default: 'active',
+        enum: ['active', 'completed', 'expired', 'cancelled']
+    },
+    backers: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        amount: Number,
+        message: String,
+        bkashNumber: String,
+        donatedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Virtual for funding percentage
+campaignSchema.virtual('fundingPercentage').get(function() {
+    return Math.min(Math.round((this.currentFunding / this.fundingGoal) * 100), 100);
+});
+
+// Virtual for days remaining
+campaignSchema.virtual('daysRemaining').get(function() {
+    const diffTime = this.deadline - Date.now();
+    return Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 0);
+});
+
+// Virtual for days left text
+campaignSchema.virtual('daysLeftText').get(function() {
+    const days = this.daysRemaining;
+    if (days === 0) return 'Last day';
+    if (days === 1) return '1 day left';
+    return `${days} days left`;
+});
+
+// Index for better querying
+campaignSchema.index({ status: 1, createdAt: -1 });
+campaignSchema.index({ category: 1, status: 1 });
+
+module.exports = mongoose.model('Campaign', campaignSchema);
