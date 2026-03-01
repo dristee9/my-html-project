@@ -1,73 +1,166 @@
-<% layout("layouts/main") -%>
-<% title = 'Campaign Details - FundMyIdea BD' -%>
+<% layout('layouts/main') -%>
+<% title = typeof campaign !== 'undefined' && campaign ? campaign.title + ' - FundMyIdea BD' : 'Campaign Details - FundMyIdea BD' -%>
 
 <div class="campaign-detail-page">
-    <div class="campaign-header-image">
-        <img src="https://via.placeholder.com/1200x400/f3f4f6/1f2937?text=Eco+Friendly+Waste+Management+App" alt="Campaign Image" class="campaign-main-image">
-    </div>
-    
-    <div class="campaign-content">
-        <div class="campaign-info">
-            <div class="campaign-header">
-                <span class="status-badge badge-active">Active • 15 days left</span>
-                <span class="status-badge badge-category">Technology</span>
+    <% if (typeof campaign !== 'undefined' && campaign) { %>
+        <div class="campaign-header-image">
+            <img src="<%= campaign.imageUrl || 'https://via.placeholder.com/1200x400/f3f4f6/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30)) %>" alt="<%= campaign.title %>" class="campaign-main-image">
+        </div>
+        
+        <div class="campaign-content">
+            <div class="campaign-info">
+                <div class="campaign-header">
+                    <span class="status-badge badge-<%= campaign.status === 'active' ? 'active' : 'completed' %>"> <%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %> • <%= campaign.daysLeftText %></span>
+                    <span class="status-badge badge-category"><%= campaign.category %></span>
+                </div>
+                
+                <h1 class="campaign-title"><%= campaign.title %></h1>
+                <p class="campaign-author-detail">by <%= campaign.creator.username %>, <%= campaign.creator.university %> Student</p>
+                
+                <div class="funding-summary">
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                        </div>
+                    </div>
+                    <div class="funding-amount">
+                        <span><%= campaign.currentFunding %> BDT</span>
+                        <span>raised of <%= campaign.fundingGoal %> BDT goal</span>
+                    </div>
+                    <div class="supporters-count">Supported by <%= campaign.backers.length %> generous <%= campaign.backers.length === 1 ? 'backer' : 'backers' %></div>
+                </div>
             </div>
-            
-            <h1 class="campaign-title">Eco-Friendly Waste Management Mobile Application</h1>
-            <p class="campaign-author-detail">by Sarah Ahmed, BRAC University Computer Science Student</p>
-            
-            <div class="funding-summary">
-                <div class="progress-container">
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: 65%"></div>
+
+            <div class="campaign-description">
+                <h2 class="section-subtitle">About this Campaign</h2>
+                <div class="description-content">
+                    <p><%= campaign.description %></p>
+                    
+                    <div style="margin-top: 2rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
+                        <h3 style="margin-bottom: 1rem; color: var(--gray-800);">Campaign Details</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div>
+                                <strong>Category:</strong> <%= campaign.category %>
+                            </div>
+                            <div>
+                                <strong>Created:</strong> <%= campaign.createdAt.toLocaleDateString() %>
+                            </div>
+                            <div>
+                                <strong>Deadline:</strong> <%= campaign.deadline.toLocaleDateString() %>
+                            </div>
+                            <div>
+                                <strong>Status:</strong> 
+                                <span style="background: <%= campaign.status === 'active' ? 'var(--success-green)' : 'var(--gray-500)' %>; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem;">
+                                    <%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="funding-amount">
-                    <span>32,500 BDT</span>
-                    <span>raised of 50,000 BDT goal</span>
-                </div>
-                <div class="supporters-count">Supported by 47 generous backers</div>
             </div>
-        </div>
 
-        <div class="campaign-description">
-            <h2 class="section-subtitle">About this Campaign</h2>
-            <div class="description-content">
-                <p>Our innovative mobile application aims to revolutionize waste management in urban Bangladesh by connecting citizens with local recycling centers and waste collection services. The app will feature real-time tracking of waste collection trucks, educational content about proper waste segregation, and a reward system for active participation.</p>
-                
-                <p>Built using Flutter for cross-platform compatibility, the app will integrate with Google Maps API for location services and Firebase for real-time data synchronization. Our target users are environmentally conscious citizens aged 18-45 in Dhaka city.</p>
-                
-                <p>The funds raised will be used for:</p>
-                <ul class="funding-breakdown">
-                    <li>App development and testing: 40%</li>
-                    <li>Server infrastructure and hosting: 25%</li>
-                    <li>Marketing and user acquisition: 20%</li>
-                    <li>Legal compliance and permits: 10%</li>
-                    <li>Contingency fund: 5%</li>
-                </ul>
+            <% if (typeof user !== 'undefined' && user && campaign.creator._id.toString() !== user._id.toString()) { %>
+            <div class="donation-section">
+                <h2 class="section-subtitle">Support this Project</h2>
+                <% if (typeof hasDonated !== 'undefined' && hasDonated) { %>
+                    <div style="background: var(--success-green); color: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center; margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 0.5rem;">Thank You for Your Support!</h3>
+                        <p>You've already contributed to this campaign. Your support means the world to the creator.</p>
+                    </div>
+                <% } else { %>
+                    <form class="donation-form" method="POST" action="/campaigns/<%= campaign._id %>/donate">
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <div style="background-color: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border: 1px solid #fecaca;">
+                                <%= error %>
+                            </div>
+                        <% } %>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Donation Amount (BDT)</label>
+                            <input type="number" name="amount" class="form-control" placeholder="Enter amount" min="100" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Your Message (Optional)</label>
+                            <textarea name="message" class="form-control" rows="4" placeholder="Leave an encouraging message for the creator..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">bKash Number</label>
+                            <input type="text" name="bkashNumber" class="form-control" placeholder="Enter your bKash number" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-button donation-button">Donate Now via bKash</button>
+                    </form>
+                <% } %>
             </div>
+            <% } else if (typeof user !== 'undefined' && user && campaign.creator._id.toString() === user._id.toString()) { %>
+            <div class="owner-actions" style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem; margin-top: 2rem;">
+                <h2 class="section-subtitle">Creator Tools</h2>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="/campaigns/<%= campaign._id %>/edit" class="primary-button">Edit Campaign</a>
+                    <button onclick="showDeleteModal()" class="secondary-button" style="background: var(--danger-red); color: white;">Delete Campaign</button>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--gray-800);">Recent Supporters</h3>
+                    <% if (campaign.backers.length > 0) { %>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            <% campaign.backers.slice(-5).reverse().forEach(backer => { %>
+                                <div style="display: flex; justify-content: space-between; padding: 0.75rem; border-bottom: 1px solid var(--gray-200);">
+                                    <div>
+                                        <div style="font-weight: 600;"><%= backer.user.username || 'Anonymous' %></div>
+                                        <div style="font-size: 0.875rem; color: var(--gray-600);"><%= backer.message || 'No message' %></div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-weight: 700; color: var(--secondary-green);"><%= backer.amount %> BDT</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);"><%= new Date(backer.donatedAt).toLocaleDateString() %></div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <p style="color: var(--gray-500); text-align: center; padding: 2rem;">No supporters yet. Share your campaign to start receiving donations!</p>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: var(--border-radius-lg); max-width: 500px; width: 90%;">
+                    <h3 style="margin-bottom: 1rem; color: var(--danger-red);">Delete Campaign</h3>
+                    <p style="margin-bottom: 1.5rem;">Are you sure you want to delete this campaign? This action cannot be undone.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button onclick="hideDeleteModal()" class="secondary-button">Cancel</button>
+                        <form method="POST" action="/campaigns/<%= campaign._id %>/delete" style="display: inline;">
+                            <button type="submit" class="submit-button" style="background: var(--danger-red);">Delete Campaign</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <% } %>
         </div>
-
-        <div class="donation-section">
-            <h2 class="section-subtitle">Support this Project</h2>
-            <form class="donation-form" method="POST" action="/campaigns/donate">
-                <div class="form-group">
-                    <label class="form-label">Donation Amount (BDT)</label>
-                    <input type="number" name="amount" class="form-control" placeholder="Enter amount" min="100" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Your Message (Optional)</label>
-                    <textarea name="message" class="form-control" rows="4" placeholder="Leave an encouraging message for the creator..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">bKash Number</label>
-                    <input type="text" name="bkashNumber" class="form-control" placeholder="Enter your bKash number" required>
-                </div>
-                
-                <button type="submit" class="submit-button donation-button">Donate Now via bKash</button>
-            </form>
+    <% } else { %>
+        <div style="text-align: center; padding: 4rem 1rem;">
+            <h1 style="font-size: 2rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem;">Campaign Not Found</h1>
+            <p style="color: var(--gray-600); margin-bottom: 2rem;">The campaign you're looking for doesn't exist or has been removed.</p>
+            <a href="/campaigns" class="primary-button">Browse Other Campaigns</a>
         </div>
-    </div>
+    <% } %>
 </div>
+
+<script>
+function showDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'block';
+}
+
+function hideDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideDeleteModal();
+    }
+});
+</script>
