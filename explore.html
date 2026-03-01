@@ -1,0 +1,39 @@
+<!-- Header include -->
+<div class="py-8">
+    <h1 class="text-4xl font-bold text-center text-blue-800 mb-8">Explore Student Campaigns</h1>
+    <form class="max-w-4xl mx-auto mb-10 flex flex-col md:flex-row gap-4">
+        <input type="text" placeholder="Search..." class="flex-grow px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <select class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option>All Categories</option>
+            <option>Tech</option>
+            <option>Education</option>
+            <option>Social</option>
+            <option>Art</option>
+            <option>Other</option>
+        </select>
+        <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700">Search</button>
+    </form>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Example Campaign Card -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <img src="https://via.placeholder.com/400x200" alt="Campaign Image" class="w-full h-48 object-cover">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-800">Example Campaign Title</h3>
+                <p class="text-gray-600 mb-4">Short description here...</p>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 50%"></div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-700">
+                    <span>25,000 BDT raised</span>
+                    <span>of 50,000 BDT</span>
+                </div>
+                <div class="flex justify-between mt-4">
+                    <span class="text-gray-600">10 days left</span>
+                    <a href="campaign.html" class="bg-blue-600 text-white px-5 py-2 rounded-lg">View Details</a>
+                </div>
+            </div>
+        </div>
+        <!-- More cards... -->
+    </div>
+</div>
+<!-- Footer include -->
