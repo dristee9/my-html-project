@@ -1,96 +1,61 @@
-<% layout("layouts/main") -%>
+<% layout('layouts/main') -%>
 <% title = 'Explore Campaigns - FundMyIdea BD' -%>
 
 <section class="page-section">
     <h1 class="section-title">Explore Student Campaigns</h1>
     
-    <form class="search-form">
-        <input type="text" class="form-control search-input" placeholder="Search campaigns...">
-        <select class="form-control">
-            <option>All Categories</option>
-            <option>Technology</option>
-            <option>Education</option>
-            <option>Social Impact</option>
-            <option>Arts & Culture</option>
-            <option>Other</option>
+    <form class="search-form" method="GET" action="/campaigns/search">
+        <input type="text" name="q" class="form-control search-input" placeholder="Search campaigns..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+        <select name="category" class="form-control">
+            <option value="all">All Categories</option>
+            <option value="Technology" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Technology' ? 'selected' : '' %>>Technology</option>
+            <option value="Education" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Education' ? 'selected' : '' %>>Education</option>
+            <option value="Social Impact" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Social Impact' ? 'selected' : '' %>>Social Impact</option>
+            <option value="Arts & Culture" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Arts & Culture' ? 'selected' : '' %>>Arts & Culture</option>
+            <option value="Research" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Research' ? 'selected' : '' %>>Research</option>
+            <option value="Other" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Other' ? 'selected' : '' %>>Other</option>
         </select>
         <button type="submit" class="search-button">Search</button>
     </form>
 
     <div class="campaign-grid">
-        <div class="campaign-card">
-            <img src="https://via.placeholder.com/400x200/f3f4f6/1f2937?text=Eco+App" alt="Eco-Friendly App" class="campaign-image">
-            <div class="campaign-details">
-                <div class="campaign-header">
-                    <span class="status-badge badge-active">Active • 15 days left</span>
-                    <span class="status-badge badge-category">Technology</span>
-                </div>
-                <h3 class="campaign-name">Eco-Friendly Waste Management App</h3>
-                <p class="campaign-author">by BRAC University Student</p>
-                <div class="progress-container">
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: 65%"></div>
+        <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+            <% campaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <img src="<%= campaign.imageUrl || 'https://via.placeholder.com/400x200/f3f4f6/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20)) %>" alt="<%= campaign.title %>" class="campaign-image">
+                <div class="campaign-details">
+                    <div class="campaign-header">
+                        <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
+                        <span class="status-badge badge-category"><%= campaign.category %></span>
                     </div>
-                    <div class="progress-info">
-                        <span>32,500 BDT raised</span>
-                        <span>of 50,000 BDT</span>
+                    <h3 class="campaign-name"><%= campaign.title %></h3>
+                    <p class="campaign-author">by <%= campaign.creator.username %></p>
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span><%= campaign.currentFunding %> BDT raised</span>
+                            <span>of <%= campaign.fundingGoal %> BDT</span>
+                        </div>
                     </div>
-                </div>
-                <div class="campaign-footer">
-                    <span class="time-remaining">15 days remaining</span>
-                    <a href="/campaigns/sample-id" class="view-button">View Details</a>
+                    <div class="campaign-footer">
+                        <span class="time-remaining"><%= campaign.daysLeftText %></span>
+                        <a href="/campaigns/<%= campaign._id %>" class="view-button">View Details</a>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="campaign-card">
-            <img src="https://via.placeholder.com/400x200/f3f4f6/1f2937?text=Solar" alt="Solar Project" class="campaign-image">
-            <div class="campaign-details">
-                <div class="campaign-header">
-                    <span class="status-badge badge-active">Active • 8 days left</span>
-                    <span class="status-badge badge-category">Social Impact</span>
-                </div>
-                <h3 class="campaign-name">Solar-Powered Street Lights for Rural Areas</h3>
-                <p class="campaign-author">by BUET Engineering Students</p>
-                <div class="progress-container">
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: 80%"></div>
-                    </div>
-                    <div class="progress-info">
-                        <span>40,000 BDT raised</span>
-                        <span>of 50,000 BDT</span>
-                    </div>
-                </div>
-                <div class="campaign-footer">
-                    <span class="time-remaining">8 days remaining</span>
-                    <a href="/campaigns/sample-id" class="view-button">View Details</a>
-                </div>
+            <% }) %>
+        <% } else { %>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                <h3 style="color: var(--gray-600); margin-bottom: 1rem;">No campaigns found</h3>
+                <p style="color: var(--gray-500); margin-bottom: 2rem;">Be the first to create a campaign and inspire others!</p>
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <a href="/dashboard/create-campaign" class="primary-button">Create Your First Campaign</a>
+                <% } else { %>
+                    <a href="/register" class="primary-button">Get Started</a>
+                <% } %>
             </div>
-        </div>
-
-        <div class="campaign-card">
-            <img src="https://via.placeholder.com/400x200/f3f4f6/1f2937?text=Education" alt="Education Initiative" class="campaign-image">
-            <div class="campaign-details">
-                <div class="campaign-header">
-                    <span class="status-badge badge-active">Active • 22 days left</span>
-                    <span class="status-badge badge-category">Education</span>
-                </div>
-                <h3 class="campaign-name">Digital Learning Platform for Underprivileged Children</h3>
-                <p class="campaign-author">by NSU Computer Science Students</p>
-                <div class="progress-container">
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: 40%"></div>
-                    </div>
-                    <div class="progress-info">
-                        <span>20,000 BDT raised</span>
-                        <span>of 50,000 BDT</span>
-                    </div>
-                </div>
-                <div class="campaign-footer">
-                    <span class="time-remaining">22 days remaining</span>
-                    <a href="/campaigns/sample-id" class="view-button">View Details</a>
-                </div>
-            </div>
-        </div>
+        <% } %>
     </div>
 </section>
