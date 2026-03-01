@@ -1,0 +1,35 @@
+<% layout('layouts/main') -%>
+<% title = 'FundMyIdea BD - Student Crowdfunding Platform' -%>
+
+<!-- Hero Section -->
+<section class="landing-hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Empower Student Innovation</h1>
+        <p class="hero-subtitle">FundMyIdea BD connects passionate students with supporters to bring groundbreaking ideas to life. Join our community of innovators and changemakers today.</p>
+        
+        <div class="hero-actions">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/create-campaign" class="primary-button">Start Your Campaign</a>
+                <a href="/explore" class="secondary-button">Browse Projects</a>
+            <% } else { %>
+                <a href="/register" class="primary-button">Get Started</a>
+                <a href="/explore" class="secondary-button">Explore Campaigns</a>
+            <% } %>
+        </div>
+
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-value">150+</div>
+                <div class="stat-label">Active Campaigns</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">2.5M+</div>
+                <div class="stat-label">BDT Raised</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">Universities</div>
+            </div>
+        </div>
+    </div>
+</section>

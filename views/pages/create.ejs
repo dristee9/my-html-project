@@ -1,0 +1,52 @@
+<% layout("layouts/main") -%>
+<% title = 'Create Campaign - FundMyIdea BD' -%>
+
+<form class="auth-form campaign-form" method="POST" action="/campaigns/create" enctype="multipart/form-data">
+    <h2 class="form-title">Create Your Student Campaign</h2>
+    
+    <div class="form-group">
+        <label class="form-label">Campaign Title</label>
+        <input type="text" name="title" class="form-control" placeholder="e.g. Eco-Friendly Waste App for Dhaka" required>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control textarea" rows="6" placeholder="Explain your idea, its impact, and how the funds will be used..." required></textarea>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Funding Goal (BDT)</label>
+            <input type="number" name="fundingGoal" class="form-control" placeholder="e.g. 50000" min="1000" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Campaign Deadline</label>
+            <input type="date" name="deadline" class="form-control" required>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-control" required>
+            <option value="">Select a category</option>
+            <option value="Technology">Technology</option>
+            <option value="Education">Education</option>
+            <option value="Social Impact">Social Impact</option>
+            <option value="Arts & Culture">Arts & Culture</option>
+            <option value="Research">Research</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Campaign Image</label>
+        <input type="file" name="image" class="form-control" accept="image/*">
+        <small style="color: var(--gray-500); font-size: 0.875rem;">Upload a compelling image that represents your campaign (JPG, PNG, max 5MB)</small>
+    </div>
+    
+    <button type="submit" class="submit-button" style="background-color: var(--secondary-green);">Launch Campaign</button>
+    
+    <div class="form-footer">
+        By creating a campaign, you agree to our <a href="#" class="form-link">Terms of Service</a> and <a href="#" class="form-link">Community Guidelines</a>
+    </div>
+</form>

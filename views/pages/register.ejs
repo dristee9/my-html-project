@@ -1,0 +1,62 @@
+<% layout('layouts/main') -%>
+<% title = 'Register - FundMyIdea BD' -%>
+
+<form class="auth-form" method="POST" action="/register">
+    <h2 class="form-title">Register as Student</h2>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div style="background-color: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border: 1px solid #fecaca;">
+            <%= error %>
+        </div>
+    <% } %>
+    
+    <div class="form-group">
+        <label class="form-label">Username</label>
+        <input 
+            type="text" 
+            name="username"
+            class="form-control" 
+            placeholder="Choose a username" 
+            value="<%= typeof formData !== 'undefined' && formData.username ? formData.username : '' %>"
+            required>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input 
+            type="email" 
+            name="email"
+            class="form-control" 
+            placeholder="Enter your email" 
+            value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>"
+            required>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Password</label>
+        <input 
+            type="password" 
+            name="password"
+            class="form-control" 
+            placeholder="Create a password (min 6 characters)" 
+            required>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">University</label>
+        <select name="university" class="form-control" required>
+            <option value="">Select your university</option>
+            <option value="BUET" <%= typeof formData !== 'undefined' && formData.university === 'BUET' ? 'selected' : '' %>>BUET</option>
+            <option value="Dhaka University" <%= typeof formData !== 'undefined' && formData.university === 'Dhaka University' ? 'selected' : '' %>>Dhaka University</option>
+            <option value="North South University" <%= typeof formData !== 'undefined' && formData.university === 'North South University' ? 'selected' : '' %>>North South University</option>
+            <option value="BRAC University" <%= typeof formData !== 'undefined' && formData.university === 'BRAC University' ? 'selected' : '' %>>BRAC University</option>
+            <option value="Other" <%= typeof formData !== 'undefined' && formData.university === 'Other' ? 'selected' : '' %>>Other</option>
+        </select>
+    </div>
+    
+    <button type="submit" class="submit-button">Create Account</button>
+    
+    <div class="form-footer">
+        Already have an account? <a href="/login" class="form-link">Login here</a>
+    </div>
+</form>

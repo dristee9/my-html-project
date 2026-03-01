@@ -1,0 +1,87 @@
+<% layout("layouts/main") -%>
+<% title = 'Dashboard - FundMyIdea BD' -%>
+
+<div class="dashboard-header">
+    <h1 class="dashboard-title">Welcome back, <%= user.username %>!</h1>
+    <p class="dashboard-subtitle">Manage your campaigns and track your progress</p>
+</div>
+
+<!-- Statistics Overview -->
+<div class="dashboard-stats">
+    <div class="stat-box">
+        <div class="stat-number stat-blue"><%= typeof userStats !== 'undefined' ? userStats.campaignsCount : 0 %></div>
+        <div class="stat-text">Active Campaigns</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-number stat-green"><%= typeof userStats !== 'undefined' ? userStats.totalRaised : 0 %> BDT</div>
+        <div class="stat-text">Total Funds Raised</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-number stat-purple"><%= typeof userStats !== 'undefined' ? userStats.donationsCount : 0 %></div>
+        <div class="stat-text">Total Donations</div>
+    </div>
+</div>
+
+<!-- My Campaigns Section -->
+<section class="page-section">
+    <h2 class="section-title">My Active Campaigns</h2>
+    <div class="campaign-grid">
+        <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+            <% campaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <img src="<%= campaign.imageUrl %>" alt="<%= campaign.title %>" class="campaign-image">
+                <div class="campaign-details">
+                    <div class="campaign-header">
+                        <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
+                        <span class="status-badge badge-category"><%= campaign.category %></span>
+                    </div>
+                    <h3 class="campaign-name"><%= campaign.title %></h3>
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span><%= campaign.currentFunding %> BDT raised</span>
+                            <span>of <%= campaign.fundingGoal %> BDT goal</span>
+                        </div>
+                    </div>
+                    <div class="campaign-footer">
+                        <span class="time-remaining"><%= campaign.daysLeftText %></span>
+                        <a href="/campaigns/<%= campaign._id %>" class="view-button">View Details</a>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        <% } else { %>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                <h3 style="color: var(--gray-600); margin-bottom: 1rem;">No campaigns yet</h3>
+                <p style="color: var(--gray-500); margin-bottom: 2rem;">Start your first campaign to bring your ideas to life!</p>
+                <a href="/create-campaign" class="primary-button">Create Your First Campaign</a>
+            </div>
+        <% } %>
+    </div>
+</section>
+
+<!-- Recent Donations -->
+<section class="page-section">
+    <h2 class="section-title">Recent Donations Received</h2>
+    <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--gray-100);">
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Campaign</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Donor</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Amount</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4" style="padding: 2rem; text-align: center; color: var(--gray-500);">
+                        No donations received yet
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
