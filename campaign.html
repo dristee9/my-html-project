@@ -1,35 +1,103 @@
-<!-- Header include -->
-<div class="py-8">
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        <img src="https://via.placeholder.com/800x400" alt="Campaign Image" class="w-full h-96 object-cover">
-        <div class="p-10">
-            <h1 class="text-4xl font-bold text-gray-800 mb-3">Campaign Title</h1>
-            <div class="flex gap-4 mb-4">
-                <span class="px-4 py-1 rounded-full text-sm bg-green-100 text-green-800">Active • 10 days left</span>
-                <span class="px-4 py-1 rounded-full text-sm bg-blue-100 text-blue-800">Tech</span>
-            </div>
-            <p class="text-gray-600 text-lg mb-10">by BUET Student</p>
-            <div class="mb-10 bg-gray-50 p-6 rounded-lg">
-                <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
-                    <div class="bg-blue-600 h-4 rounded-full" style="width: 50%"></div>
-                </div>
-                <div class="flex justify-between text-xl font-semibold">
-                    <span>25,000 BDT</span>
-                    <span>raised of 50,000 BDT</span>
-                </div>
-            </div>
-            <h2 class="text-2xl font-bold mb-4">About this Campaign</h2>
-            <p class="text-gray-700 leading-relaxed mb-10">Full description here...</p>
-            <div class="bg-blue-50 p-8 rounded-xl">
-                <h2 class="text-2xl font-bold text-blue-800 mb-6">Support this Project</h2>
-                <form class="space-y-6">
-                    <input type="number" placeholder="Amount (BDT)" class="w-full px-4 py-3 border rounded-lg">
-                    <textarea placeholder="Message" rows="3" class="w-full px-4 py-3 border rounded-lg"></textarea>
-                    <input type="text" placeholder="bKash Number" class="w-full px-4 py-3 border rounded-lg">
-                    <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-lg">Donate Now</button>
-                </form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Details - FundMyIdea BD</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="app-container">
+    <!-- Navigation -->
+    <nav class="site-navigation">
+        <div class="nav-wrapper">
+            <a href="index.html" class="site-logo">FundMyIdea BD</a>
+            <div class="nav-links">
+                <a href="explore.html" class="nav-item">Explore Campaigns</a>
+                <a href="login.html" class="nav-item">Login</a>
+                <a href="register.html" class="nav-item">Register</a>
             </div>
         </div>
-    </div>
-</div>
-<!-- Footer include -->
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="campaign-detail-page">
+            <div class="campaign-header-image">
+                <img src="https://via.placeholder.com/1200x400/f3f4f6/1f2937?text=Eco+Friendly+Waste+Management+App" alt="Campaign Image" class="campaign-main-image">
+            </div>
+            
+            <div class="campaign-content">
+                <div class="campaign-info">
+                    <div class="campaign-header">
+                        <span class="status-badge badge-active">Active • 15 days left</span>
+                        <span class="status-badge badge-category">Technology</span>
+                    </div>
+                    
+                    <h1 class="campaign-title">Eco-Friendly Waste Management Mobile Application</h1>
+                    <p class="campaign-author-detail">by Sarah Ahmed, BRAC University Computer Science Student</p>
+                    
+                    <div class="funding-summary">
+                        <div class="progress-container">
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div class="funding-amount">
+                            <span>32,500 BDT</span>
+                            <span>raised of 50,000 BDT goal</span>
+                        </div>
+                        <div class="supporters-count">Supported by 47 generous backers</div>
+                    </div>
+                </div>
+
+                <div class="campaign-description">
+                    <h2 class="section-subtitle">About this Campaign</h2>
+                    <div class="description-content">
+                        <p>Our innovative mobile application aims to revolutionize waste management in urban Bangladesh by connecting citizens with local recycling centers and waste collection services. The app will feature real-time tracking of waste collection trucks, educational content about proper waste segregation, and a reward system for active participation.</p>
+                        
+                        <p>Built using Flutter for cross-platform compatibility, the app will integrate with Google Maps API for location services and Firebase for real-time data synchronization. Our target users are environmentally conscious citizens aged 18-45 in Dhaka city.</p>
+                        
+                        <p>The funds raised will be used for:</p>
+                        <ul class="funding-breakdown">
+                            <li>App development and testing: 40%</li>
+                            <li>Server infrastructure and hosting: 25%</li>
+                            <li>Marketing and user acquisition: 20%</li>
+                            <li>Legal compliance and permits: 10%</li>
+                            <li>Contingency fund: 5%</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="donation-section">
+                    <h2 class="section-subtitle">Support this Project</h2>
+                    <form class="donation-form">
+                        <div class="form-group">
+                            <label class="form-label">Donation Amount (BDT)</label>
+                            <input type="number" class="form-control" placeholder="Enter amount" min="100" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Your Message (Optional)</label>
+                            <textarea class="form-control" rows="4" placeholder="Leave an encouraging message for the creator..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">bKash Number</label>
+                            <input type="text" class="form-control" placeholder="Enter your bKash number" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-button donation-button">Donate Now via bKash</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 FundMyIdea BD - Empowering Student Innovations</p>
+        </div>
+    </footer>
+</body>
+</html>
