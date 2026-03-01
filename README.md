@@ -169,10 +169,10 @@ We love contributions! Here's how you can help:
 ## 📈 Project Stats
 
 <!-- GitHub Stats -->
-![GitHub contributors](https://img.shields.io/github/contributors/dristee9/my-html-project
-![GitHub last commit](https://img.shields.io/github/last-commit/dristee9/my-html-project
-![GitHub issues](https://img.shields.io/github/issues/dristee9/my-html-project
-![GitHub pull requests](https://img.shields.io/github/issues-pr/dristee9/my-html-project
+![GitHub contributors](https://img.shields.io/github/contributors/dristee9/my-html-project)
+![GitHub last commit](https://img.shields.io/github/last-commit/dristee9/my-html-project)
+![GitHub issues](https://img.shields.io/github/issues/dristee9/my-html-project)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/dristee9/my-html-project)
 https://github.com/
 
 ## 🛡 Security
@@ -206,5 +206,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <p align="center">
   Made with ❤️ for Bangladeshi students
   <br>
-  <a href="https://github.com/dristee9/my-html-project">View on GitHub</a>
+  <a href="https://github.com/yourusername/fundmyidea-bd">View on GitHub</a>
 </p>
