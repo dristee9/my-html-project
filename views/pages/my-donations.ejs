@@ -1,0 +1,80 @@
+<% layout('layouts/main') -%>
+<% title = 'My Donations - FundMyIdea BD' -%>
+
+<div class="dashboard-header">
+    <h1 class="dashboard-title">My Donations</h1>
+    <p class="dashboard-subtitle">Track your contributions to student campaigns</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 3fr; gap: 2rem; max-width: 1200px; margin: 0 auto;">
+    <!-- Sidebar Navigation -->
+    <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: var(--gray-800);">Account Settings</h3>
+        <nav>
+            <a href="/dashboard/profile" style="display: block; padding: 0.75rem 1rem; color: var(--gray-700); text-decoration: none; border-radius: var(--border-radius-lg); margin-bottom: 0.5rem;">Profile Information</a>
+            <a href="/dashboard/my-campaigns" style="display: block; padding: 0.75rem 1rem; color: var(--gray-700); text-decoration: none; border-radius: var(--border-radius-lg); margin-bottom: 0.5rem;">My Campaigns</a>
+            <a href="/dashboard/my-donations" style="display: block; padding: 0.75rem 1rem; background: var(--primary-blue); color: white; text-decoration: none; border-radius: var(--border-radius-lg);">My Donations</a>
+        </nav>
+    </div>
+
+    <!-- Donations List -->
+    <div>
+        <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
+            <h2 style="margin-bottom: 1.5rem; color: var(--gray-800);">Recent Donations</h2>
+            
+            <% if (typeof donations !== 'undefined' && donations.length > 0) { %>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--gray-100);">
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Campaign</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Amount</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Date</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% donations.forEach(donation => { %>
+                            <tr style="border-bottom: 1px solid var(--gray-200);">
+                                <td style="padding: 1rem;">
+                                    <div style="font-weight: 600;"><%= donation.campaignTitle %></div>
+                                    <div style="color: var(--gray-500); font-size: 0.875rem;">by <%= donation.creatorName %></div>
+                                </td>
+                                <td style="padding: 1rem; font-weight: 600; color: var(--secondary-green);"><%= donation.amount %> BDT</td>
+                                <td style="padding: 1rem; color: var(--gray-600);"><%= donation.date %></td>
+                                <td style="padding: 1rem;">
+                                    <span style="background: var(--success-green); color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Completed</span>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div style="text-align: center; padding: 3rem;">
+                    <h3 style="color: var(--gray-600); margin-bottom: 1rem;">No donations yet</h3>
+                    <p style="color: var(--gray-500); margin-bottom: 2rem;">You haven't made any donations to campaigns yet.</p>
+                    <a href="/campaigns" class="primary-button">Explore Campaigns</a>
+                </div>
+            <% } %>
+        </div>
+
+        <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem; margin-top: 2rem;">
+            <h2 style="margin-bottom: 1.5rem; color: var(--gray-800);">Donation Statistics</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);">0</div>
+                    <div style="color: var(--gray-600);">Total Donations</div>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-green);">0 BDT</div>
+                    <div style="color: var(--gray-600);">Total Amount</div>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--purple-600);">0</div>
+                    <div style="color: var(--gray-600);">Campaigns Supported</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
