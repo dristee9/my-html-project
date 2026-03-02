@@ -14,6 +14,51 @@
                     <span class="status-badge badge-category"><%= campaign.category %></span>
                 </div>
                 
+                <!-- Donate Button Section -->
+                <% if (typeof user !== 'undefined' && user && campaign.creator._id.toString() !== user._id.toString() && campaign.status === 'active') { %>
+                <div class="donate-button-section">
+                    <a href="/campaigns/<%= campaign._id %>/donate" class="donate-now-button">
+                        <span class="button-icon">💰</span>
+                        <span class="button-text">Donate Funds</span>
+                        <span class="button-subtext">Support this campaign</span>
+                    </a>
+                </div>
+                <% } %>
+                
+                <!-- Already Donated Message -->
+                <% if (typeof hasDonated !== 'undefined' && hasDonated) { %>
+                <div class="already-donated-banner">
+                    <span class="donated-icon">✅</span>
+                    <span class="donated-text">You've already supported this campaign</span>
+                </div>
+                <% } %>
+                
+                <!-- Campaign Expired Message -->
+                <% if (campaign.status !== 'active') { %>
+                <div class="campaign-status-banner <%= campaign.status === 'completed' ? 'status-completed' : 'status-expired' %>">
+                    <span class="status-icon"><%= campaign.status === 'completed' ? '🎉' : '⏰' %></span>
+                    <span class="status-text">
+                        <%= campaign.status === 'completed' ? 'This campaign has reached its funding goal!' : 'This campaign is no longer accepting donations' %>
+                    </span>
+                </div>
+                <% } %>
+                
+                <!-- Days Left Warning -->
+                <% if (campaign.status === 'active' && campaign.daysRemaining <= 3 && campaign.daysRemaining > 0) { %>
+                <div class="urgent-warning">
+                    <span class="warning-icon">⚡</span>
+                    <span class="warning-text">Only <%= campaign.daysRemaining %> <%= campaign.daysRemaining === 1 ? 'day' : 'days' %> left! Donate now to support this campaign.</span>
+                </div>
+                <% } %>
+                
+                <!-- Last Day Warning -->
+                <% if (campaign.status === 'active' && campaign.daysRemaining === 0) { %>
+                <div class="last-day-warning">
+                    <span class="warning-icon">🚨</span>
+                    <span class="warning-text">Final day! This is your last chance to support this campaign.</span>
+                </div>
+                <% } %>
+                
                 <h1 class="campaign-title"><%= campaign.title %></h1>
                 <p class="campaign-author-detail">by <%= campaign.creator.username %>, <%= campaign.creator.university %> Student</p>
                 
