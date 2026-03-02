@@ -34,10 +34,16 @@ app.use((req, res, next) => {
 app.use('/', require('./src/routes/authRoutes'));
 app.use('/campaigns', require('./src/routes/campaignRoutes'));
 app.use('/dashboard', require('./src/routes/dashboardRoutes'));
+app.use('/builder', require('./src/routes/pageBuilderRoutes'));
 
 // Home route
 app.get('/', (req, res) => {
     res.render('pages/index');
+});
+
+// Redirect old create campaign route to page builder
+app.get('/create-campaign', (req, res) => {
+    res.redirect('/builder/create');
 });
 
 // 404 handler
