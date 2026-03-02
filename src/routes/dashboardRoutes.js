@@ -9,9 +9,6 @@ router.use(authenticateToken);
 // Dashboard route
 router.get('/', dashboardController.getDashboard);
 
-// Create campaign form route
-router.get('/create-campaign', dashboardController.getCreateCampaign);
-
 // User profile routes
 router.get('/profile', dashboardController.getProfile);
 router.post('/profile', dashboardController.updateProfile);

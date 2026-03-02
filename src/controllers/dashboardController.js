@@ -30,15 +30,6 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
-// Get create campaign form
-exports.getCreateCampaign = (req, res) => {
-    res.render('pages/create', {
-        title: 'Create Campaign - FundMyIdea BD',
-        user: req.user,
-        error: null
-    });
-};
-
 // Get user profile
 exports.getProfile = (req, res) => {
     res.render('pages/profile', {
