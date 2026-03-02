@@ -1,0 +1,280 @@
+<% layout('layouts/main') -%>
+<% title = typeof campaign !== 'undefined' && campaign ? 'Donate to ' + campaign.title + ' - FundMyIdea BD' : 'Donate - FundMyIdea BD' -%>
+
+<div class="donate-page">
+    <% if (typeof campaign !== 'undefined' && campaign) { %>
+        <!-- Campaign Header Section -->
+        <div class="donate-header">
+            <div class="campaign-preview">
+                <img src="<%= campaign.imageUrl || 'https://via.placeholder.com/800x400/f3f4f6/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30)) %>" 
+                     alt="<%= campaign.title %>" 
+                     class="campaign-preview-image">
+                <div class="campaign-preview-info">
+                    <h1 class="campaign-preview-title"><%= campaign.title %></h1>
+                    <p class="campaign-preview-creator">by <%= campaign.creator.username %>, <%= campaign.creator.university %> Student</p>
+                    <div class="campaign-preview-stats">
+                        <span class="stat-item"><%= campaign.currentFunding %> BDT raised</span>
+                        <span class="stat-item"><%= campaign.fundingPercentage %>% funded</span>
+                        <span class="stat-item"><%= campaign.backers.length %> backers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="donate-content">
+            <div class="donate-form-section">
+                <div class="form-container">
+                    <h2 class="form-title">Make Your Donation</h2>
+                    <p class="form-subtitle">Support this student's innovative idea with a secure donation via bKash</p>
+                    
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="error-message">
+                            <i class="error-icon">⚠️</i>
+                            <span><%= error %></span>
+                        </div>
+                    <% } %>
+
+                    <% if (typeof success !== 'undefined' && success) { %>
+                        <div class="success-message">
+                            <i class="success-icon">✅</i>
+                            <span><%= success %></span>
+                        </div>
+                    <% } %>
+
+                    <form class="donation-form" method="POST" action="/campaigns/donate/<%= campaign._id %>">
+                        <!-- Donation Amount Selection -->
+                        <div class="form-section">
+                            <h3 class="section-title">Choose Your Donation Amount</h3>
+                            <div class="amount-options">
+                                <button type="button" class="amount-option" data-amount="500">500 BDT</button>
+                                <button type="button" class="amount-option" data-amount="1000">1000 BDT</button>
+                                <button type="button" class="amount-option" data-amount="2000">2000 BDT</button>
+                                <button type="button" class="amount-option" data-amount="5000">5000 BDT</button>
+                                <button type="button" class="amount-option custom-amount" data-amount="custom">Custom Amount</button>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Donation Amount (BDT)</label>
+                                <div class="amount-input-container">
+                                    <span class="currency-symbol">৳</span>
+                                    <input type="number" 
+                                           name="amount" 
+                                           id="donationAmount" 
+                                           class="form-control amount-input" 
+                                           placeholder="Enter amount (minimum 100 BDT)" 
+                                           min="100" 
+                                           required>
+                                </div>
+                                <div class="amount-hint">Minimum donation: 100 BDT</div>
+                            </div>
+                        </div>
+
+                        <!-- Donor Information -->
+                        <div class="form-section">
+                            <h3 class="section-title">Your Information</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">bKash Number *</label>
+                                <input type="tel" 
+                                       name="bkashNumber" 
+                                       class="form-control" 
+                                       placeholder="Enter your bKash mobile number" 
+                                       pattern="[0-9]{11}" 
+                                       required>
+                                <div class="field-hint">We'll use this to process your payment via bKash</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Your Message (Optional)</label>
+                                <textarea name="message" 
+                                          class="form-control" 
+                                          rows="4" 
+                                          placeholder="Leave an encouraging message for the campaign creator..."></textarea>
+                                <div class="field-hint">Your message will be visible to the campaign creator and other supporters</div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Instructions -->
+                        <div class="payment-instructions">
+                            <h3 class="section-title">Payment Instructions</h3>
+                            <div class="instructions-content">
+                                <div class="instruction-step">
+                                    <span class="step-number">1</span>
+                                    <div class="step-content">
+                                        <h4>Submit this form</h4>
+                                        <p>Fill in your donation details and click "Process Donation"</p>
+                                    </div>
+                                </div>
+                                <div class="instruction-step">
+                                    <span class="step-number">2</span>
+                                    <div class="step-content">
+                                        <h4>Complete bKash payment</h4>
+                                        <p>You'll receive instructions to complete your bKash transaction</p>
+                                    </div>
+                                </div>
+                                <div class="instruction-step">
+                                    <span class="step-number">3</span>
+                                    <div class="step-content">
+                                        <h4>Your donation is confirmed</h4>
+                                        <p>Once verified, your contribution will appear on the campaign page</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-actions">
+                            <button type="submit" class="submit-button donation-submit-button">
+                                <span class="button-text">Process Donation</span>
+                                <span class="button-amount" id="buttonAmount">৳0</span>
+                            </button>
+                            
+                            <div class="security-note">
+                                <i class="security-icon">🔒</i>
+                                <span>All transactions are secure and encrypted</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Campaign Progress Sidebar -->
+            <div class="donate-sidebar">
+                <div class="progress-widget">
+                    <h3 class="widget-title">Campaign Progress</h3>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="stat">
+                                <span class="stat-value"><%= campaign.currentFunding %></span>
+                                <span class="stat-label">BDT Raised</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value"><%= campaign.fundingGoal %></span>
+                                <span class="stat-label">Goal</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value"><%= campaign.daysRemaining %></span>
+                                <span class="stat-label"><%= campaign.daysRemaining === 1 ? 'Day' : 'Days' %> Left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="creator-widget">
+                    <h3 class="widget-title">Meet the Creator</h3>
+                    <div class="creator-info">
+                        <div class="creator-avatar">
+                            <% if (campaign.creator.profileImage) { %>
+                                <img src="<%= campaign.creator.profileImage %>" alt="<%= campaign.creator.username %>" class="avatar-image">
+                            <% } else { %>
+                                <div class="avatar-placeholder">
+                                    <%= campaign.creator.username.charAt(0).toUpperCase() %>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="creator-details">
+                            <h4 class="creator-name"><%= campaign.creator.username %></h4>
+                            <p class="creator-university"><%= campaign.creator.university %></p>
+                        </div>
+                    </div>
+                    <p class="creator-bio">A passionate student bringing innovative ideas to life with community support.</p>
+                </div>
+
+                <div class="recent-supporters">
+                    <h3 class="widget-title">Recent Supporters</h3>
+                    <% if (campaign.backers.length > 0) { %>
+                        <div class="supporters-list">
+                            <% campaign.backers.slice(-3).reverse().forEach(backer => { %>
+                                <div class="supporter-item">
+                                    <div class="supporter-info">
+                                        <span class="supporter-name"><%= backer.user.username || 'Anonymous Supporter' %></span>
+                                        <span class="supporter-amount"><%= backer.amount %> BDT</span>
+                                    </div>
+                                    <% if (backer.message) { %>
+                                        <p class="supporter-message"><%= backer.message.substring(0, 60) + (backer.message.length > 60 ? '...' : '') %></p>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <p class="no-supporters">Be the first to support this campaign!</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="error-page">
+            <h1>Campaign Not Found</h1>
+            <p>The campaign you're trying to support doesn't exist or has been removed.</p>
+            <a href="/campaigns" class="primary-button">Browse Other Campaigns</a>
+        </div>
+    <% } %>
+</div>
+
+<script>
+// Handle amount selection buttons
+document.querySelectorAll('.amount-option').forEach(button => {
+    button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.amount-option').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        // Set the amount value
+        const amount = this.dataset.amount;
+        const amountInput = document.getElementById('donationAmount');
+        
+        if (amount === 'custom') {
+            amountInput.focus();
+        } else {
+            amountInput.value = amount;
+            updateButtonAmount(amount);
+        }
+    });
+});
+
+// Update button amount display
+function updateButtonAmount(amount) {
+    const buttonAmount = document.getElementById('buttonAmount');
+    buttonAmount.textContent = `৳${amount}`;
+}
+
+// Update amount when typing
+document.getElementById('donationAmount').addEventListener('input', function() {
+    updateButtonAmount(this.value || 0);
+    
+    // Remove active class from preset buttons when typing custom amount
+    document.querySelectorAll('.amount-option:not(.custom-amount)').forEach(btn => {
+        btn.classList.remove('active');
+    });
+});
+
+// Form validation
+document.querySelector('.donation-form').addEventListener('submit', function(e) {
+    const amount = parseInt(document.getElementById('donationAmount').value);
+    const bkashNumber = document.querySelector('input[name="bkashNumber"]').value;
+    
+    if (amount < 100) {
+        e.preventDefault();
+        alert('Minimum donation amount is 100 BDT');
+        return;
+    }
+    
+    if (!bkashNumber.match(/^[0-9]{11}$/)) {
+        e.preventDefault();
+        alert('Please enter a valid 11-digit bKash number');
+        return;
+    }
+    
+    // Show loading state
+    const submitButton = document.querySelector('.donation-submit-button');
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="button-text">Processing...</span>';
+});
+</script>
