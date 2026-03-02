@@ -1,4 +1,3 @@
-// Page Builder JavaScript
 class PageBuilder {
     constructor() {
         this.sections = [];
