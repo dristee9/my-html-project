@@ -1,0 +1,319 @@
+<% if (typeof content !== 'undefined') { %>
+<div class="testimonials-section">
+    <% if (content.title) { %>
+    <h2 class="testimonials-title"><%= content.title %></h2>
+    <% } %>
+    
+    <% if (content.description) { %>
+    <p class="testimonials-description"><%= content.description %></p>
+    <% } %>
+    
+    <div class="testimonials-container">
+        <% if (content.testimonials && content.testimonials.length > 0) { %>
+            <% content.testimonials.forEach(function(testimonial, index) { %>
+            <div class="testimonial-card" data-index="<%= index %>">
+                <div class="testimonial-content">
+                    <% if (testimonial.quote) { %>
+                    <blockquote class="testimonial-quote">
+                        <p><%= testimonial.quote %></p>
+                    </blockquote>
+                    <% } %>
+                    
+                    <div class="testimonial-author">
+                        <% if (testimonial.avatar) { %>
+                        <img src="<%= testimonial.avatar %>" alt="<%= testimonial.name %>" class="author-avatar">
+                        <% } else { %>
+                        <div class="author-initials"><%= testimonial.name.charAt(0).toUpperCase() %></div>
+                        <% } %>
+                        
+                        <div class="author-info">
+                            <% if (testimonial.name) { %>
+                            <h4 class="author-name"><%= testimonial.name %></h4>
+                            <% } %>
+                            <% if (testimonial.role) { %>
+                            <p class="author-role"><%= testimonial.role %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        <% } %>
+    </div>
+    
+    <% if (content.testimonials && content.testimonials.length > 1) { %>
+    <div class="testimonial-navigation">
+        <button class="nav-button prev-button" aria-label="Previous testimonial">←</button>
+        <div class="testimonial-indicators">
+            <% content.testimonials.forEach(function(_, index) { %>
+            <button class="indicator" data-index="<%= index %>" <% if (index === 0) { %>aria-current="true"<% } %>></button>
+            <% }); %>
+        </div>
+        <button class="nav-button next-button" aria-label="Next testimonial">→</button>
+    </div>
+    <% } %>
+</div>
+
+<style>
+.testimonials-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.testimonials-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: inherit;
+}
+
+.testimonials-description {
+    font-size: 1.125rem;
+    margin-bottom: 3rem;
+    color: inherit;
+    opacity: 0.8;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.testimonials-container {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.testimonial-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 0 auto;
+    transition: all 0.5s ease;
+}
+
+.testimonial-quote {
+    margin-bottom: 2rem;
+}
+
+.testimonial-quote p {
+    font-size: 1.25rem;
+    line-height: 1.7;
+    font-style: italic;
+    color: inherit;
+    position: relative;
+}
+
+.testimonial-quote p::before {
+    content: """;
+    font-size: 4rem;
+    position: absolute;
+    left: -2rem;
+    top: -1rem;
+    color: var(--primary-color, #3b82f6);
+    opacity: 0.2;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.author-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color, #3b82f6);
+}
+
+.author-initials {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary-color, #3b82f6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border: 3px solid var(--primary-color, #3b82f6);
+}
+
+.author-info {
+    text-align: left;
+}
+
+.author-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: inherit;
+}
+
+.author-role {
+    font-size: 0.875rem;
+    color: inherit;
+    opacity: 0.7;
+    margin: 0;
+}
+
+.testimonial-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.nav-button {
+    background: white;
+    border: 2px solid var(--primary-color, #3b82f6);
+    color: var(--primary-color, #3b82f6);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background: var(--primary-color, #3b82f6);
+    color: white;
+    transform: scale(1.1);
+}
+
+.testimonial-indicators {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator[aria-current="true"] {
+    background: var(--primary-color, #3b82f6);
+    transform: scale(1.2);
+}
+
+.indicator:hover {
+    background: var(--primary-color, #3b82f6);
+    opacity: 0.8;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .testimonials-section {
+        padding: 2rem 1rem;
+    }
+    
+    .testimonials-title {
+        font-size: 1.875rem;
+    }
+    
+    .testimonial-card {
+        padding: 1.5rem;
+    }
+    
+    .testimonial-quote p {
+        font-size: 1.125rem;
+    }
+    
+    .testimonial-quote p::before {
+        font-size: 3rem;
+        left: -1.5rem;
+    }
+    
+    .author-avatar,
+    .author-initials {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const testimonials = document.querySelectorAll('.testimonial-card');
+    const indicators = document.querySelectorAll('.indicator');
+    const prevButton = document.querySelector('.prev-button');
+    const nextButton = document.querySelector('.next-button');
+    
+    let currentIndex = 0;
+    const totalTestimonials = testimonials.length;
+    
+    function showTestimonial(index) {
+        // Hide all testimonials
+        testimonials.forEach(testimonial => {
+            testimonial.style.display = 'none';
+        });
+        
+        // Show current testimonial
+        if (testimonials[index]) {
+            testimonials[index].style.display = 'block';
+        }
+        
+        // Update indicators
+        indicators.forEach((indicator, i) => {
+            if (i === index) {
+                indicator.setAttribute('aria-current', 'true');
+            } else {
+                indicator.removeAttribute('aria-current');
+            }
+        });
+        
+        currentIndex = index;
+    }
+    
+    function nextTestimonial() {
+        const nextIndex = (currentIndex + 1) % totalTestimonials;
+        showTestimonial(nextIndex);
+    }
+    
+    function prevTestimonial() {
+        const prevIndex = (currentIndex - 1 + totalTestimonials) % totalTestimonials;
+        showTestimonial(prevIndex);
+    }
+    
+    // Event listeners
+    if (nextButton) {
+        nextButton.addEventListener('click', nextTestimonial);
+    }
+    
+    if (prevButton) {
+        prevButton.addEventListener('click', prevTestimonial);
+    }
+    
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            showTestimonial(index);
+        });
+    });
+    
+    // Auto-rotate testimonials
+    if (totalTestimonials > 1) {
+        setInterval(nextTestimonial, 5000);
+    }
+    
+    // Initialize
+    showTestimonial(0);
+});
+</script>
+<% } %>
