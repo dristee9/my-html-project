@@ -195,6 +195,152 @@ exports.getUserCampaigns = async (req, res) => {
     }
 };
 
+// Render donation page
+exports.getDonationPage = async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id)
+            .populate('creator', 'username university profileImage')
+            .populate('backers.user', 'username');
+        
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Add virtual properties for template usage
+        const campaignData = campaign.toObject();
+        campaignData.daysLeftText = campaign.daysLeftText;
+        campaignData.fundingPercentage = campaign.fundingPercentage;
+        
+        // Check if user has donated to this campaign
+        const hasDonated = req.user && campaign.backers.some(backer => 
+            backer.user && backer.user._id.toString() === req.user._id.toString()
+        );
+        
+        res.render('pages/donate', {
+            title: `Donate to ${campaign.title} - FundMyIdea BD`,
+            campaign: campaignData,
+            hasDonated: hasDonated,
+            user: req.user
+        });
+    } catch (error) {
+        console.error('Error loading donation page:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to load donation page',
+            user: req.user
+        });
+    }
+};
+
+// Process donation from dedicated donation page
+exports.processDonation = async (req, res) => {
+    try {
+        console.log('Processing donation for campaign:', req.params.id);
+        console.log('Request body:', req.body);
+        console.log('User:', req.user._id);
+        
+        const { amount, message, bkashNumber } = req.body;
+        const campaignId = req.params.id;
+        
+        // Validate amount
+        const donationAmount = parseInt(amount);
+        if (donationAmount < 100) {
+            console.log('Donation amount too low:', donationAmount);
+            return res.status(400).render('pages/donate', {
+                title: 'Donate - FundMyIdea BD',
+                user: req.user,
+                error: 'Minimum donation amount is 100 BDT'
+            });
+        }
+        
+        // Validate bKash number
+        if (!bkashNumber || !bkashNumber.match(/^[0-9]{11}$/)) {
+            console.log('Invalid bKash number:', bkashNumber);
+            return res.status(400).render('pages/donate', {
+                title: 'Donate - FundMyIdea BD',
+                user: req.user,
+                error: 'Please enter a valid 11-digit bKash number'
+            });
+        }
+        
+        const campaign = await Campaign.findById(campaignId).populate('creator', 'username university profileImage');
+        console.log('Found campaign:', campaign ? campaign.title : 'not found');
+        
+        if (!campaign) {
+            console.log('Campaign not found');
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Check if campaign is still active
+        if (campaign.status !== 'active' || campaign.deadline < new Date()) {
+            console.log('Campaign not active or expired');
+            return res.status(400).render('pages/donate', {
+                title: `Donate to ${campaign.title} - FundMyIdea BD`,
+                campaign: campaign,
+                user: req.user,
+                error: 'This campaign is no longer accepting donations'
+            });
+        }
+        
+        // Check if user has already donated
+        const hasAlreadyDonated = campaign.backers.some(backer => 
+            backer.user && backer.user.toString() === req.user._id.toString()
+        );
+        
+        if (hasAlreadyDonated) {
+            console.log('User has already donated');
+            return res.status(400).render('pages/donate', {
+                title: `Donate to ${campaign.title} - FundMyIdea BD`,
+                campaign: campaign,
+                user: req.user,
+                error: 'You have already donated to this campaign'
+            });
+        }
+        
+        console.log('Adding donation to campaign');
+        // Add donation to campaign
+        campaign.backers.push({
+            user: req.user._id,
+            amount: donationAmount,
+            message: message || '',
+            bkashNumber: bkashNumber
+        });
+        
+        campaign.currentFunding += donationAmount;
+        
+        // Check if funding goal is reached
+        if (campaign.currentFunding >= campaign.fundingGoal) {
+            campaign.status = 'completed';
+        }
+        
+        await campaign.save();
+        console.log('Campaign saved successfully');
+        
+        console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
+        
+        // Redirect to success page or back to campaign with success message
+        res.render('pages/donate', {
+            title: `Thank You - FundMyIdea BD`,
+            campaign: campaign,
+            user: req.user,
+            success: `Thank you for your generous donation of ${donationAmount} BDT! Your support means everything to ${campaign.creator.username}.`
+        });
+    } catch (error) {
+        console.error('Error processing donation:', error);
+        res.status(500).render('pages/donate', {
+            title: 'Donate - FundMyIdea BD',
+            user: req.user,
+            error: 'Failed to process donation. Please try again.'
+        });
+    }
+};
+
 // Search campaigns
 exports.searchCampaigns = async (req, res) => {
     try {

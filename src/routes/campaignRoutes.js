@@ -37,14 +37,20 @@ router.get('/', campaignController.getAllCampaigns);
 // Search campaigns route
 router.get('/search', campaignController.searchCampaigns);
 
-// Single campaign route
-router.get('/:id', campaignController.getCampaignById);
+// Dedicated donation page routes
+router.get('/:id/donate', authenticateToken, campaignController.getDonationPage);
+router.post('/donate/:id', authenticateToken, campaignController.processDonation);
 
 // Create campaign route (POST)
 router.post('/create', authenticateToken, upload.single('image'), campaignController.createCampaign);
 
-// Donate to campaign route (POST)
-router.post('/:id/donate', authenticateToken, campaignController.donateToCampaign);
+// Single campaign route
+router.get('/:id', campaignController.getCampaignById);
+
+// Campaign preview route
+router.get('/:id/preview', (req, res) => {
+    res.redirect(`/builder/${req.params.id}/preview`);
+});
 
 // Edit campaign route (GET)
 router.get('/:id/edit', authenticateToken, (req, res) => {
