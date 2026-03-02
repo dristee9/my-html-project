@@ -48,10 +48,57 @@ const campaignSchema = new mongoose.Schema({
         type: String,
         default: '/images/default-campaign.jpg'
     },
+    // Page Builder Data
+    pageBuilder: {
+        enabled: {
+            type: Boolean,
+            default: false
+        },
+        sections: [{
+            id: String,
+            type: {
+                type: String,
+                enum: ['hero', 'text', 'image', 'gallery', 'video', 'features', 'testimonials', 'faq', 'cta', 'form', 'divider', 'custom']
+            },
+            content: mongoose.Schema.Types.Mixed,
+            settings: {
+                backgroundColor: String,
+                textColor: String,
+                padding: {
+                    top: { type: Number, default: 20 },
+                    bottom: { type: Number, default: 20 },
+                    left: { type: Number, default: 20 },
+                    right: { type: Number, default: 20 }
+                },
+                margin: {
+                    top: { type: Number, default: 0 },
+                    bottom: { type: Number, default: 0 }
+                },
+                borderRadius: { type: Number, default: 0 },
+                boxShadow: String,
+                customClass: String
+            },
+            order: Number
+        }],
+        globalStyles: {
+            fontFamily: String,
+            primaryColor: String,
+            secondaryColor: String,
+            accentColor: String,
+            backgroundColor: String
+        },
+        customCSS: String,
+        versionHistory: [{
+            version: Number,
+            data: mongoose.Schema.Types.Mixed,
+            createdAt: { type: Date, default: Date.now },
+            createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        }]
+    },
     status: {
         type: String,
         default: 'active',
-        enum: ['active', 'completed', 'expired', 'cancelled']
+        enum: ['active', 'completed', 'expired', 'cancelled', 'draft']
     },
     backers: [{
         user: {
