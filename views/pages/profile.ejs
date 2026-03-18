@@ -6,34 +6,34 @@
     <p class="dashboard-subtitle">Manage your account information</p>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; max-width: 1200px; margin: 0 auto;">
+<div class="dashboard-grid">
     <!-- Sidebar Navigation -->
-    <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
-        <h3 style="margin-bottom: 1.5rem; color: var(--gray-800);">Account Settings</h3>
+    <div class="stat-sidebar">
+        <h3 class="text-xl font-semibold text-gray-800 mb-6">Account Settings</h3>
         <nav>
-            <a href="/dashboard/profile" style="display: block; padding: 0.75rem 1rem; background: var(--primary-blue); color: white; text-decoration: none; border-radius: var(--border-radius-lg); margin-bottom: 0.5rem;">Profile Information</a>
-            <a href="/dashboard/my-campaigns" style="display: block; padding: 0.75rem 1rem; color: var(--gray-700); text-decoration: none; border-radius: var(--border-radius-lg); margin-bottom: 0.5rem;">My Campaigns</a>
-            <a href="/dashboard/my-donations" style="display: block; padding: 0.75rem 1rem; color: var(--gray-700); text-decoration: none; border-radius: var(--border-radius-lg);">My Donations</a>
+            <a href="/dashboard/profile" class="sidebar-nav-link active">Profile Information</a>
+            <a href="/dashboard/my-campaigns" class="sidebar-nav-link">My Campaigns</a>
+            <a href="/dashboard/my-donations" class="sidebar-nav-link">My Donations</a>
         </nav>
     </div>
 
     <!-- Profile Form -->
-    <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
+    <div class="card-shadow">
         <form method="POST" action="/dashboard/profile">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="form-group">
                 <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" value="<%= user.username %>" required>
+                <input type="text" name="username" class="form-input" value="<%= user.username %>" required>
             </div>
             
             <div class="form-group">
                 <label class="form-label">Email Address</label>
-                <input type="email" name="email" class="form-control" value="<%= user.email %>" required>
+                <input type="email" name="email" class="form-input" value="<%= user.email %>" required>
             </div>
             
             <div class="form-group">
                 <label class="form-label">University</label>
-                <select name="university" class="form-control" required>
+                <select name="university" class="form-input" required>
                     <option value="BUET" <%= user.university === 'BUET' ? 'selected' : '' %>>BUET</option>
                     <option value="Dhaka University" <%= user.university === 'Dhaka University' ? 'selected' : '' %>>Dhaka University</option>
                     <option value="North South University" <%= user.university === 'North South University' ? 'selected' : '' %>>North South University</option>
@@ -45,12 +45,12 @@
             <div class="form-group">
                 <label class="form-label">Profile Image</label>
                 <% if (user.profileImage) { %>
-                    <div style="margin-bottom: 1rem;">
-                        <img src="<%= user.profileImage %>" alt="Profile image" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                    <div class="mb-4">
+                        <img src="<%= user.profileImage %>" alt="Profile image" class="profile-image-preview">
                     </div>
                 <% } %>
-                <input type="file" name="profileImage" class="form-control" accept="image/*">
-                <small style="color: var(--gray-500); font-size: 0.875rem;">Upload a profile picture (JPG, PNG, max 2MB)</small>
+                <input type="file" name="profileImage" class="form-input" accept="image/*">
+                <small class="form-help-text">Upload a profile picture (JPG, PNG, max 2MB)</small>
             </div>
             
             <button type="submit" class="submit-button">Update Profile</button>

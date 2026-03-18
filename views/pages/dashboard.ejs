@@ -47,18 +47,18 @@
                     </div>
                     <div class="campaign-footer">
                         <span class="time-remaining"><%= campaign.daysLeftText %></span>
-                        <div style="display: flex; gap: 0.5rem;">
+                        <div class="flex gap-4">
                             <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
-                            <a href="/campaigns/<%= campaign._id %>/edit" class="secondary-button" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Edit</a>
+                            <a href="/campaigns/<%= campaign._id %>/edit" class="secondary-button text-sm px-4 py-2">Edit</a>
                         </div>
                     </div>
                 </div>
             </div>
             <% }) %>
         <% } else { %>
-            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-                <h3 style="color: var(--gray-600); margin-bottom: 1rem;">No campaigns yet</h3>
-                <p style="color: var(--gray-500); margin-bottom: 2rem;">Start your first campaign to bring your ideas to life!</p>
+            <div class="empty-state">
+                <h3 class="text-xl text-gray-600 mb-4">No campaigns yet</h3>
+                <p class="text-gray-500 mb-6">Start your first campaign to bring your ideas to life!</p>
                 <a href="/builder/create" class="primary-button">Create Your First Campaign</a>
             </div>
         <% } %>
@@ -68,19 +68,19 @@
 <!-- Recent Donations -->
 <section class="page-section">
     <h2 class="section-title">Recent Donations Received</h2>
-    <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
-        <table style="width: 100%; border-collapse: collapse;">
+    <div class="table-container">
+        <table class="data-table">
             <thead>
-                <tr style="background: var(--gray-100);">
-                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Campaign</th>
-                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Donor</th>
-                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Amount</th>
-                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Date</th>
+                <tr>
+                    <th>Campaign</th>
+                    <th>Donor</th>
+                    <th>Amount</th>
+                    <th>Date</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="4" style="padding: 2rem; text-align: center; color: var(--gray-500);">
+                    <td colspan="4" class="empty-state">
                         No donations received yet
                     </td>
                 </tr>
