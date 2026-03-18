@@ -298,36 +298,82 @@ exports.processDonation = async (req, res) => {
 // Search campaigns
 exports.searchCampaigns = async (req, res) => {
     try {
-        const { q, category } = req.query;
+        const { q, category, sort, page } = req.query;
         
-        // If no search query and no category, redirect to main explore page
-        if (!q && (!category || category === 'all')) {
-            return res.redirect('/campaigns');
-        }
+        // Pagination settings
+        const currentPage = parseInt(page) || 1;
+        const pageSize = 9; // Show 9 campaigns per page
+        const skip = (currentPage - 1) * pageSize;
         
+        // Build query
         let query = { status: 'active' };
         
+        // Use text search if query exists
         if (q && q.trim() !== '') {
-            query.$or = [
-                { title: { $regex: q, $options: 'i' } },
-                { description: { $regex: q, $options: 'i' } }
-            ];
+            // Try text search first (requires text index)
+            try {
+                const textSearch = await Campaign.find(
+                    { $text: { $search: q }, status: 'active' },
+                    { score: { $meta: 'textScore' } }
+                ).sort({ score: { $meta: 'textScore' } });
+                
+                // If text search returns results, filter by category and use it
+                if (textSearch.length > 0) {
+                    query = { _id: { $in: textSearch.map(c => c._id) } };
+                } else {
+                    // Fallback to regex search if text search returns nothing
+                    query.$or = [
+                        { title: { $regex: q, $options: 'i' } },
+                        { description: { $regex: q, $options: 'i' } }
+                    ];
+                }
+            } catch (textError) {
+                // Fallback to regex search if text index doesn't exist or fails
+                query.$or = [
+                    { title: { $regex: q, $options: 'i' } },
+                    { description: { $regex: q, $options: 'i' } }
+                ];
+            }
         }
         
         if (category && category !== 'all') {
             query.category = category;
         }
         
+        // Determine sorting
+        let sortOptions = {};
+        if (sort === 'most-funded') {
+            sortOptions = { currentFunding: -1 };
+        } else if (sort === 'ending-soon') {
+            sortOptions = { deadline: 1 };
+        } else if (sort === 'newest' || !sort) {
+            sortOptions = { createdAt: -1 }; // Default to newest
+        }
+        
+        // Get total count for pagination
+        const totalCount = await Campaign.countDocuments(query);
+        const totalPages = Math.ceil(totalCount / pageSize);
+        
+        // Fetch campaigns with pagination and sorting
         const campaigns = await Campaign.find(query)
             .populate('creator', 'username university')
-            .sort({ createdAt: -1 });
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(pageSize);
         
         res.render('pages/explore', {
             title: q ? `Search Results - FundMyIdea BD` : 'Explore Campaigns - FundMyIdea BD',
             campaigns: campaigns,
             user: req.user,
-            searchQuery: q,
-            searchCategory: category
+            searchQuery: q || '',
+            searchCategory: category || 'all',
+            sortBy: sort || 'newest',
+            currentPage: currentPage,
+            totalPages: totalPages,
+            hasPrevPage: currentPage > 1,
+            hasNextPage: currentPage < totalPages,
+            prevPage: currentPage - 1,
+            nextPage: currentPage + 1
         });
     } catch (error) {
         console.error('Error searching campaigns:', error);

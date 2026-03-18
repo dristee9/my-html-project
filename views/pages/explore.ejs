@@ -10,19 +10,68 @@
         <h1 class="section-title">Explore Student Campaigns</h1>
     <% } %>
     
-    <form class="search-form" method="GET" action="/campaigns/search">
-        <input type="text" name="q" class="form-control search-input" placeholder="Search campaigns..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
-        <select name="category" class="form-control">
-            <option value="all">All Categories</option>
-            <option value="Technology" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Technology' ? 'selected' : '' %>>Technology</option>
-            <option value="Education" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Education' ? 'selected' : '' %>>Education</option>
-            <option value="Social Impact" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Social Impact' ? 'selected' : '' %>>Social Impact</option>
-            <option value="Arts & Culture" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Arts & Culture' ? 'selected' : '' %>>Arts & Culture</option>
-            <option value="Research" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Research' ? 'selected' : '' %>>Research</option>
-            <option value="Other" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Other' ? 'selected' : '' %>>Other</option>
-        </select>
-        <button type="submit" class="search-button">Search</button>
-    </form>
+    <!-- Search and Filter Bar -->
+    <div class="search-filter-bar" style="background: white; padding: 2rem; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); margin-bottom: 2rem;">
+        <form method="GET" action="/campaigns/search" class="search-filter-form">
+            <div class="search-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <input type="text" name="q" class="form-control search-input" placeholder="Search campaigns..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" style="flex: 1; min-width: 250px;">
+                <select name="category" class="form-control" style="min-width: 180px;">
+                    <option value="all">All Categories</option>
+                    <option value="Technology" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Technology' ? 'selected' : '' %>>Technology</option>
+                    <option value="Education" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Education' ? 'selected' : '' %>>Education</option>
+                    <option value="Social Impact" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Social Impact' ? 'selected' : '' %>>Social Impact</option>
+                    <option value="Arts & Culture" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Arts & Culture' ? 'selected' : '' %>>Arts & Culture</option>
+                    <option value="Research" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Research' ? 'selected' : '' %>>Research</option>
+                    <option value="Other" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Other' ? 'selected' : '' %>>Other</option>
+                </select>
+                <select name="sort" class="form-control" style="min-width: 180px;">
+                    <option value="newest" <%= typeof sortBy !== 'undefined' && sortBy === 'newest' ? 'selected' : '' %>>Newest First</option>
+                    <option value="most-funded" <%= typeof sortBy !== 'undefined' && sortBy === 'most-funded' ? 'selected' : '' %>>Most Funded</option>
+                    <option value="ending-soon" <%= typeof sortBy !== 'undefined' && sortBy === 'ending-soon' ? 'selected' : '' %>>Ending Soon</option>
+                </select>
+                <button type="submit" class="primary-button" style="padding: 0.75rem 2rem;">Search</button>
+            </div>
+        </form>
+        
+        <!-- Quick Category Filters -->
+        <div class="category-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+            <a href="/campaigns/search?category=all&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+               class="category-tag <%= typeof searchCategory === 'undefined' || searchCategory === 'all' ? 'active' : '' %>"
+               style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory === 'undefined' || searchCategory === 'all' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+               All
+            </a>
+            <a href="/campaigns/search?category=Technology&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+               class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Technology' ? 'active' : '' %>"
+               style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Technology' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+               Technology
+            </a>
+            <a href="/campaigns/search?category=Education&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+               class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Education' ? 'active' : '' %>"
+               style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Education' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+               Education
+            </a>
+            <a href="/campaigns/search?category=Social Impact&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+               class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Social Impact' ? 'active' : '' %>"
+               style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Social Impact' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+               Social Impact
+            </a>
+            <a href="/campaigns/search?category=Arts & Culture&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+               class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Arts & Culture' ? 'active' : '' %>"
+               style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Arts & Culture' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+               Arts & Culture
+            </a>
+            <a href="/campaigns/search?category=Research&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+               class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Research' ? 'active' : '' %>"
+               style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Research' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+               Research
+            </a>
+            <a href="/campaigns/search?category=Other&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+               class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Other' ? 'active' : '' %>"
+               style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Other' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+               Other
+            </a>
+        </div>
+    </div>
 
     <div class="campaign-grid">
         <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
@@ -64,4 +113,38 @@
             </div>
         <% } %>
     </div>
+    
+    <!-- Pagination Controls -->
+    <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+    <div class="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 3rem; padding: 2rem;">
+        <% if (typeof hasPrevPage !== 'undefined' && hasPrevPage) { %>
+            <a href="/campaigns/search?q=<%= typeof searchQuery !== 'undefined' ? encodeURIComponent(searchQuery) : '' %>&category=<%= typeof searchCategory !== 'undefined' ? searchCategory : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>&page=<%= prevPage %>" 
+               class="pagination-btn" 
+               style="padding: 0.75rem 1.5rem; background: white; border: 2px solid var(--gray-300); border-radius: var(--border-radius-lg); text-decoration: none; color: var(--gray-700); font-weight: 600; transition: all var(--transition-fast);">
+               ← Previous
+            </a>
+        <% } %>
+        
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === currentPage) { %>
+                <span style="padding: 0.75rem 1.5rem; background: var(--primary-blue); color: white; border-radius: var(--border-radius-lg); font-weight: 600;"><%= i %></span>
+            <% } else if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) { %>
+                <a href="/campaigns/search?q=<%= typeof searchQuery !== 'undefined' ? encodeURIComponent(searchQuery) : '' %>&category=<%= typeof searchCategory !== 'undefined' ? searchCategory : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>&page=<%= i %>" 
+                   style="padding: 0.75rem 1.5rem; background: white; border: 2px solid var(--gray-300); border-radius: var(--border-radius-lg); text-decoration: none; color: var(--gray-700); font-weight: 600; transition: all var(--transition-fast);">
+                   <%= i %>
+                </a>
+            <% } else if (i === currentPage - 3 || i === currentPage + 3) { %>
+                <span style="padding: 0.75rem 0.5rem; color: var(--gray-500);">...</span>
+            <% } %>
+        <% } %>
+        
+        <% if (typeof hasNextPage !== 'undefined' && hasNextPage) { %>
+            <a href="/campaigns/search?q=<%= typeof searchQuery !== 'undefined' ? encodeURIComponent(searchQuery) : '' %>&category=<%= typeof searchCategory !== 'undefined' ? searchCategory : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>&page=<%= nextPage %>" 
+               class="pagination-btn" 
+               style="padding: 0.75rem 1.5rem; background: white; border: 2px solid var(--gray-300); border-radius: var(--border-radius-lg); text-decoration: none; color: var(--gray-700); font-weight: 600; transition: all var(--transition-fast);">
+               Next →
+            </a>
+        <% } %>
+    </div>
+    <% } %>
 </section>
