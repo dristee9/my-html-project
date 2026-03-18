@@ -27,7 +27,7 @@ class PageBuilder {
         
         // Category filtering
         document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.filterTemplates(e.target.dataset.category));
+            btn.addEventListener('click', (e) => this.filterTemplates(e.target.dataset.category, e));
         });
         
         // Template dragging
@@ -648,7 +648,9 @@ class PageBuilder {
         }
     }
 
-    filterTemplates(category) {
+    filterTemplates(category, event) {
+        if (!event) return;
+        
         document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
         
