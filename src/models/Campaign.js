@@ -113,11 +113,9 @@ const campaignSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+    }]
+}, {
+    timestamps: true // Automatically adds createdAt and updatedAt
 });
 
 // Virtual for funding percentage
