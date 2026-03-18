@@ -142,6 +142,7 @@ campaignSchema.virtual('daysLeftText').get(function() {
 // Index for better querying
 campaignSchema.index({ status: 1, createdAt: -1 });
 campaignSchema.index({ category: 1, status: 1 });
+campaignSchema.index({ 'backers.user': 1 }); // Index for efficient donation queries
 
 // Method to check and update campaign expiration
 campaignSchema.methods.checkAndUpdateExpiration = async function() {
