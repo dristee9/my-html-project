@@ -6,6 +6,10 @@ const authenticateToken = async (req, res, next) => {
         const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
         
         if (!token) {
+            // Check if this is an AJAX/API request
+            if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+                return res.status(401).json({ error: 'Unauthorized', redirect: '/login' });
+            }
             return res.redirect('/login');
         }
         
@@ -13,12 +17,20 @@ const authenticateToken = async (req, res, next) => {
         const user = await User.findById(decoded.userId).select('-password');
         
         if (!user) {
+            // Check if this is an AJAX/API request
+            if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+                return res.status(401).json({ error: 'Unauthorized', redirect: '/login' });
+            }
             return res.redirect('/login');
         }
         
         req.user = user;
         next();
     } catch (error) {
+        // Check if this is an AJAX/API request
+        if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+            return res.status(401).json({ error: 'Unauthorized', redirect: '/login' });
+        }
         res.redirect('/login');
     }
 };
