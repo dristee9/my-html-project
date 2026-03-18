@@ -313,12 +313,13 @@ exports.processDonation = async (req, res) => {
         }
         
         console.log('Adding donation to campaign');
-        // Add donation to campaign
+        // Add donation to campaign - store only last 4 digits for privacy
         campaign.backers.push({
             user: req.user._id,
             amount: donationAmount,
             message: message || '',
-            bkashNumber: bkashNumber
+            bkashNumberLast4: bkashNumber.slice(-4), // Store only last 4 digits
+            transactionId: null // Placeholder for future bKash API integration
         });
         
         campaign.currentFunding += donationAmount;

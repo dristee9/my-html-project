@@ -107,7 +107,8 @@ const campaignSchema = new mongoose.Schema({
         },
         amount: Number,
         message: String,
-        bkashNumber: String,
+        bkashNumberLast4: String, // Store only last 4 digits for privacy
+        transactionId: String, // For future bKash API integration
         donatedAt: {
             type: Date,
             default: Date.now
