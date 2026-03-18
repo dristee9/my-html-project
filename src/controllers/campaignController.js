@@ -47,10 +47,16 @@ exports.getCampaignById = async (req, res) => {
             backer.user && backer.user._id.toString() === req.user._id.toString()
         );
         
+        // Check for donation success message from redirect
+        const donationSuccess = req.query.donated === 'true' ? 
+            `Thank you for your generous donation! Your support means everything to ${campaign.creator.username}.` : 
+            null;
+        
         res.render('pages/campaign', {
             title: `${campaign.title} - FundMyIdea BD`,
             campaign: campaignData,
             hasDonated: hasDonated,
+            donationSuccess: donationSuccess,
             user: req.user
         });
     } catch (error) {
@@ -257,13 +263,8 @@ exports.processDonation = async (req, res) => {
         
         console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
         
-        // Redirect to success page or back to campaign with success message
-        res.render('pages/donate', {
-            title: `Thank You - FundMyIdea BD`,
-            campaign: campaign,
-            user: req.user,
-            success: `Thank you for your generous donation of ${donationAmount} BDT! Your support means everything to ${campaign.creator.username}.`
-        });
+        // Redirect to campaign page with success flag (POST-Redirect-GET pattern)
+        res.redirect(`/campaigns/${campaignId}?donated=true`);
     } catch (error) {
         console.error('Error processing donation:', error);
         res.status(500).render('pages/donate', {
