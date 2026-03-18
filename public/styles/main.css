@@ -1,35 +1,7 @@
 /* FundMyIdea BD - Component-Based CSS Architecture */
+/* Note: Base styles, CSS variables, and reset are loaded from base.css */
+/* Utility Classes - Replacing Inline Styles (non-duplicate) */
 
-/* Utility Classes - Replacing Inline Styles */
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
-
-.font-bold { font-weight: 700; }
-.font-semibold { font-weight: 600; }
-.font-medium { font-weight: 500; }
-
-.mb-4 { margin-bottom: 1rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.mb-8 { margin-bottom: 2rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-6 { margin-top: 1.5rem; }
-.mt-8 { margin-top: 2rem; }
-
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
-.p-8 { padding: 2rem; }
-.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-.py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-
-.gap-4 { gap: 1rem; }
-.gap-6 { gap: 1.5rem; }
-.gap-8 { gap: 2rem; }
-
-.w-full { width: 100%; }
 .max-w-xl { max-width: 36rem; }
 .max-w-2xl { max-width: 42rem; }
 .max-w-3xl { max-width: 48rem; }
@@ -37,38 +9,7 @@
 .max-w-5xl { max-width: 64rem; }
 .max-w-6xl { max-width: 72rem; }
 
-.mx-auto { margin-left: auto; margin-right: auto; }
 
-.grid { display: grid; }
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.justify-center { justify-content: center; }
-.justify-end { justify-content: flex-end; }
-
-.overflow-y-auto { overflow-y: auto; }
-.overflow-x-hidden { overflow-x: hidden; }
-
-.relative { position: relative; }
-.absolute { position: absolute; }
-.fixed { position: fixed; }
-
-.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-.top-0 { top: 0; }
-.left-0 { left: 0; }
-.right-0 { right: 0; }
-.bottom-0 { bottom: 0; }
-
-.z-50 { z-index: 50; }
-.z-100 { z-index: 100; }
-.z-1000 { z-index: 1000; }
-
-.transform { transform: translate(-50%, -50%); }
-.transform-center { transform: translate(-50%, -50%); }
-
-/* Background Colors */
-.bg-white { background-color: var(--white); }
 .bg-gray-50 { background-color: var(--gray-50); }
 .bg-gray-100 { background-color: var(--gray-100); }
 .bg-gray-200 { background-color: var(--gray-200); }
@@ -515,20 +456,7 @@
     }
 }
 
-/* Reset and Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: var(--gray-50);
-    color: var(--gray-800);
-    line-height: 1.6;
-    min-height: 100vh;
-}
 
 /* Layout Container */
 .app-container {

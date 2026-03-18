@@ -8,8 +8,9 @@ exports.getDashboard = async (req, res) => {
             .sort({ createdAt: -1 });
         
         // Calculate user statistics
+        const activeCampaigns = campaigns.filter(c => c.status === 'active');
         const userStats = {
-            campaignsCount: campaigns.length,
+            campaignsCount: activeCampaigns.length,
             totalRaised: campaigns.reduce((sum, camp) => sum + camp.currentFunding, 0),
             donationsCount: campaigns.reduce((sum, camp) => sum + camp.backers.length, 0)
         };
