@@ -26,8 +26,14 @@ const authenticateToken = async (req, res, next) => {
         
         req.user = user;
         
-        // Check if email is verified (except for verification routes)
-        if (!user.emailVerified && !req.path.startsWith('/verify-email')) {
+        // Check if email is verified (except for verification and auth routes)
+        // Only enforce for users who have the emailVerified field set to false
+        const shouldVerifyEmail = user.emailVerified === false;
+        const isExcludedRoute = req.path.startsWith('/verify-email') || 
+                                req.path.startsWith('/resend-verification') ||
+                                req.path === '/logout';
+        
+        if (shouldVerifyEmail && !isExcludedRoute) {
             // Store user info in session for resend verification
             req.session.pendingUser = user._id.toString();
             

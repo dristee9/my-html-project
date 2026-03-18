@@ -191,3 +191,117 @@ exports.getMyDonations = async (req, res) => {
         });
     }
 };
+
+// Get settings page
+exports.getSettings = (req, res) => {
+    res.render('pages/settings', {
+        title: 'Account Settings - FundMyIdea BD',
+        user: req.user,
+        success: null,
+        error: null
+    });
+};
+
+// Change password
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        
+        // Validation
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.render('pages/settings', {
+                title: 'Account Settings - FundMyIdea BD',
+                user: req.user,
+                error: 'All fields are required'
+            });
+        }
+        
+        if (newPassword.length < 6) {
+            return res.render('pages/settings', {
+                title: 'Account Settings - FundMyIdea BD',
+                user: req.user,
+                error: 'New password must be at least 6 characters'
+            });
+        }
+        
+        if (newPassword !== confirmPassword) {
+            return res.render('pages/settings', {
+                title: 'Account Settings - FundMyIdea BD',
+                user: req.user,
+                error: 'New passwords do not match'
+            });
+        }
+        
+        // Fetch user with password
+        const user = await User.findById(req.user._id);
+        
+        // Verify current password
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            return res.render('pages/settings', {
+                title: 'Account Settings - FundMyIdea BD',
+                user: req.user,
+                error: 'Current password is incorrect'
+            });
+        }
+        
+        // Update password (pre-save hook will hash it)
+        user.password = newPassword;
+        await user.save();
+        
+        res.render('pages/settings', {
+            title: 'Account Settings - FundMyIdea BD',
+            user: req.user,
+            success: 'Password changed successfully!',
+            error: null
+        });
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.render('pages/settings', {
+            title: 'Account Settings - FundMyIdea BD',
+            user: req.user,
+            error: 'Failed to change password. Please try again.'
+        });
+    }
+};
+
+// Delete account
+exports.deleteAccount = async (req, res) => {
+    try {
+        const { password } = req.body;
+        
+        if (!password) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Password is required' 
+            });
+        }
+        
+        // Verify password
+        const user = await User.findById(req.user._id);
+        const isMatch = await user.comparePassword(password);
+        
+        if (!isMatch) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Incorrect password' 
+            });
+        }
+        
+        // Delete all user's campaigns
+        await Campaign.deleteMany({ creator: req.user._id });
+        
+        // Delete user account
+        await User.findByIdAndDelete(req.user._id);
+        
+        // Clear cookie and redirect
+        res.clearCookie('token');
+        res.json({ success: true, redirect: '/' });
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to delete account' 
+        });
+    }
+};

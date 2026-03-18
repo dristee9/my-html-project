@@ -1,0 +1,503 @@
+<% layout('layouts/main') -%>
+<% title = 'Account Settings - FundMyIdea BD' -%>
+
+<div class="dashboard-header">
+    <h1 class="dashboard-title">Account Settings</h1>
+    <p class="dashboard-subtitle">Manage your account preferences and security</p>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Sidebar Navigation -->
+    <div class="stat-sidebar">
+        <h3 class="text-xl font-semibold text-gray-800 mb-6">Account Settings</h3>
+        <nav>
+            <a href="/dashboard/profile" class="sidebar-nav-link">Profile Information</a>
+            <a href="/dashboard/my-campaigns" class="sidebar-nav-link">My Campaigns</a>
+            <a href="/dashboard/my-donations" class="sidebar-nav-link">My Donations</a>
+            <a href="/dashboard/settings" class="sidebar-nav-link active">Settings</a>
+        </nav>
+    </div>
+
+    <!-- Settings Content -->
+    <div class="settings-container">
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="success-banner" style="background: #dcfce7; color: #16a34a; padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem;">
+                <%= success %>
+            </div>
+        <% } %>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-banner" style="background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem;">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <!-- Tabs -->
+        <div class="settings-tabs">
+            <button class="tab-button active" data-tab="password">Change Password</button>
+            <button class="tab-button" data-tab="notifications">Notifications</button>
+            <button class="tab-button" data-tab="danger">Danger Zone</button>
+        </div>
+
+        <!-- Tab Content: Change Password -->
+        <div id="password-tab" class="tab-content active">
+            <div class="card-shadow">
+                <h2 class="text-xl font-semibold mb-4">Change Password</h2>
+                <form method="POST" action="/dashboard/settings/password" class="space-y-4">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input 
+                            type="password" 
+                            name="currentPassword" 
+                            class="form-input" 
+                            placeholder="Enter current password"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input 
+                            type="password" 
+                            name="newPassword" 
+                            class="form-input" 
+                            placeholder="Enter new password"
+                            minlength="6"
+                            required
+                        >
+                        <small class="form-help-text">Must be at least 6 characters</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Confirm New Password</label>
+                        <input 
+                            type="password" 
+                            name="confirmPassword" 
+                            class="form-input" 
+                            placeholder="Confirm new password"
+                            minlength="6"
+                            required
+                        >
+                    </div>
+                    
+                    <button type="submit" class="submit-button">Update Password</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab Content: Notification Preferences -->
+        <div id="notifications-tab" class="tab-content">
+            <div class="card-shadow">
+                <h2 class="text-xl font-semibold mb-4">Notification Preferences</h2>
+                <p class="text-gray-600 mb-6">Manage how you receive notifications about your campaigns and donations.</p>
+                
+                <div class="notification-options">
+                    <div class="notification-option">
+                        <div class="notification-info">
+                            <h4 class="font-semibold">Email Notifications</h4>
+                            <p class="text-sm text-gray-600">Receive emails about campaign updates, donations, and important announcements</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <div class="notification-info">
+                            <h4 class="font-semibold">Donation Alerts</h4>
+                            <p class="text-sm text-gray-600">Get notified when someone donates to your campaigns</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <div class="notification-info">
+                            <h4 class="font-semibold">Campaign Updates</h4>
+                            <p class="text-sm text-gray-600">Receive updates about campaigns you've donated to</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <div class="notification-info">
+                            <h4 class="font-semibold">Newsletter</h4>
+                            <p class="text-sm text-gray-600">Monthly newsletter with platform updates and featured campaigns</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                    <p class="text-sm text-blue-800">
+                        <strong>Note:</strong> Essential transactional emails (password reset, email verification) cannot be disabled.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Danger Zone -->
+        <div id="danger-tab" class="tab-content">
+            <div class="card-shadow danger-zone">
+                <h2 class="text-xl font-semibold text-red-600 mb-4">Danger Zone</h2>
+                <p class="text-gray-700 mb-6">
+                    Once you delete your account, there is no going back. Please be certain.
+                </p>
+                
+                <div class="danger-warning">
+                    <h4 class="font-semibold text-red-700 mb-2">⚠️ What will happen:</h4>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li>All your campaigns will be permanently deleted</li>
+                        <li>Your donation history will be removed</li>
+                        <li>Your profile will be completely erased</li>
+                        <li>This action cannot be undone</li>
+                    </ul>
+                </div>
+                
+                <button class="delete-account-btn" onclick="showDeleteModal()">
+                    Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div id="deleteModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Delete Account?</h3>
+            <button class="modal-close" onclick="hideDeleteModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <p class="text-gray-700 mb-4">
+                This action is permanent and cannot be undone. All your data will be deleted.
+            </p>
+            
+            <form id="deleteAccountForm" onsubmit="handleDelete(event)">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                
+                <div class="form-group">
+                    <label class="form-label">Enter your password to confirm:</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="deletePassword" 
+                        class="form-input" 
+                        placeholder="Your password"
+                        required
+                    >
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="hideDeleteModal()">Cancel</button>
+                    <button type="submit" class="btn-delete">Delete Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .settings-container {
+        max-width: 900px;
+    }
+    
+    .settings-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--gray-200);
+        padding-bottom: 0.5rem;
+    }
+    
+    .tab-button {
+        padding: 0.75rem 1.5rem;
+        background: transparent;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        color: var(--gray-600);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+    
+    .tab-button:hover {
+        background: var(--gray-100);
+        color: var(--gray-800);
+    }
+    
+    .tab-button.active {
+        background: var(--primary-blue);
+        color: white;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    .notification-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .notification-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius-md);
+    }
+    
+    .notification-info h4 {
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 26px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--gray-300);
+        transition: .4s;
+        border-radius: 34px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+        background-color: var(--primary-blue);
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+    }
+    
+    .danger-zone {
+        border: 2px solid #fca5a5;
+        background: #fef2f2;
+    }
+    
+    .danger-warning {
+        background: white;
+        padding: 1.5rem;
+        border-radius: var(--border-radius-md);
+        margin: 1.5rem 0;
+    }
+    
+    .delete-account-btn {
+        background: #dc2626;
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+    
+    .delete-account-btn:hover {
+        background: #b91c1c;
+    }
+    
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: var(--border-radius-xl);
+        max-width: 500px;
+        width: 90%;
+        box-shadow: var(--shadow-2xl);
+    }
+    
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        cursor: pointer;
+        color: var(--gray-500);
+        line-height: 1;
+    }
+    
+    .modal-close:hover {
+        color: var(--gray-700);
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .btn-cancel {
+        flex: 1;
+        padding: 0.75rem;
+        background: var(--gray-200);
+        color: var(--gray-700);
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .btn-delete {
+        flex: 1;
+        padding: 0.75rem;
+        background: #dc2626;
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .btn-delete:hover {
+        background: #b91c1c;
+    }
+</style>
+
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            
+            // Remove active class from all buttons and contents
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
+            this.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        });
+    });
+    
+    // Modal functions
+    function showDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+    
+    function hideDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.getElementById('deleteAccountForm').reset();
+    }
+    
+    // Handle delete account
+    async function handleDelete(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const password = document.getElementById('deletePassword').value;
+        const deleteBtn = form.querySelector('.btn-delete');
+        
+        try {
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = 'Deleting...';
+            
+            const response = await fetch('/dashboard/settings/account', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                window.location.href = result.redirect;
+            } else {
+                alert(result.error || 'Failed to delete account');
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = 'Delete Account';
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Failed to delete account. Please try again.');
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = 'Delete Account';
+        }
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('deleteModal');
+        if (event.target === modal) {
+            hideDeleteModal();
+        }
+    }
+</script>
