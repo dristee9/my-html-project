@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken: protect } = require('../middleware/auth');
+const { authenticateToken: protect, optionalAuth } = require('../middleware/auth');
 const {
     getPageBuilder,
     editPageBuilder,
@@ -12,6 +12,6 @@ const {
 router.get('/create', protect, getPageBuilder);
 router.get('/:id/edit', protect, editPageBuilder);
 router.post('/save/:id?', protect, savePageBuilder);
-router.get('/:id/preview', protect, previewCampaign);
+router.get('/:id/preview', optionalAuth, previewCampaign);
 
 module.exports = router;

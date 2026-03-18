@@ -43,12 +43,20 @@ exports.updateProfile = async (req, res) => {
     try {
         const { username, email, university } = req.body;
         
-        // Update user
-        await User.findByIdAndUpdate(req.user._id, {
+        // Build update data
+        const updateData = {
             username,
             email,
             university
-        });
+        };
+        
+        // Handle profile image upload if file exists
+        if (req.file) {
+            updateData.profileImage = '/uploads/profiles/' + req.file.filename;
+        }
+        
+        // Update user
+        await User.findByIdAndUpdate(req.user._id, updateData);
         
         // Refresh user data
         const updatedUser = await User.findById(req.user._id);

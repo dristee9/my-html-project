@@ -39,7 +39,16 @@ router.get('/search', campaignController.searchCampaigns);
 
 // Dedicated donation page routes
 router.get('/:id/donate', authenticateToken, campaignController.getDonationPage);
-router.post('/donate/:id', authenticateToken, campaignController.processDonation);
+router.post('/:id/donate', authenticateToken, campaignController.processDonation);
+
+// Create campaign route (GET)
+router.get('/create', authenticateToken, (req, res) => {
+    res.render('pages/create', {
+        title: 'Create Campaign - FundMyIdea BD',
+        user: req.user,
+        error: null
+    });
+});
 
 // Create campaign route (POST)
 router.post('/create', authenticateToken, upload.single('image'), campaignController.createCampaign);
@@ -89,35 +98,103 @@ router.get('/:id/edit', authenticateToken, async (req, res) => {
 });
 
 // Update campaign route (POST)
-router.post('/:id/edit', authenticateToken, upload.single('image'), (req, res) => {
-    // Campaign update logic will go here
-    console.log('Campaign update attempted:', req.body);
-    
-    // For now, redirect back to campaign page
-    res.redirect(`/campaigns/${req.params.id}`);
+router.post('/:id/edit', authenticateToken, upload.single('image'), async (req, res) => {
+    try {
+        const { title, description, category, fundingGoal, deadline } = req.body;
+        
+        // Validate required fields
+        if (!title || !description || !category || !fundingGoal || !deadline) {
+            return res.status(400).render('pages/error', {
+                title: 'Validation Error - FundMyIdea BD',
+                error: 'All fields are required',
+                user: req.user
+            });
+        }
+        
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Check if user owns this campaign
+        if (campaign.creator.toString() !== req.user._id.toString()) {
+            return res.status(403).render('pages/error', {
+                title: 'Access Denied - FundMyIdea BD',
+                error: 'You can only edit your own campaigns',
+                user: req.user
+            });
+        }
+        
+        // Build update data
+        const updateData = {
+            title,
+            description,
+            category,
+            fundingGoal: parseInt(fundingGoal),
+            deadline: new Date(deadline)
+        };
+        
+        // Handle image update if new image is uploaded
+        if (req.file) {
+            updateData.imageUrl = `/uploads/${req.file.filename}`;
+        }
+        
+        // Update campaign
+        const updatedCampaign = await Campaign.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+        
+        console.log('Campaign updated successfully:', req.params.id);
+        res.redirect(`/campaigns/${req.params.id}`);
+    } catch (error) {
+        console.error('Error updating campaign:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to update campaign',
+            user: req.user
+        });
+    }
 });
 
 // Delete campaign route (POST)
-router.post('/:id/delete', authenticateToken, (req, res) => {
-    // Campaign deletion logic will go here
-    console.log('Campaign deletion attempted:', req.params.id);
-    
-    // For now, redirect back to dashboard
-    res.redirect('/dashboard');
-});
-
-// Search campaigns route (GET)
-router.get('/search', (req, res) => {
-    const { q, category } = req.query;
-    console.log('Search query:', { q, category });
-    
-    // Search logic will go here
-    res.render('pages/explore', {
-        title: 'Search Results - FundMyIdea BD',
-        campaigns: [], // Will be populated with search results
-        searchQuery: q,
-        searchCategory: category
-    });
+router.post('/:id/delete', authenticateToken, async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Check if user owns this campaign
+        if (campaign.creator.toString() !== req.user._id.toString()) {
+            return res.status(403).render('pages/error', {
+                title: 'Access Denied - FundMyIdea BD',
+                error: 'You can only delete your own campaigns',
+                user: req.user
+            });
+        }
+        
+        await Campaign.findByIdAndDelete(req.params.id);
+        console.log('Campaign deleted successfully:', req.params.id);
+        
+        res.redirect('/dashboard');
+    } catch (error) {
+        console.error('Error deleting campaign:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to delete campaign',
+            user: req.user
+        });
+    }
 });
 
 module.exports = router;
