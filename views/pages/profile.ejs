@@ -20,6 +20,7 @@
     <!-- Profile Form -->
     <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
         <form method="POST" action="/dashboard/profile">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="form-group">
                 <label class="form-label">Username</label>
                 <input type="text" name="username" class="form-control" value="<%= user.username %>" required>

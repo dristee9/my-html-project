@@ -5,6 +5,7 @@ const ejsMate = require('ejs-mate');
 const fs = require('fs');
 const connectDB = require('./src/config/database');
 const { optionalAuth } = require('./src/middleware/auth');
+const { doubleCsrf } = require('csrf-csrf');
 require('dotenv').config();
 
 const app = express();
@@ -25,8 +26,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Apply optionalAuth to make user available in all routes
-app.use(optionalAuth);
+// CSRF Protection
+const {
+    generateToken,
+    doubleCsrfProtection
+} = doubleCsrf({
+    getSecret: (req) => process.env.CSRF_SECRET || 'your-secret-key-change-in-production',
+    cookieName: '__Host-psid',
+    cookieOptions: {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        httpOnly: true
+    },
+    size: 64,
+    ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
+    getTokenFromRequest: (req) => req.body._csrf || req.headers['x-csrf-token']
+});
+
+// Apply CSRF protection to all routes
+app.use(doubleCsrfProtection);
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -36,9 +54,13 @@ app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Middleware to make user available in all templates
+// Apply optionalAuth to make user available in all routes
+app.use(optionalAuth);
+
+// Middleware to make user and csrfToken available in all templates
 app.use((req, res, next) => {
     res.locals.user = req.user;
+    res.locals.csrfToken = generateToken(res, req);
     next();
 });
 

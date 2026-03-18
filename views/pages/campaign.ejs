@@ -114,6 +114,7 @@
                     </div>
                 <% } else { %>
                     <form class="donation-form" method="POST" action="/campaigns/<%= campaign._id %>/donate">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <% if (typeof error !== 'undefined' && error) { %>
                             <div style="background-color: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border: 1px solid #fecaca;">
                                 <%= error %>
@@ -177,6 +178,7 @@
                     <div style="display: flex; gap: 1rem; justify-content: flex-end;">
                         <button onclick="hideDeleteModal()" class="secondary-button">Cancel</button>
                         <form method="POST" action="/campaigns/<%= campaign._id %>/delete" style="display: inline;">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <button type="submit" class="submit-button" style="background: var(--danger-red);">Delete Campaign</button>
                         </form>
                     </div>
