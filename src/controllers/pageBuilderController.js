@@ -197,3 +197,84 @@ exports.previewCampaign = async (req, res) => {
         });
     }
 };
+
+// Get campaign version history
+exports.getVersionHistory = async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).json({ error: 'Campaign not found' });
+        }
+        
+        const versions = campaign.pageBuilder?.versionHistory || [];
+        res.json({ versions });
+    } catch (error) {
+        console.error('Error fetching version history:', error);
+        res.status(500).json({ error: 'Failed to fetch version history' });
+    }
+};
+
+// Save version to campaign history
+exports.saveVersion = async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).json({ error: 'Campaign not found' });
+        }
+        
+        const { version, timestamp, status, sections, campaignData } = req.body;
+        
+        // Initialize version history if it doesn't exist
+        if (!campaign.pageBuilder) {
+            campaign.pageBuilder = { enabled: true };
+        }
+        
+        if (!campaign.pageBuilder.versionHistory) {
+            campaign.pageBuilder.versionHistory = [];
+        }
+        
+        // Add new version
+        campaign.pageBuilder.versionHistory.push({
+            version,
+            timestamp: new Date(timestamp),
+            data: { sections, ...campaignData },
+            createdBy: req.user._id
+        });
+        
+        // Keep only last 10 versions
+        if (campaign.pageBuilder.versionHistory.length > 10) {
+            campaign.pageBuilder.versionHistory.shift();
+        }
+        
+        await campaign.save();
+        
+        const versions = campaign.pageBuilder.versionHistory;
+        res.json({ success: true, versions });
+    } catch (error) {
+        console.error('Error saving version:', error);
+        res.status(500).json({ error: 'Failed to save version' });
+    }
+};
+
+// Clear version history
+exports.clearVersionHistory = async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).json({ error: 'Campaign not found' });
+        }
+        
+        if (campaign.pageBuilder) {
+            campaign.pageBuilder.versionHistory = [];
+            await campaign.save();
+        }
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error clearing version history:', error);
+        res.status(500).json({ error: 'Failed to clear version history' });
+    }
+};

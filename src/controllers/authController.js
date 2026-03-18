@@ -40,7 +40,11 @@ exports.register = [
             if (!errors.isEmpty()) {
                 return res.status(400).render('pages/register', {
                     error: errors.array()[0].msg,
-                    formData: req.body
+                    formData: {
+                        username: req.body.username,
+                        email: req.body.email,
+                        university: req.body.university
+                    }
                 });
             }
 
@@ -55,7 +59,11 @@ exports.register = [
                 const field = existingUser.email === email ? 'Email' : 'Username';
                 return res.status(400).render('pages/register', {
                     error: `${field} already exists`,
-                    formData: req.body
+                    formData: {
+                        username: req.body.username,
+                        email: req.body.email,
+                        university: req.body.university
+                    }
                 });
             }
 
@@ -88,7 +96,11 @@ exports.register = [
             console.error('Registration error:', error);
             res.status(500).render('pages/register', {
                 error: 'Something went wrong. Please try again.',
-                formData: req.body
+                formData: {
+                    username: req.body.username,
+                    email: req.body.email,
+                    university: req.body.university
+                }
             });
         }
     }
@@ -103,7 +115,9 @@ exports.login = [
             if (!errors.isEmpty()) {
                 return res.status(400).render('pages/login', {
                     error: errors.array()[0].msg,
-                    formData: req.body
+                    formData: {
+                        email: req.body.email
+                    }
                 });
             }
 
@@ -114,7 +128,9 @@ exports.login = [
             if (!user) {
                 return res.status(400).render('pages/login', {
                     error: 'Invalid email or password',
-                    formData: req.body
+                    formData: {
+                        email: req.body.email
+                    }
                 });
             }
 
@@ -123,7 +139,9 @@ exports.login = [
             if (!isMatch) {
                 return res.status(400).render('pages/login', {
                     error: 'Invalid email or password',
-                    formData: req.body
+                    formData: {
+                        email: req.body.email
+                    }
                 });
             }
 
@@ -146,7 +164,9 @@ exports.login = [
             console.error('Login error:', error);
             res.status(500).render('pages/login', {
                 error: 'Something went wrong. Please try again.',
-                formData: req.body
+                formData: {
+                    email: req.body.email
+                }
             });
         }
     }

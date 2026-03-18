@@ -443,7 +443,7 @@ class PageBuilder {
         }
     }
 
-    addToVersionHistory(status) {
+    async addToVersionHistory(status) {
         const versionData = {
             version: this.history.length,
             timestamp: new Date().toISOString(),
@@ -452,19 +452,27 @@ class PageBuilder {
             campaignData: this.collectCampaignData()
         };
         
-        // Store in localStorage as backup
-        const versionHistory = JSON.parse(localStorage.getItem('campaignVersions') || '[]');
-        versionHistory.push(versionData);
-        
-        // Keep only last 10 versions
-        if (versionHistory.length > 10) {
-            versionHistory.shift();
+        // Store version history server-side via API
+        try {
+            const response = await fetch(`/builder/${this.campaignId}/versions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(versionData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                // Update UI with server-stored versions
+                this.updateVersionHistoryUI(result.versions);
+            }
+        } catch (error) {
+            console.error('Error saving version history:', error);
+            // Fallback to local UI update only
+            this.showMessage('Saved, but version history not stored', 'warning');
         }
-        
-        localStorage.setItem('campaignVersions', JSON.stringify(versionHistory));
-        
-        // Update UI
-        this.updateVersionHistoryUI(versionHistory);
     }
     
     updateVersionHistoryUI(versions) {
@@ -494,8 +502,23 @@ class PageBuilder {
         `;
     }
     
-    restoreVersion(versionIndex) {
-        const versions = JSON.parse(localStorage.getItem('campaignVersions') || '[]');
+    async loadVersionHistory() {
+        if (!this.campaignId) return [];
+        
+        try {
+            const response = await fetch(`/builder/${this.campaignId}/versions`);
+            if (response.ok) {
+                const result = await response.json();
+                return result.versions || [];
+            }
+        } catch (error) {
+            console.error('Error loading version history:', error);
+        }
+        return [];
+    }
+    
+    async restoreVersion(versionIndex) {
+        const versions = await this.loadVersionHistory();
         const version = versions[versionIndex];
         
         if (!version) return;
@@ -508,8 +531,8 @@ class PageBuilder {
         }
     }
     
-    compareVersion(versionIndex) {
-        const versions = JSON.parse(localStorage.getItem('campaignVersions') || '[]');
+    async compareVersion(versionIndex) {
+        const versions = await this.loadVersionHistory();
         const version = versions[versionIndex];
         
         if (!version) return;
@@ -547,11 +570,21 @@ class PageBuilder {
         document.body.appendChild(modal);
     }
     
-    clearVersionHistory() {
+    async clearVersionHistory() {
         if (confirm('Clear all version history? This cannot be undone.')) {
-            localStorage.removeItem('campaignVersions');
-            this.updateVersionHistoryUI([]);
-            this.showMessage('Version history cleared', 'info');
+            try {
+                const response = await fetch(`/builder/${this.campaignId}/versions`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    this.updateVersionHistoryUI([]);
+                    this.showMessage('Version history cleared', 'info');
+                }
+            } catch (error) {
+                console.error('Error clearing version history:', error);
+                this.showMessage('Failed to clear version history', 'error');
+            }
         }
     }
     

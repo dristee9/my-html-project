@@ -43,24 +43,32 @@ exports.updateProfile = async (req, res) => {
     try {
         const { username, email, university } = req.body;
         
-        // Build update data
-        const updateData = {
-            username,
-            email,
-            university
-        };
+        // Fetch-then-save pattern to ensure pre-save hooks run
+        const user = await User.findById(req.user._id);
+        
+        if (!user) {
+            return res.status(404).render('pages/error', {
+                title: 'User Not Found - FundMyIdea BD',
+                error: 'User not found',
+                user: req.user
+            });
+        }
+        
+        // Update user fields
+        user.username = username;
+        user.email = email;
+        user.university = university;
         
         // Handle profile image upload if file exists
         if (req.file) {
-            updateData.profileImage = '/uploads/profiles/' + req.file.filename;
+            user.profileImage = '/uploads/profiles/' + req.file.filename;
         }
         
-        // Update user
-        await User.findByIdAndUpdate(req.user._id, updateData);
+        // Save to trigger pre-save hooks and validation
+        await user.save();
         
         // Refresh user data
-        const updatedUser = await User.findById(req.user._id);
-        req.user = updatedUser;
+        req.user = user;
         
         res.redirect('/dashboard/profile');
     } catch (error) {
