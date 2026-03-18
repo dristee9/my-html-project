@@ -19,15 +19,15 @@
 
         <div class="stats-overview">
             <div class="stat-card">
-                <div class="stat-value">150+</div>
+                <div class="stat-value"><%= stats.activeCampaigns %>+</div>
                 <div class="stat-label">Active Campaigns</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">2.5M+</div>
+                <div class="stat-value"><%=(stats.totalRaised / 1000).toFixed(1)%>K+</div>
                 <div class="stat-label">BDT Raised</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">50+</div>
+                <div class="stat-value"><%= stats.universities %>+</div>
                 <div class="stat-label">Universities</div>
             </div>
         </div>

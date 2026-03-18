@@ -91,9 +91,8 @@ app.use('/dashboard', require('./src/routes/dashboardRoutes'));
 app.use('/builder', require('./src/routes/pageBuilderRoutes'));
 
 // Home route
-app.get('/', (req, res) => {
-    res.render('pages/index');
-});
+const indexController = require('./src/controllers/indexController');
+app.get('/', indexController.getHomePage);
 
 // Redirect old create campaign route to page builder
 app.get('/create-campaign', (req, res) => {
