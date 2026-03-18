@@ -37,6 +37,9 @@ class PageBuilder {
         
         // Properties panel
         document.getElementById('closeProperties')?.addEventListener('click', () => this.closeProperties());
+        
+        // Initialize preview button state
+        this.updatePreviewButtonState();
     }
 
     setupDragAndDrop() {
@@ -864,6 +867,9 @@ class PageBuilder {
                 this.campaignId = result.campaignId;
                 this.showMessage('Campaign saved successfully!', 'success');
                 
+                // Update preview button state now that we have a campaignId
+                this.updatePreviewButtonState();
+                
                 // Add to version history
                 this.addToVersionHistory(status);
                 
@@ -1060,13 +1066,49 @@ class PageBuilder {
     }
 
     async preview() {
+        const previewBtn = document.getElementById('previewBtn');
+        
         if (!this.campaignId) {
             this.showMessage('Please save your campaign first to preview', 'warning');
+            // Shake animation to draw attention to why it's disabled
+            if (previewBtn) {
+                previewBtn.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    previewBtn.style.animation = '';
+                }, 500);
+            }
             return;
         }
         
         // Open preview in same window to maintain authentication
         window.location.href = `/builder/${this.campaignId}/preview`;
+    }
+
+    updatePreviewButtonState() {
+        const previewBtn = document.getElementById('previewBtn');
+        if (!previewBtn) return;
+        
+        if (!this.campaignId) {
+            // Disable and dim the button
+            previewBtn.disabled = true;
+            previewBtn.classList.add('disabled');
+            previewBtn.style.opacity = '0.5';
+            previewBtn.style.cursor = 'not-allowed';
+            
+            // Add tooltip explaining why
+            previewBtn.title = 'Please save your campaign first before previewing';
+            previewBtn.setAttribute('data-tooltip', 'Save campaign first');
+        } else {
+            // Enable the button
+            previewBtn.disabled = false;
+            previewBtn.classList.remove('disabled');
+            previewBtn.style.opacity = '1';
+            previewBtn.style.cursor = 'pointer';
+            
+            // Remove tooltip
+            previewBtn.title = 'Preview your campaign';
+            previewBtn.removeAttribute('data-tooltip');
+        }
     }
 
     loadExistingData() {
