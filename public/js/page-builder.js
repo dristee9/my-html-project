@@ -835,8 +835,15 @@ class PageBuilder {
     }
 
     updateHistoryButtons() {
-        document.getElementById('undoBtn').disabled = this.historyIndex <= 0;
-        document.getElementById('redoBtn').disabled = this.historyIndex >= this.history.length - 1;
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        
+        if (undoBtn) {
+            undoBtn.disabled = this.historyIndex <= 0;
+        }
+        if (redoBtn) {
+            redoBtn.disabled = this.historyIndex >= this.history.length - 1;
+        }
     }
 
     async saveDraft() {
