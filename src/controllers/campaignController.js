@@ -104,68 +104,6 @@ exports.createCampaign = async (req, res) => {
 };
 
 // Process donation
-exports.donateToCampaign = async (req, res) => {
-    try {
-        const { amount, message, bkashNumber } = req.body;
-        const campaignId = req.params.id;
-        
-        // Validate amount
-        const donationAmount = parseInt(amount);
-        if (donationAmount < 100) {
-            return res.status(400).render('pages/campaign', {
-                title: 'Donate - FundMyIdea BD',
-                user: req.user,
-                error: 'Minimum donation amount is 100 BDT'
-            });
-        }
-        
-        const campaign = await Campaign.findById(campaignId);
-        if (!campaign) {
-            return res.status(404).render('pages/404', {
-                title: 'Campaign Not Found - FundMyIdea BD',
-                user: req.user
-            });
-        }
-        
-        // Check if campaign is still active
-        if (campaign.status !== 'active' || campaign.deadline < new Date()) {
-            return res.status(400).render('pages/campaign', {
-                title: campaign.title + ' - FundMyIdea BD',
-                campaign: campaign,
-                user: req.user,
-                error: 'This campaign is no longer accepting donations'
-            });
-        }
-        
-        // Add donation to campaign
-        campaign.backers.push({
-            user: req.user._id,
-            amount: donationAmount,
-            message: message || '',
-            bkashNumber: bkashNumber
-        });
-        
-        campaign.currentFunding += donationAmount;
-        
-        // Check if funding goal is reached
-        if (campaign.currentFunding >= campaign.fundingGoal) {
-            campaign.status = 'completed';
-        }
-        
-        await campaign.save();
-        
-        console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
-        res.redirect(`/campaigns/${campaignId}`);
-    } catch (error) {
-        console.error('Error processing donation:', error);
-        res.status(500).render('pages/campaign', {
-            title: 'Donate - FundMyIdea BD',
-            user: req.user,
-            error: 'Failed to process donation'
-        });
-    }
-};
-
 // Get user's campaigns for dashboard
 exports.getUserCampaigns = async (req, res) => {
     try {
@@ -294,21 +232,6 @@ exports.processDonation = async (req, res) => {
                 campaign: campaignData,
                 user: req.user,
                 error: 'This campaign is no longer accepting donations'
-            });
-        }
-        
-        // Check if user has already donated
-        const hasAlreadyDonated = campaign.backers.some(backer => 
-            backer.user && backer.user._id.toString() === req.user._id.toString()
-        );
-        
-        if (hasAlreadyDonated) {
-            console.log('User has already donated');
-            return res.status(400).render('pages/donate', {
-                title: `Donate to ${campaign.title} - FundMyIdea BD`,
-                campaign: campaignData,
-                user: req.user,
-                error: 'You have already donated to this campaign'
             });
         }
         
