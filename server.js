@@ -52,18 +52,44 @@ app.use(helmet({
 
 // CSRF Protection
 const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true });
+const csrfProtection = csrf({ 
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+    }
+});
 
 // Apply CSRF protection conditionally
 app.use((req, res, next) => {
-    // Skip CSRF for API routes and page builder AJAX requests
+    // Skip CSRF for API routes, page builder AJAX requests, and certain paths
     if (req.path.startsWith('/builder/') && req.accepts('json')) {
         // Still provide csrfToken function but skip validation
         req.csrfToken = () => '';
         return next();
     }
+    
     // Apply CSRF to all other routes
-    csrfProtection(req, res, next);
+    csrfProtection(req, res, (err) => {
+        if (err) {
+            console.error('CSRF Token Error:', err.message);
+            
+            // If it's a CSRF error and user is trying to logout, allow it anyway
+            // This prevents users from being stuck logged in due to token issues
+            if (req.path === '/logout' && err.code === 'EBADCSRFTOKEN') {
+                console.warn('Allowing logout despite CSRF error for path:', req.path);
+                return next();
+            }
+            
+            // For other routes, return proper error
+            return res.status(403).render('pages/error', {
+                title: 'Security Error - FundMyIdea BD',
+                error: 'Security verification failed. Please refresh the page and try again.',
+                user: req.user
+            });
+        }
+        next();
+    });
 });
 
 // Static files
@@ -78,9 +104,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(optionalAuth);
 
 // Middleware to make user and csrfToken available in all templates
+// This MUST come AFTER CSRF protection but BEFORE routes
 app.use((req, res, next) => {
     res.locals.user = req.user;
-    res.locals.csrfToken = req.csrfToken();
+    // Safely get CSRF token, fallback to empty string if not available
+    try {
+        res.locals.csrfToken = req.csrfToken ? req.csrfToken() : '';
+    } catch (err) {
+        console.error('Error getting CSRF token:', err.message);
+        res.locals.csrfToken = '';
+    }
     next();
 });
 

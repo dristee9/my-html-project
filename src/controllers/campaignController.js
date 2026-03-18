@@ -1,6 +1,7 @@
 const Campaign = require('../models/Campaign');
 const User = require('../models/User');
 const bkashService = require('../services/bkash');
+const emailService = require('../services/emailService');
 
 // Get all active campaigns for explore page
 exports.getAllCampaigns = async (req, res) => {
@@ -282,6 +283,17 @@ exports.processDonation = async (req, res) => {
         await campaign.save();
         console.log('Campaign saved successfully');
         
+        // Send donation confirmation email (non-blocking)
+        const donor = req.user;
+        emailService.sendDonationConfirmation(
+            donor, 
+            campaign, 
+            donationAmount,
+            null // No bKash transaction ID for manual donations
+        ).catch(err => {
+            console.error('Failed to send donation confirmation email:', err);
+        });
+        
         console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
         
         // Redirect to campaign page with success flag (POST-Redirect-GET pattern)
@@ -484,6 +496,17 @@ exports.handleBkashCallback = async (req, res) => {
             
             // Clear session data
             delete req.session.bkashPayment;
+            
+            // Send donation confirmation email (non-blocking)
+            const donor = req.user;
+            emailService.sendDonationConfirmation(
+                donor, 
+                campaign, 
+                parseFloat(paymentResult.amount),
+                paymentResult.trxID
+            ).catch(err => {
+                console.error('Failed to send donation confirmation email:', err);
+            });
             
             console.log(`bKash donation of ${paymentResult.amount} BDT processed successfully. TrxID: ${paymentResult.trxID}`);
             

@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const emailService = require('../services/emailService');
 
 // Validation rules
 const registerValidation = [
@@ -76,6 +77,11 @@ exports.register = [
             });
 
             await user.save();
+
+            // Send welcome email (non-blocking)
+            emailService.sendWelcomeEmail(user).catch(err => {
+                console.error('Failed to send welcome email:', err);
+            });
 
             // Generate JWT token
             const token = jwt.sign(

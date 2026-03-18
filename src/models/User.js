@@ -31,6 +31,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '/images/default-profile.png'
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+    emailVerificationToken: String,
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: Date.now
