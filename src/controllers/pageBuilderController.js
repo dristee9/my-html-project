@@ -59,45 +59,60 @@ exports.savePageBuilder = async (req, res) => {
             category, 
             fundingGoal, 
             deadline,
-            pageBuilderData,
-            status = 'draft'
+            pageBuilderData
         } = req.body;
 
-        const campaignData = {
-            title,
-            description,
-            category,
-            fundingGoal: parseInt(fundingGoal),
-            deadline: new Date(deadline),
-            creator: req.user._id,
-            status
-        };
-
-        // Add page builder data if provided
-        if (pageBuilderData) {
-            campaignData.pageBuilder = {
-                enabled: true,
-                sections: pageBuilderData.sections || [],
-                globalStyles: pageBuilderData.globalStyles || {},
-                customCSS: pageBuilderData.customCSS || '',
-                versionHistory: [{
-                    version: 1,
-                    data: pageBuilderData,
-                    createdBy: req.user._id
-                }]
-            };
-        }
-
         let campaign;
+        
         if (req.params.id) {
-            // Update existing campaign
+            // Update existing campaign - use $set to avoid overwriting sensitive fields
+            const updateData = {
+                $set: {
+                    title,
+                    description,
+                    category,
+                    fundingGoal: parseInt(fundingGoal),
+                    deadline: new Date(deadline)
+                }
+            };
+            
+            // Add page builder data if provided
+            if (pageBuilderData) {
+                updateData.$set['pageBuilder.enabled'] = true;
+                updateData.$set['pageBuilder.sections'] = pageBuilderData.sections || [];
+                updateData.$set['pageBuilder.globalStyles'] = pageBuilderData.globalStyles || {};
+                updateData.$set['pageBuilder.customCSS'] = pageBuilderData.customCSS || '';
+            }
+            
+            // IMPORTANT: Do NOT update status, backers, or currentFunding from page builder
+            // These fields are managed by donation and campaign management logic
             campaign = await Campaign.findByIdAndUpdate(
                 req.params.id,
-                campaignData,
+                updateData,
                 { new: true, runValidators: true }
             );
         } else {
             // Create new campaign
+            const campaignData = {
+                title,
+                description,
+                category,
+                fundingGoal: parseInt(fundingGoal),
+                deadline: new Date(deadline),
+                creator: req.user._id,
+                status: 'draft'
+            };
+            
+            // Add page builder data if provided
+            if (pageBuilderData) {
+                campaignData.pageBuilder = {
+                    enabled: true,
+                    sections: pageBuilderData.sections || [],
+                    globalStyles: pageBuilderData.globalStyles || {},
+                    customCSS: pageBuilderData.customCSS || ''
+                };
+            }
+            
             campaign = new Campaign(campaignData);
             await campaign.save();
         }

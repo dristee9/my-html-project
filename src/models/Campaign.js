@@ -11,7 +11,7 @@ const campaignSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Campaign description is required'],
         trim: true,
-        maxlength: [2000, 'Description cannot exceed 2000 characters']
+        maxlength: [10000, 'Description cannot exceed 10000 characters']
     },
     category: {
         type: String,
