@@ -143,4 +143,29 @@ campaignSchema.virtual('daysLeftText').get(function() {
 campaignSchema.index({ status: 1, createdAt: -1 });
 campaignSchema.index({ category: 1, status: 1 });
 
+// Method to check and update campaign expiration
+campaignSchema.methods.checkAndUpdateExpiration = async function() {
+    // Auto-expire if deadline has passed and status is still active
+    if (this.status === 'active' && this.deadline < new Date()) {
+        this.status = 'expired';
+        await this.save();
+    }
+    return this;
+};
+
+// Static method to bulk expire old campaigns
+campaignSchema.statics.expireOldCampaigns = async function() {
+    const result = await this.updateMany(
+        {
+            status: 'active',
+            deadline: { $lt: new Date() }
+        },
+        {
+            $set: { status: 'expired' }
+        }
+    );
+    console.log(`Expired ${result.modifiedCount} campaigns`);
+    return result;
+};
+
 module.exports = mongoose.model('Campaign', campaignSchema);

@@ -37,6 +37,9 @@ exports.getCampaignById = async (req, res) => {
             });
         }
         
+        // Auto-expire campaign if deadline has passed
+        await campaign.checkAndUpdateExpiration();
+        
         // Add virtual properties for template usage
         const campaignData = campaign.toObject();
         campaignData.daysLeftText = campaign.daysLeftText;
@@ -153,6 +156,9 @@ exports.getDonationPage = async (req, res) => {
             });
         }
         
+        // Auto-expire campaign if deadline has passed
+        await campaign.checkAndUpdateExpiration();
+        
         // Add virtual properties for template usage
         const campaignData = campaign.toObject();
         campaignData.daysLeftText = campaign.daysLeftText;
@@ -199,6 +205,20 @@ exports.processDonation = async (req, res) => {
             return res.status(404).render('pages/404', {
                 title: 'Campaign Not Found - FundMyIdea BD',
                 user: req.user
+            });
+        }
+        
+        // Auto-expire campaign if deadline has passed
+        await campaign.checkAndUpdateExpiration();
+        
+        // Check if campaign is still active after expiration check
+        if (campaign.status !== 'active') {
+            console.log('Campaign not active or expired');
+            return res.status(400).render('pages/donate', {
+                title: `Donate to ${campaign.title} - FundMyIdea BD`,
+                campaign: campaignData,
+                user: req.user,
+                error: 'This campaign is no longer accepting donations'
             });
         }
         
