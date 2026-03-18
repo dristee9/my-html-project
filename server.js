@@ -11,6 +11,12 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Validate required environment variables
+if (!process.env.JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET is not set. Exiting.');
+    process.exit(1);
+}
+
 // Connect to MongoDB
 connectDB();
 
