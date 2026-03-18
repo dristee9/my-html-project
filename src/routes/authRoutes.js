@@ -25,6 +25,9 @@ router.get('/logout', authController.logout);
 router.post('/login', authLimiter, authController.login);
 router.post('/register', authLimiter, authController.register);
 
+// Token refresh route (for AJAX requests)
+router.post('/refresh', authenticateToken, authController.refreshToken);
+
 // Password reset routes
 router.get('/forgot-password', (req, res) => {
     res.render('pages/forgot-password', {

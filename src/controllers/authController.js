@@ -193,3 +193,52 @@ exports.getRegister = (req, res) => {
     }
     res.render('pages/register', { error: null, formData: {} });
 };
+
+// Refresh JWT token endpoint for AJAX requests
+exports.refreshToken = async (req, res) => {
+    try {
+        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+        
+        if (!token) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+        
+        // Verify token without checking expiration
+        const jwt = require('jsonwebtoken');
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (error) {
+            // Token is expired or invalid
+            return res.status(401).json({ error: 'Token expired or invalid' });
+        }
+        
+        // Get user to ensure they still exist
+        const User = require('../models/User');
+        const user = await User.findById(decoded.userId).select('-password');
+        
+        if (!user) {
+            return res.status(401).json({ error: 'User not found' });
+        }
+        
+        // Generate new token with fresh expiry
+        const newToken = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+        
+        // Set new token in cookie
+        res.cookie('token', newToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            sameSite: 'strict'
+        });
+        
+        res.json({ success: true, message: 'Token refreshed successfully' });
+    } catch (error) {
+        console.error('Token refresh error:', error);
+        res.status(500).json({ error: 'Failed to refresh token' });
+    }
+};

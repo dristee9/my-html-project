@@ -25,6 +25,30 @@ const authenticateToken = async (req, res, next) => {
         }
         
         req.user = user;
+        
+        // Implement sliding window token refresh
+        // Refresh token if less than 1 day remaining (tokens are valid for 7 days)
+        const now = Math.floor(Date.now() / 1000);
+        const timeUntilExpiry = decoded.exp - now;
+        const oneDayInSeconds = 24 * 60 * 60;
+        
+        if (timeUntilExpiry < oneDayInSeconds && timeUntilExpiry > 0) {
+            // Token is still valid but expiring soon, issue new token
+            const newToken = jwt.sign(
+                { userId: user._id },
+                process.env.JWT_SECRET,
+                { expiresIn: '7d' }
+            );
+            
+            // Set new token in cookie
+            res.cookie('token', newToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                sameSite: 'strict'
+            });
+        }
+        
         next();
     } catch (error) {
         // Check if this is an AJAX/API request
