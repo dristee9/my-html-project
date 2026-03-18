@@ -54,8 +54,17 @@ app.use(helmet({
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 
-// Apply CSRF protection to all routes
-app.use(csrfProtection);
+// Apply CSRF protection conditionally
+app.use((req, res, next) => {
+    // Skip CSRF for API routes and page builder AJAX requests
+    if (req.path.startsWith('/builder/') && req.accepts('json')) {
+        // Still provide csrfToken function but skip validation
+        req.csrfToken = () => '';
+        return next();
+    }
+    // Apply CSRF to all other routes
+    csrfProtection(req, res, next);
+});
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
