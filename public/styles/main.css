@@ -729,9 +729,6 @@ body {
     }
 }
 
-/* Import Donation Styles */
-@import url('./components/donate.css');
-
 /* Campaign Page Enhancements */
 .donate-button-section {
     margin: 1.5rem 0;

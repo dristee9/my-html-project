@@ -245,29 +245,10 @@ exports.processDonation = async (req, res) => {
         const { amount, message, bkashNumber } = req.body;
         const campaignId = req.params.id;
         
-        // Validate amount
-        const donationAmount = parseInt(amount);
-        if (donationAmount < 100) {
-            console.log('Donation amount too low:', donationAmount);
-            return res.status(400).render('pages/donate', {
-                title: 'Donate - FundMyIdea BD',
-                user: req.user,
-                error: 'Minimum donation amount is 100 BDT'
-            });
-        }
-        
-        // Validate bKash number
-        if (!bkashNumber || !bkashNumber.match(/^[0-9]{11}$/)) {
-            console.log('Invalid bKash number:', bkashNumber);
-            return res.status(400).render('pages/donate', {
-                title: 'Donate - FundMyIdea BD',
-                user: req.user,
-                error: 'Please enter a valid 11-digit bKash number'
-            });
-        }
-        
-        const campaign = await Campaign.findById(campaignId).populate('creator', 'username university profileImage');
-        console.log('Found campaign:', campaign ? campaign.title : 'not found');
+        // Fetch campaign first
+        const campaign = await Campaign.findById(campaignId)
+            .populate('creator', 'username university profileImage')
+            .populate('backers.user', 'username');
         
         if (!campaign) {
             console.log('Campaign not found');
@@ -277,12 +258,40 @@ exports.processDonation = async (req, res) => {
             });
         }
         
+        // Add virtual properties for template usage
+        const campaignData = campaign.toObject();
+        campaignData.daysLeftText = campaign.daysLeftText;
+        campaignData.fundingPercentage = campaign.fundingPercentage;
+        
+        // Validate amount
+        const donationAmount = parseInt(amount);
+        if (donationAmount < 100) {
+            console.log('Donation amount too low:', donationAmount);
+            return res.status(400).render('pages/donate', {
+                title: `Donate to ${campaign.title} - FundMyIdea BD`,
+                campaign: campaignData,
+                user: req.user,
+                error: 'Minimum donation amount is 100 BDT'
+            });
+        }
+        
+        // Validate bKash number
+        if (!bkashNumber || !bkashNumber.match(/^[0-9]{11}$/)) {
+            console.log('Invalid bKash number:', bkashNumber);
+            return res.status(400).render('pages/donate', {
+                title: `Donate to ${campaign.title} - FundMyIdea BD`,
+                campaign: campaignData,
+                user: req.user,
+                error: 'Please enter a valid 11-digit bKash number'
+            });
+        }
+        
         // Check if campaign is still active
         if (campaign.status !== 'active' || campaign.deadline < new Date()) {
             console.log('Campaign not active or expired');
             return res.status(400).render('pages/donate', {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
-                campaign: campaign,
+                campaign: campaignData,
                 user: req.user,
                 error: 'This campaign is no longer accepting donations'
             });
@@ -290,14 +299,14 @@ exports.processDonation = async (req, res) => {
         
         // Check if user has already donated
         const hasAlreadyDonated = campaign.backers.some(backer => 
-            backer.user && backer.user.toString() === req.user._id.toString()
+            backer.user && backer.user._id.toString() === req.user._id.toString()
         );
         
         if (hasAlreadyDonated) {
             console.log('User has already donated');
             return res.status(400).render('pages/donate', {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
-                campaign: campaign,
+                campaign: campaignData,
                 user: req.user,
                 error: 'You have already donated to this campaign'
             });

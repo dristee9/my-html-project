@@ -1,3 +1,4 @@
+class PageBuilder {
     constructor() {
         this.sections = [];
         this.selectedSection = null;

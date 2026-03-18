@@ -53,14 +53,39 @@ router.get('/:id/preview', (req, res) => {
 });
 
 // Edit campaign route (GET)
-router.get('/:id/edit', authenticateToken, (req, res) => {
-    // Check if user owns this campaign
-    // For now, render edit form
-    res.render('pages/edit-campaign', {
-        title: 'Edit Campaign - FundMyIdea BD',
-        user: req.user,
-        campaign: null // Will be populated with actual data
-    });
+router.get('/:id/edit', authenticateToken, async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id).lean();
+        
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Check if user owns this campaign
+        if (campaign.creator.toString() !== req.user._id.toString()) {
+            return res.status(403).render('pages/error', {
+                title: 'Access Denied - FundMyIdea BD',
+                error: 'You can only edit your own campaigns',
+                user: req.user
+            });
+        }
+        
+        res.render('pages/edit-campaign', {
+            title: `Edit ${campaign.title} - FundMyIdea BD`,
+            user: req.user,
+            campaign: campaign
+        });
+    } catch (error) {
+        console.error('Error loading edit campaign:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to load edit campaign page',
+            user: req.user
+        });
+    }
 });
 
 // Update campaign route (POST)

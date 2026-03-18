@@ -7,7 +7,7 @@ exports.getPageBuilder = async (req, res) => {
             title: 'Create Campaign - Page Builder',
             user: req.user,
             campaign: null,
-            templates: await this.getTemplates()
+            templates: await exports.getTemplates()
         });
     } catch (error) {
         console.error('Error loading page builder:', error);
@@ -39,7 +39,7 @@ exports.editPageBuilder = async (req, res) => {
             title: `Edit ${campaign.title} - Page Builder`,
             user: req.user,
             campaign: campaign,
-            templates: await this.getTemplates()
+            templates: await exports.getTemplates()
         });
     } catch (error) {
         console.error('Error loading edit page builder:', error);

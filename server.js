@@ -2,7 +2,9 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const ejsMate = require('ejs-mate');
+const fs = require('fs');
 const connectDB = require('./src/config/database');
+const { optionalAuth } = require('./src/middleware/auth');
 require('dotenv').config();
 
 const app = express();
@@ -11,10 +13,20 @@ const PORT = process.env.PORT || 3000;
 // Connect to MongoDB
 connectDB();
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('📁 Uploads directory created at:', uploadsDir);
+}
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Apply optionalAuth to make user available in all routes
+app.use(optionalAuth);
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
