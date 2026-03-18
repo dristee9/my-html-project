@@ -6,6 +6,7 @@ const fs = require('fs');
 const connectDB = require('./src/config/database');
 const { optionalAuth } = require('./src/middleware/auth');
 const { doubleCsrf } = require('csrf-csrf');
+const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
@@ -31,6 +32,24 @@ if (!fs.existsSync(uploadsDir)) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Security Headers with Helmet
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            imgSrc: ["'self'", "data:", "https:", "http:"],
+            connectSrc: ["'self'"],
+            frameSrc: ["'none'"],
+            objectSrc: ["'none'"],
+            upgradeInsecureRequests: [],
+        },
+    },
+    crossOriginEmbedderPolicy: false,
+}));
 
 // CSRF Protection
 const {
