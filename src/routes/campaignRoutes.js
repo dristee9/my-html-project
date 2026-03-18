@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
+const Campaign = require('../models/Campaign');
 const campaignController = require('../controllers/campaignController');
 
 // Configure multer for file uploads
