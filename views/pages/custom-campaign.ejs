@@ -147,7 +147,7 @@
     <div class="campaign-detail-page">
         <!-- Same content as original campaign.ejs -->
         <div class="campaign-header-image">
-            <img src="<%= campaign.imageUrl || 'https://via.placeholder.com/1200x400/f3f4f6/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30)) %>" alt="<%= campaign.title %>" class="campaign-main-image">
+            <img src="<%= campaign.imageUrl || 'https://placehold.co/1200x400/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-main-image">
         </div>
         
         <div class="campaign-content">

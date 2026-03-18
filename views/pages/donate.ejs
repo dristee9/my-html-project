@@ -6,7 +6,7 @@
         <!-- Campaign Header Section -->
         <div class="donate-header">
             <div class="campaign-preview">
-                <img src="<%= campaign.imageUrl || 'https://via.placeholder.com/800x400/f3f4f6/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30)) %>" 
+                <img src="<%= campaign.imageUrl || 'https://placehold.co/800x400/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30).replace(/\s+/g, '+')) %>", 
                      alt="<%= campaign.title %>" 
                      class="campaign-preview-image">
                 <div class="campaign-preview-info">

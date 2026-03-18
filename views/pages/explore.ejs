@@ -77,7 +77,7 @@
         <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
             <% campaigns.forEach(campaign => { %>
             <div class="campaign-card">
-                <img src="<%= campaign.imageUrl || 'https://via.placeholder.com/400x200/f3f4f6/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20)) %>" alt="<%= campaign.title %>" class="campaign-image">
+                <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                 <div class="campaign-details">
                     <div class="campaign-header">
                         <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
@@ -102,14 +102,50 @@
             </div>
             <% }) %>
         <% } else { %>
-            <div class="empty-state-box">
-                <h3 class="empty-state-title">No campaigns found</h3>
-                <p class="empty-state-text">Be the first to create a campaign and inspire others!</p>
-                <% if (typeof user !== 'undefined' && user) { %>
-                    <a href="/builder/create" class="primary-button">Create Your First Campaign</a>
+            <div class="empty-state-box" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); max-width: 600px; margin: 3rem auto;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+                <h3 class="empty-state-title" style="font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem;">No campaigns found</h3>
+                
+                <% if (typeof searchQuery !== 'undefined' && searchQuery && searchQuery.trim() !== '') { %>
+                    <p class="empty-state-text" style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                        No results matched "<strong><%= searchQuery %></strong>". Try different keywords or browse all campaigns.
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="/campaigns/search?q=&category=all&sort=newest" class="primary-button" style="background: var(--primary-blue);">Browse All Campaigns</a>
+                        <a href="/builder/create" class="primary-button" style="background: var(--gray-700);">Create Your Own</a>
+                    </div>
+                <% } else if (typeof searchCategory !== 'undefined' && searchCategory && searchCategory !== 'all') { %>
+                    <p class="empty-state-text" style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                        There are no campaigns in the <strong><%= searchCategory %></strong> category yet.
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="/campaigns/search?category=all&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" class="primary-button" style="background: var(--primary-blue);">View All Categories</a>
+                        <a href="/builder/create?category=<%= encodeURIComponent(searchCategory) %>" class="primary-button" style="background: var(--gray-700);">Create in This Category</a>
+                    </div>
                 <% } else { %>
-                    <a href="/register" class="primary-button">Get Started</a>
+                    <p class="empty-state-text" style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                        Be the first to create a campaign and inspire others!
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <% if (typeof user !== 'undefined' && user) { %>
+                            <a href="/builder/create" class="primary-button">Create Your First Campaign</a>
+                        <% } else { %>
+                            <a href="/register" class="primary-button">Get Started</a>
+                            <a href="/campaigns/search?q=&category=all&sort=newest" class="primary-button" style="background: var(--gray-700);">Browse All Campaigns</a>
+                        <% } %>
+                    </div>
                 <% } %>
+                
+                <!-- Popular Categories Suggestions -->
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gray-200);">
+                    <h4 style="font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 1rem;">📊 Browse Popular Categories:</h4>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="/campaigns/search?category=Technology&sort=newest" class="category-tag" style="background: var(--gray-100); color: var(--gray-700); padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem;">Technology</a>
+                        <a href="/campaigns/search?category=Education&sort=newest" class="category-tag" style="background: var(--gray-100); color: var(--gray-700); padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem;">Education</a>
+                        <a href="/campaigns/search?category=Social Impact&sort=newest" class="category-tag" style="background: var(--gray-100); color: var(--gray-700); padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem;">Social Impact</a>
+                        <a href="/campaigns/search?category=Arts & Culture&sort=newest" class="category-tag" style="background: var(--gray-100); color: var(--gray-700); padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem;">Arts & Culture</a>
+                    </div>
+                </div>
             </div>
         <% } %>
     </div>
