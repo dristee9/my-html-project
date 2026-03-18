@@ -59,12 +59,8 @@ router.post('/forgot-password', async (req, res) => {
             });
         }
         
-        // Generate reset token
-        const resetToken = crypto.randomBytes(32).toString('hex');
-        
-        // Save hashed token to user (you'll need to add these fields to User model)
-        user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
+        // Generate reset token using bcrypt hashing
+        const resetToken = await user.generatePasswordResetToken();
         await user.save();
         
         // Send password reset email
@@ -95,11 +91,19 @@ router.get('/reset-password/:token', async (req, res) => {
     try {
         const User = require('../models/User');
         const user = await User.findOne({
-            resetPasswordToken: crypto.createHash('sha256').update(req.params.token).digest('hex'),
             resetPasswordExpire: { $gt: Date.now() }
         });
         
         if (!user) {
+            return res.status(400).render('pages/error', {
+                title: 'Invalid Reset Link - FundMyIdea BD',
+                error: 'Password reset link is invalid or has expired'
+            });
+        }
+        
+        // Verify the token matches
+        const isValid = await User.verifyResetToken(user.resetPasswordToken, req.params.token);
+        if (!isValid) {
             return res.status(400).render('pages/error', {
                 title: 'Invalid Reset Link - FundMyIdea BD',
                 error: 'Password reset link is invalid or has expired'
@@ -142,11 +146,19 @@ router.post('/reset-password/:token', async (req, res) => {
         
         const User = require('../models/User');
         const user = await User.findOne({
-            resetPasswordToken: crypto.createHash('sha256').update(req.params.token).digest('hex'),
             resetPasswordExpire: { $gt: Date.now() }
         });
         
         if (!user) {
+            return res.status(400).render('pages/error', {
+                title: 'Invalid Reset Link - FundMyIdea BD',
+                error: 'Password reset link is invalid or has expired'
+            });
+        }
+        
+        // Verify the token matches
+        const isValid = await User.verifyResetToken(user.resetPasswordToken, req.params.token);
+        if (!isValid) {
             return res.status(400).render('pages/error', {
                 title: 'Invalid Reset Link - FundMyIdea BD',
                 error: 'Password reset link is invalid or has expired'
