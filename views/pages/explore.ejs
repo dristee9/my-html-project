@@ -2,7 +2,13 @@
 <% title = 'Explore Campaigns - FundMyIdea BD' -%>
 
 <section class="page-section">
-    <h1 class="section-title">Explore Student Campaigns</h1>
+    <% if (typeof searchQuery !== 'undefined' && searchQuery && searchQuery.trim() !== '') { %>
+        <h1 class="section-title">Search Results for: "<%= searchQuery %>"</h1>
+    <% } else if (typeof searchCategory !== 'undefined' && searchCategory && searchCategory !== 'all') { %>
+        <h1 class="section-title">Browse Category: <%= searchCategory %></h1>
+    <% } else { %>
+        <h1 class="section-title">Explore Student Campaigns</h1>
+    <% } %>
     
     <form class="search-form" method="GET" action="/campaigns/search">
         <input type="text" name="q" class="form-control search-input" placeholder="Search campaigns..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">

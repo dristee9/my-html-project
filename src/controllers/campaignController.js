@@ -299,9 +299,15 @@ exports.processDonation = async (req, res) => {
 exports.searchCampaigns = async (req, res) => {
     try {
         const { q, category } = req.query;
+        
+        // If no search query and no category, redirect to main explore page
+        if (!q && (!category || category === 'all')) {
+            return res.redirect('/campaigns');
+        }
+        
         let query = { status: 'active' };
         
-        if (q) {
+        if (q && q.trim() !== '') {
             query.$or = [
                 { title: { $regex: q, $options: 'i' } },
                 { description: { $regex: q, $options: 'i' } }
@@ -317,7 +323,7 @@ exports.searchCampaigns = async (req, res) => {
             .sort({ createdAt: -1 });
         
         res.render('pages/explore', {
-            title: 'Search Results - FundMyIdea BD',
+            title: q ? `Search Results - FundMyIdea BD` : 'Explore Campaigns - FundMyIdea BD',
             campaigns: campaigns,
             user: req.user,
             searchQuery: q,
