@@ -13,7 +13,8 @@ exports.getPageBuilder = async (req, res) => {
     } catch (error) {
         console.error('Error loading page builder:', error);
         res.status(500).render('pages/error', { 
-            error: 'Failed to load page builder' 
+            error: 'Failed to load page builder',
+            user: req.user || null
         });
     }
 };
@@ -32,7 +33,8 @@ exports.editPageBuilder = async (req, res) => {
         // Check if user owns this campaign
         if (campaign.creator._id.toString() !== req.user._id.toString()) {
             return res.status(403).render('pages/error', { 
-                error: 'You can only edit your own campaigns' 
+                error: 'You can only edit your own campaigns',
+                user: req.user || null
             });
         }
 
@@ -45,7 +47,8 @@ exports.editPageBuilder = async (req, res) => {
     } catch (error) {
         console.error('Error loading edit page builder:', error);
         res.status(500).render('pages/error', { 
-            error: 'Failed to load page builder' 
+            error: 'Failed to load page builder',
+            user: req.user || null
         });
     }
 };
@@ -187,7 +190,9 @@ exports.previewCampaign = async (req, res) => {
             .lean();
 
         if (!campaign) {
-            return res.status(404).render('pages/404');
+            return res.status(404).render('pages/404', {
+                user: req.user || null
+            });
         }
 
         // Render with custom page builder if enabled
@@ -209,7 +214,8 @@ exports.previewCampaign = async (req, res) => {
     } catch (error) {
         console.error('Error previewing campaign:', error);
         res.status(500).render('pages/error', { 
-            error: 'Failed to preview campaign' 
+            error: 'Failed to preview campaign',
+            user: req.user || null
         });
     }
 };
