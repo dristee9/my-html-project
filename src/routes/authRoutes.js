@@ -19,9 +19,9 @@ router.use(optionalAuth);
 // GET routes
 router.get('/login', authController.getLogin);
 router.get('/register', authController.getRegister);
-router.get('/logout', authController.logout);
 
 // POST routes
+router.post('/logout', authController.logout);
 router.post('/login', authLimiter, authController.login);
 router.post('/register', authLimiter, authController.register);
 

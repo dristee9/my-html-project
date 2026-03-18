@@ -14,7 +14,9 @@
                 <a href="/campaigns" class="nav-item">Explore Campaigns</a>
                 <a href="/builder/create" class="nav-item">Create Campaign</a>
                 <a href="/dashboard" class="nav-item">Dashboard</a>
-                <a href="/logout" class="nav-item logout-button">Logout</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="nav-item logout-button">Logout</button>
+                </form>
             <% } else { %>
                 <a href="/campaigns" class="nav-item">Explore Campaigns</a>
                 <a href="/login" class="nav-item">Login</a>
