@@ -87,13 +87,8 @@ const campaignSchema = new mongoose.Schema({
             accentColor: String,
             backgroundColor: String
         },
-        customCSS: String,
-        versionHistory: [{
-            version: Number,
-            data: mongoose.Schema.Types.Mixed,
-            createdAt: { type: Date, default: Date.now },
-            createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-        }]
+        customCSS: String
+        // Note: Version history is now stored in separate CampaignVersion collection
     },
     status: {
         type: String,

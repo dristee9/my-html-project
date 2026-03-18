@@ -1,4 +1,5 @@
 const Campaign = require('../models/Campaign');
+const CampaignVersion = require('../models/CampaignVersion');
 
 // Get page builder interface for creating new campaign
 exports.getPageBuilder = async (req, res) => {
@@ -201,13 +202,7 @@ exports.previewCampaign = async (req, res) => {
 // Get campaign version history
 exports.getVersionHistory = async (req, res) => {
     try {
-        const campaign = await Campaign.findById(req.params.id);
-        
-        if (!campaign) {
-            return res.status(404).json({ error: 'Campaign not found' });
-        }
-        
-        const versions = campaign.pageBuilder?.versionHistory || [];
+        const versions = await CampaignVersion.findByCampaign(req.params.id);
         res.json({ versions });
     } catch (error) {
         console.error('Error fetching version history:', error);
@@ -226,31 +221,18 @@ exports.saveVersion = async (req, res) => {
         
         const { version, timestamp, status, sections, campaignData } = req.body;
         
-        // Initialize version history if it doesn't exist
-        if (!campaign.pageBuilder) {
-            campaign.pageBuilder = { enabled: true };
-        }
-        
-        if (!campaign.pageBuilder.versionHistory) {
-            campaign.pageBuilder.versionHistory = [];
-        }
-        
-        // Add new version
-        campaign.pageBuilder.versionHistory.push({
+        // Create new version in separate collection
+        const versionDoc = new CampaignVersion({
+            campaign: campaign._id,
             version,
-            timestamp: new Date(timestamp),
             data: { sections, ...campaignData },
             createdBy: req.user._id
         });
         
-        // Keep only last 10 versions
-        if (campaign.pageBuilder.versionHistory.length > 10) {
-            campaign.pageBuilder.versionHistory.shift();
-        }
+        await versionDoc.saveVersion(); // Auto-cleanup old versions
         
-        await campaign.save();
-        
-        const versions = campaign.pageBuilder.versionHistory;
+        // Get updated version list
+        const versions = await CampaignVersion.findByCampaign(req.params.id);
         res.json({ success: true, versions });
     } catch (error) {
         console.error('Error saving version:', error);
@@ -261,16 +243,7 @@ exports.saveVersion = async (req, res) => {
 // Clear version history
 exports.clearVersionHistory = async (req, res) => {
     try {
-        const campaign = await Campaign.findById(req.params.id);
-        
-        if (!campaign) {
-            return res.status(404).json({ error: 'Campaign not found' });
-        }
-        
-        if (campaign.pageBuilder) {
-            campaign.pageBuilder.versionHistory = [];
-            await campaign.save();
-        }
+        await CampaignVersion.deleteMany({ campaign: req.params.id });
         
         res.json({ success: true });
     } catch (error) {
