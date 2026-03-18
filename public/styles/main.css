@@ -685,6 +685,31 @@
     text-align: center;
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-header .section-title {
+    margin-bottom: 0;
+    text-align: left;
+}
+
+.view-all-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: opacity var(--transition-fast);
+}
+
+.view-all-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
 /* Feature Cards Grid */
 .features-grid {
     display: grid;
@@ -815,6 +840,89 @@
     width: 100%;
     height: 12rem;
     object-fit: cover;
+}
+
+.campaign-content {
+    padding: 1.5rem;
+}
+
+.campaign-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 0.75rem;
+}
+
+.campaign-description {
+    color: var(--gray-600);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.campaign-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.campaign-category {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-radius: var(--border-radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.campaign-creator {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.campaign-stats {
+    margin-top: 1rem;
+}
+
+.funding-progress {
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 0.5rem;
+    background-color: var(--gray-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-blue-light), var(--primary-blue));
+    border-radius: var(--border-radius-full);
+    transition: width var(--transition-normal);
+}
+
+.funding-amount {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+.funding-amount span:first-child {
+    font-weight: 600;
+    color: var(--secondary-green);
+}
+
+.days-left {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    text-align: right;
 }
 
 .campaign-details {
