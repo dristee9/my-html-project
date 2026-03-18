@@ -6,25 +6,25 @@
     <p class="dashboard-subtitle">Manage your fundraising campaigns</p>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 3fr; gap: 2rem; max-width: 1200px; margin: 0 auto;">
+<div class="layout-grid">
     <!-- Sidebar Navigation -->
-    <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
-        <h3 style="margin-bottom: 1.5rem; color: var(--gray-800);">Account Settings</h3>
+    <div class="sidebar-card">
+        <h3 class="sidebar-title">Account Settings</h3>
         <nav>
-            <a href="/dashboard/profile" style="display: block; padding: 0.75rem 1rem; color: var(--gray-700); text-decoration: none; border-radius: var(--border-radius-lg); margin-bottom: 0.5rem;">Profile Information</a>
-            <a href="/dashboard/my-campaigns" style="display: block; padding: 0.75rem 1rem; background: var(--primary-blue); color: white; text-decoration: none; border-radius: var(--border-radius-lg); margin-bottom: 0.5rem;">My Campaigns</a>
-            <a href="/dashboard/my-donations" style="display: block; padding: 0.75rem 1rem; color: var(--gray-700); text-decoration: none; border-radius: var(--border-radius-lg);">My Donations</a>
+            <a href="/dashboard/profile" class="sidebar-nav-link">Profile Information</a>
+            <a href="/dashboard/my-campaigns" class="sidebar-nav-link active">My Campaigns</a>
+            <a href="/dashboard/my-donations" class="sidebar-nav-link">My Donations</a>
         </nav>
         
-        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
-            <a href="/builder/create" class="primary-button" style="display: block; text-align: center;">Create New Campaign</a>
+        <div class="sidebar-action-area">
+            <a href="/builder/create" class="primary-button btn-block">Create New Campaign</a>
         </div>
     </div>
 
     <!-- Campaigns List -->
     <div>
-        <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="margin-bottom: 1.5rem; color: var(--gray-800);">Active Campaigns</h2>
+        <div class="sidebar-card mb-6">
+            <h2 class="sidebar-title">Active Campaigns</h2>
             
             <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
                 <div class="campaign-grid">
@@ -48,9 +48,9 @@
                             </div>
                             <div class="campaign-footer">
                                 <span class="time-remaining"><%= campaign.daysLeftText %></span>
-                                <div style="display: flex; gap: 0.5rem;">
+                                <div class="flex gap-2">
                                     <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
-                                    <a href="/campaigns/<%= campaign._id %>/edit" class="secondary-button" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Edit</a>
+                                    <a href="/campaigns/<%= campaign._id %>/edit" class="btn-success-sm">Edit</a>
                                 </div>
                             </div>
                         </div>
@@ -58,17 +58,17 @@
                     <% }) %>
                 </div>
             <% } else { %>
-                <div style="text-align: center; padding: 3rem;">
-                    <h3 style="color: var(--gray-600); margin-bottom: 1rem;">No active campaigns</h3>
-                    <p style="color: var(--gray-500); margin-bottom: 2rem;">You haven't created any campaigns yet.</p>
+                <div class="empty-state-box">
+                    <h3 class="empty-state-title">No active campaigns</h3>
+                    <p class="empty-state-text">You haven't created any campaigns yet.</p>
                     <a href="/builder/create" class="primary-button">Create Your First Campaign</a>
                 </div>
             <% } %>
         </div>
 
-        <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
-            <h2 style="margin-bottom: 1.5rem; color: var(--gray-800);">Completed Campaigns</h2>
-            <p style="color: var(--gray-500); text-align: center; padding: 2rem;">No completed campaigns yet.</p>
+        <div class="sidebar-card">
+            <h2 class="sidebar-title">Completed Campaigns</h2>
+            <p class="empty-state-text text-center py-6">No completed campaigns yet.</p>
         </div>
     </div>
 </div>

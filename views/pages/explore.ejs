@@ -47,9 +47,9 @@
             </div>
             <% }) %>
         <% } else { %>
-            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-                <h3 style="color: var(--gray-600); margin-bottom: 1rem;">No campaigns found</h3>
-                <p style="color: var(--gray-500); margin-bottom: 2rem;">Be the first to create a campaign and inspire others!</p>
+            <div class="empty-state-box">
+                <h3 class="empty-state-title">No campaigns found</h3>
+                <p class="empty-state-text">Be the first to create a campaign and inspire others!</p>
                 <% if (typeof user !== 'undefined' && user) { %>
                     <a href="/builder/create" class="primary-button">Create Your First Campaign</a>
                 <% } else { %>

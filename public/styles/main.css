@@ -272,6 +272,100 @@
     width: 100%;
 }
 
+/* Form helper text */
+.form-helper {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-image-preview {
+    max-width: 200px;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-label-helper {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+/* Empty state */
+.empty-state-box {
+    text-align: center;
+    padding: 3rem;
+}
+
+.empty-state-title {
+    color: var(--gray-600);
+    margin-bottom: 1rem;
+}
+
+.empty-state-text {
+    color: var(--gray-500);
+    margin-bottom: 2rem;
+}
+
+/* Sidebar navigation */
+.sidebar-card {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: 2rem;
+}
+
+.sidebar-title {
+    color: var(--gray-800);
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-nav-link:hover {
+    background-color: var(--gray-50);
+}
+
+.sidebar-action-area {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+/* Progress bar - dynamic width via inline style, but base styles here */
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-blue), var(--secondary-green));
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+/* Button variants */
+.btn-success-sm {
+    background-color: var(--secondary-green);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Text utilities */
+.text-muted {
+    color: var(--gray-600);
+}
+
+.text-small {
+    font-size: 0.875rem;
+}
+
+/* Layout utilities */
+.layout-grid {
+    display: grid;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .layout-grid { grid-template-columns: 1fr 3fr; }
+}
+
 .stat-sidebar {
     background: white;
     border-radius: var(--border-radius-xl);

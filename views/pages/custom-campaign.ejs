@@ -187,7 +187,7 @@
                 <form class="donation-form" method="POST" action="/campaigns/<%= campaign._id %>/donate">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <% if (typeof error !== 'undefined' && error) { %>
-                        <div style="background-color: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                        <div class="error-banner mb-4">
                             <%= error %>
                         </div>
                     <% } %>
