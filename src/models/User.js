@@ -74,9 +74,19 @@ userSchema.methods.generatePasswordResetToken = async function() {
     return resetToken; // Return unhashed token for email link
 };
 
-// Verify password reset token
-userSchema.statics.verifyResetToken = async function(hashedToken, resetToken) {
-    return await bcrypt.compare(resetToken, hashedToken);
+// Generate email verification token
+userSchema.methods.generateEmailVerificationToken = async function() {
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    
+    // Hash the token using bcrypt
+    this.emailVerificationToken = await bcrypt.hash(verificationToken, 12);
+    
+    return verificationToken; // Return unhashed token for email link
+};
+
+// Verify email verification token
+userSchema.statics.verifyEmailToken = async function(hashedToken, verificationToken) {
+    return await bcrypt.compare(verificationToken, hashedToken);
 };
 
 module.exports = mongoose.model('User', userSchema);

@@ -78,27 +78,20 @@ exports.register = [
 
             await user.save();
 
-            // Send welcome email (non-blocking)
-            emailService.sendWelcomeEmail(user).catch(err => {
-                console.error('Failed to send welcome email:', err);
+            // Generate email verification token
+            const verificationToken = await user.generateEmailVerificationToken();
+            await user.save();
+            
+            // Send verification email (non-blocking)
+            emailService.sendEmailVerification(user, verificationToken).catch(err => {
+                console.error('Failed to send verification email:', err);
             });
 
-            // Generate JWT token
-            const token = jwt.sign(
-                { userId: user._id }, 
-                process.env.JWT_SECRET,
-                { expiresIn: '7d' }
-            );
-
-            // Set cookie
-            res.cookie('token', token, {
-                httpOnly: true,
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
+            // Render "check your email" page instead of logging in
+            return res.render('pages/verify-email-pending', {
+                title: 'Verify Your Email - FundMyIdea BD',
+                email: user.email
             });
-
-            res.redirect('/dashboard');
         } catch (error) {
             console.error('Registration error:', error);
             res.status(500).render('pages/register', {

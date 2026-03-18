@@ -26,6 +26,18 @@ const authenticateToken = async (req, res, next) => {
         
         req.user = user;
         
+        // Check if email is verified (except for verification routes)
+        if (!user.emailVerified && !req.path.startsWith('/verify-email')) {
+            // Store user info in session for resend verification
+            req.session.pendingUser = user._id.toString();
+            
+            // Check if this is an AJAX/API request
+            if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+                return res.status(403).json({ error: 'Email not verified', redirect: '/verify-email-pending' });
+            }
+            return res.redirect('/verify-email-pending');
+        }
+        
         // Implement sliding window token refresh
         // Refresh token if less than 1 day remaining (tokens are valid for 7 days)
         const now = Math.floor(Date.now() / 1000);
