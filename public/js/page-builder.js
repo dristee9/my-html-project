@@ -27,7 +27,7 @@ class PageBuilder {
         
         // Category filtering
         document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.filterTemplates(e.target.dataset.category));
+            btn.addEventListener('click', (e) => this.filterTemplates(e.target.dataset.category, e));
         });
         
         // Template dragging
@@ -37,6 +37,9 @@ class PageBuilder {
         
         // Properties panel
         document.getElementById('closeProperties')?.addEventListener('click', () => this.closeProperties());
+        
+        // Initialize preview button state
+        this.updatePreviewButtonState();
     }
 
     setupDragAndDrop() {
@@ -69,6 +72,9 @@ class PageBuilder {
 
     handleDragStart(e) {
         const templateCard = e.target.closest('.template-card');
+        if (!templateCard) return;
+        
+        e.dataTransfer.setData('text/plain', templateCard.dataset.template);
         e.dataTransfer.setData('template-id', templateCard.dataset.template);
         e.dataTransfer.effectAllowed = 'copy';
     }
@@ -134,6 +140,7 @@ class PageBuilder {
                         <p style="color: ${section.settings.textColor}">${section.content.subtitle}</p>
                     </div>
                 `;
+            
             case 'features':
                 return `
                     <div class="features-preview">
@@ -149,6 +156,132 @@ class PageBuilder {
                         </div>
                     </div>
                 `;
+            
+            case 'testimonials':
+                return `
+                    <div class="testimonials-preview">
+                        <h3>${section.content.title || 'Testimonials'}</h3>
+                        <div class="testimonials-grid">
+                            ${section.content.testimonials.map(testimonial => `
+                                <div class="testimonial-item">
+                                    <blockquote class="testimonial-quote">
+                                        "${testimonial.quote}"
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <strong>${testimonial.name}</strong>
+                                        <span>${testimonial.role}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            
+            case 'form':
+                return `
+                    <div class="form-preview">
+                        <h3>${section.content.title}</h3>
+                        <div class="form-fields">
+                            ${section.content.fields.map(field => `
+                                <div class="form-field">
+                                    <label>${field.label}</label>
+                                    ${field.type === 'textarea' ? 
+                                        '<textarea disabled placeholder="Field preview"></textarea>' :
+                                        `<input type="${field.type}" disabled placeholder="${field.label}">`
+                                    }
+                                    ${field.required ? '<small style="color: #ef4444;">* Required</small>' : ''}
+                                </div>
+                            `).join('')}
+                            <button class="btn btn-primary" disabled>${section.content.buttonText}</button>
+                        </div>
+                    </div>
+                `;
+            
+            case 'text':
+                return `
+                    <div class="text-preview" style="padding: 1rem;">
+                        ${section.content.heading ? `<h3>${section.content.heading}</h3>` : ''}
+                        <div class="text-body" style="line-height: 1.6; color: ${section.settings.textColor};">
+                            ${section.content.body}
+                        </div>
+                    </div>
+                `;
+            
+            case 'image':
+                return `
+                    <div class="image-preview">
+                        <img src="${section.content.src}" alt="${section.content.alt}" style="max-width: 100%; height: auto; border-radius: 0.5rem;">
+                        ${section.content.caption ? `<p class="image-caption" style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem;">${section.content.caption}</p>` : ''}
+                    </div>
+                `;
+            
+            case 'gallery':
+                return `
+                    <div class="gallery-preview">
+                        ${section.content.title ? `<h3>${section.content.title}</h3>` : ''}
+                        <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                            ${section.content.images.map(img => `
+                                <img src="${img}" alt="Gallery image" style="width: 100%; height: 150px; object-fit: cover; border-radius: 0.5rem;">
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            
+            case 'video':
+                return `
+                    <div class="video-preview">
+                        <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 0.5rem;">
+                            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+                                src="${section.content.url}" 
+                                title="Video preview"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+                            </iframe>
+                        </div>
+                        ${section.content.caption ? `<p class="video-caption" style="text-align: center; margin-top: 0.5rem;">${section.content.caption}</p>` : ''}
+                    </div>
+                `;
+            
+            case 'cta':
+                return `
+                    <div class="cta-preview" style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0.5rem;">
+                        <h3 style="color: white; margin-bottom: 1rem;">${section.content.heading}</h3>
+                        <p style="color: rgba(255,255,255,0.9); margin-bottom: 1.5rem;">${section.content.description}</p>
+                        <button class="btn" style="background: white; color: #667eea; padding: 0.75rem 2rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+                            ${section.content.buttonText}
+                        </button>
+                    </div>
+                `;
+            
+            case 'faq':
+                return `
+                    <div class="faq-preview">
+                        ${section.content.title ? `<h3>${section.content.title}</h3>` : ''}
+                        <div class="faq-list">
+                            ${section.content.faqs.map(faq => `
+                                <div class="faq-item" style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.75rem;">
+                                    <h4 style="font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">❓ ${faq.question}</h4>
+                                    <p style="color: #4b5563; line-height: 1.5;">${faq.answer}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            
+            case 'divider':
+                return `
+                    <div class="divider-preview" style="padding: 1rem 0;">
+                        <hr style="border: none; border-top: 2px solid #e5e7eb;">
+                    </div>
+                `;
+            
+            case 'custom':
+                return `
+                    <div class="custom-preview" style="padding: 2rem; border: 2px dashed #9ca3af; border-radius: 0.5rem; text-align: center;">
+                        <h4>⚙️ Custom Section</h4>
+                        <p style="color: #6b7280;">Custom HTML or embedded content</p>
+                    </div>
+                `;
+            
             default:
                 return `<div class="generic-preview">[${this.formatSectionType(section.type)} Section]</div>`;
         }
@@ -245,6 +378,290 @@ class PageBuilder {
                             <label>Subtitle</label>
                             <input type="text" class="form-control" data-content="subtitle" value="${section.content.subtitle}">
                         </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" data-content="description" rows="3">${section.content.description}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>CTA Text</label>
+                            <input type="text" class="form-control" data-content="ctaText" value="${section.content.ctaText}">
+                        </div>
+                        <div class="form-group">
+                            <label>CTA Link</label>
+                            <input type="text" class="form-control" data-content="ctaLink" value="${section.content.ctaLink}">
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'features':
+                html += `
+                    <div class="property-group">
+                        <h4>Features Content</h4>
+                        <div class="form-group">
+                            <label>Section Title</label>
+                            <input type="text" class="form-control" data-content="title" value="${section.content.title}">
+                        </div>
+                        <div class="form-group">
+                            <label>Features</label>
+                            <div id="featuresList">
+                                ${section.content.features.map((feature, index) => `
+                                    <div class="feature-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <strong>Feature ${index + 1}</strong>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFeature(${index})" title="Remove feature">🗑️</button>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <label style="font-size: 12px;">Icon</label>
+                                            <input type="text" class="form-control" data-content="features[${index}].icon" value="${feature.icon}" style="font-size: 14px;">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <label style="font-size: 12px;">Title</label>
+                                            <input type="text" class="form-control" data-content="features[${index}].title" value="${feature.title}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="font-size: 12px;">Description</label>
+                                            <textarea class="form-control" data-content="features[${index}].description" rows="2">${feature.description}</textarea>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="pageBuilder.addFeature()" style="width: 100%; margin-top: 8px;">+ Add Feature</button>
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'testimonials':
+                html += `
+                    <div class="property-group">
+                        <h4>Testimonials Content</h4>
+                        <div class="form-group">
+                            <label>Section Title</label>
+                            <input type="text" class="form-control" data-content="title" value="${section.content.title}">
+                        </div>
+                        <div class="form-group">
+                            <label>Testimonials</label>
+                            <div id="testimonialsList">
+                                ${section.content.testimonials.map((testimonial, index) => `
+                                    <div class="testimonial-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <strong>Testimonial ${index + 1}</strong>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeTestimonial(${index})" title="Remove testimonial">🗑️</button>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <label style="font-size: 12px;">Name</label>
+                                            <input type="text" class="form-control" data-content="testimonials[${index}].name" value="${testimonial.name}">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <label style="font-size: 12px;">Role</label>
+                                            <input type="text" class="form-control" data-content="testimonials[${index}].role" value="${testimonial.role}">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <label style="font-size: 12px;">Quote</label>
+                                            <textarea class="form-control" data-content="testimonials[${index}].quote" rows="2">${testimonial.quote}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="font-size: 12px;">Avatar URL (optional)</label>
+                                            <input type="text" class="form-control" data-content="testimonials[${index}].avatar" value="${testimonial.avatar}">
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="pageBuilder.addTestimonial()" style="width: 100%; margin-top: 8px;">+ Add Testimonial</button>
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'form':
+                html += `
+                    <div class="property-group">
+                        <h4>Form Content</h4>
+                        <div class="form-group">
+                            <label>Form Title</label>
+                            <input type="text" class="form-control" data-content="title" value="${section.content.title}">
+                        </div>
+                        <div class="form-group">
+                            <label>Button Text</label>
+                            <input type="text" class="form-control" data-content="buttonText" value="${section.content.buttonText}">
+                        </div>
+                        <div class="form-group">
+                            <label>Form Fields</label>
+                            <div id="fieldsList">
+                                ${section.content.fields.map((field, index) => `
+                                    <div class="field-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <strong>Field ${index + 1}</strong>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFormField(${index})" title="Remove field">🗑️</button>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <label style="font-size: 12px;">Label</label>
+                                            <input type="text" class="form-control" data-content="fields[${index}].label" value="${field.label}">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <label style="font-size: 12px;">Field Type</label>
+                                            <select class="form-control" data-content="fields[${index}].type">
+                                                <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
+                                                <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option>
+                                                <option value="number" ${field.type === 'number' ? 'selected' : ''}>Number</option>
+                                                <option value="textarea" ${field.type === 'textarea' ? 'selected' : ''}>Textarea</option>
+                                                <option value="tel" ${field.type === 'tel' ? 'selected' : ''}>Phone</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="font-size: 12px;">
+                                                <input type="checkbox" data-content="fields[${index}].required" ${field.required ? 'checked' : ''}>
+                                                Required
+                                            </label>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="pageBuilder.addFormField()" style="width: 100%; margin-top: 8px;">+ Add Field</button>
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'text':
+                html += `
+                    <div class="property-group">
+                        <h4>Text Content</h4>
+                        <div class="form-group">
+                            <label>Heading (optional)</label>
+                            <input type="text" class="form-control" data-content="heading" value="${section.content.heading || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Body Text</label>
+                            <textarea class="form-control" data-content="body" rows="6">${section.content.body}</textarea>
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'image':
+                html += `
+                    <div class="property-group">
+                        <h4>Image Content</h4>
+                        <div class="form-group">
+                            <label>Image URL</label>
+                            <input type="text" class="form-control" data-content="src" value="${section.content.src}">
+                        </div>
+                        <div class="form-group">
+                            <label>Alt Text</label>
+                            <input type="text" class="form-control" data-content="alt" value="${section.content.alt}">
+                        </div>
+                        <div class="form-group">
+                            <label>Caption (optional)</label>
+                            <input type="text" class="form-control" data-content="caption" value="${section.content.caption || ''}">
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'cta':
+                html += `
+                    <div class="property-group">
+                        <h4>Call to Action</h4>
+                        <div class="form-group">
+                            <label>Heading</label>
+                            <input type="text" class="form-control" data-content="heading" value="${section.content.heading}">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" data-content="description" rows="3">${section.content.description}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Button Text</label>
+                            <input type="text" class="form-control" data-content="buttonText" value="${section.content.buttonText}">
+                        </div>
+                        <div class="form-group">
+                            <label>Button Link</label>
+                            <input type="text" class="form-control" data-content="buttonLink" value="${section.content.buttonLink}">
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'faq':
+                html += `
+                    <div class="property-group">
+                        <h4>FAQ Content</h4>
+                        <div class="form-group">
+                            <label>Section Title (optional)</label>
+                            <input type="text" class="form-control" data-content="title" value="${section.content.title || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>FAQ Items</label>
+                            <div id="faqList">
+                                ${section.content.faqs.map((faq, index) => `
+                                    <div class="faq-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <strong>Q&A ${index + 1}</strong>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFaq(${index})" title="Remove FAQ">🗑️</button>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <label style="font-size: 12px;">Question</label>
+                                            <input type="text" class="form-control" data-content="faqs[${index}].question" value="${faq.question}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="font-size: 12px;">Answer</label>
+                                            <textarea class="form-control" data-content="faqs[${index}].answer" rows="3">${faq.answer}</textarea>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="pageBuilder.addFaq()" style="width: 100%; margin-top: 8px;">+ Add FAQ</button>
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'gallery':
+                html += `
+                    <div class="property-group">
+                        <h4>Gallery Content</h4>
+                        <div class="form-group">
+                            <label>Section Title (optional)</label>
+                            <input type="text" class="form-control" data-content="title" value="${section.content.title || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Images</label>
+                            <div id="galleryList">
+                                ${section.content.images.map((image, index) => `
+                                    <div class="gallery-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px; display: flex; gap: 10px; align-items: start;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                                <strong>Image ${index + 1}</strong>
+                                                <button type="button" class="btn-icon" onclick="pageBuilder.removeGalleryImage(${index})" title="Remove image">🗑️</button>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;">
+                                                <label style="font-size: 12px;">Image URL</label>
+                                                <input type="text" class="form-control" data-content="images[${index}]" value="${image}" style="font-size: 12px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="pageBuilder.addGalleryImage()" style="width: 100%; margin-top: 8px;">+ Add Image</button>
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'video':
+                html += `
+                    <div class="property-group">
+                        <h4>Video Content</h4>
+                        <div class="form-group">
+                            <label>Video URL (YouTube/Vimeo)</label>
+                            <input type="text" class="form-control" data-content="url" value="${section.content.url}">
+                        </div>
+                        <div class="form-group">
+                            <label>Caption (optional)</label>
+                            <input type="text" class="form-control" data-content="caption" value="${section.content.caption || ''}">
+                        </div>
                     </div>
                 `;
                 break;
@@ -294,7 +711,29 @@ class PageBuilder {
         document.querySelectorAll('[data-content]').forEach(input => {
             input.addEventListener('input', (e) => {
                 const property = e.target.dataset.content;
-                section.content[property] = e.target.value;
+                const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+                
+                // Handle nested properties like features[0].title
+                if (property.includes('[')) {
+                    const match = property.match(/([\w]+)\[(\d+)\]\.?([\w]*)/);
+                    if (match) {
+                        const [, arrayName, index, nestedProp] = match;
+                        if (!section.content[arrayName]) section.content[arrayName] = [];
+                        
+                        if (nestedProp) {
+                            // Nested object property like features[0].title
+                            if (section.content[arrayName][index]) {
+                                section.content[arrayName][index][nestedProp] = value;
+                            }
+                        } else {
+                            // Direct array value like images[0]
+                            section.content[arrayName][parseInt(index)] = value;
+                        }
+                    }
+                } else {
+                    section.content[property] = value;
+                }
+                
                 this.updateSectionPreview(section);
                 this.saveToHistory();
             });
@@ -396,8 +835,15 @@ class PageBuilder {
     }
 
     updateHistoryButtons() {
-        document.getElementById('undoBtn').disabled = this.historyIndex <= 0;
-        document.getElementById('redoBtn').disabled = this.historyIndex >= this.history.length - 1;
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        
+        if (undoBtn) {
+            undoBtn.disabled = this.historyIndex <= 0;
+        }
+        if (redoBtn) {
+            redoBtn.disabled = this.historyIndex >= this.history.length - 1;
+        }
     }
 
     async saveDraft() {
@@ -428,6 +874,9 @@ class PageBuilder {
                 this.campaignId = result.campaignId;
                 this.showMessage('Campaign saved successfully!', 'success');
                 
+                // Update preview button state now that we have a campaignId
+                this.updatePreviewButtonState();
+                
                 // Add to version history
                 this.addToVersionHistory(status);
                 
@@ -443,7 +892,7 @@ class PageBuilder {
         }
     }
 
-    addToVersionHistory(status) {
+    async addToVersionHistory(status) {
         const versionData = {
             version: this.history.length,
             timestamp: new Date().toISOString(),
@@ -452,19 +901,27 @@ class PageBuilder {
             campaignData: this.collectCampaignData()
         };
         
-        // Store in localStorage as backup
-        const versionHistory = JSON.parse(localStorage.getItem('campaignVersions') || '[]');
-        versionHistory.push(versionData);
-        
-        // Keep only last 10 versions
-        if (versionHistory.length > 10) {
-            versionHistory.shift();
+        // Store version history server-side via API
+        try {
+            const response = await fetch(`/builder/${this.campaignId}/versions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(versionData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                // Update UI with server-stored versions
+                this.updateVersionHistoryUI(result.versions);
+            }
+        } catch (error) {
+            console.error('Error saving version history:', error);
+            // Fallback to local UI update only
+            this.showMessage('Saved, but version history not stored', 'warning');
         }
-        
-        localStorage.setItem('campaignVersions', JSON.stringify(versionHistory));
-        
-        // Update UI
-        this.updateVersionHistoryUI(versionHistory);
     }
     
     updateVersionHistoryUI(versions) {
@@ -494,8 +951,23 @@ class PageBuilder {
         `;
     }
     
-    restoreVersion(versionIndex) {
-        const versions = JSON.parse(localStorage.getItem('campaignVersions') || '[]');
+    async loadVersionHistory() {
+        if (!this.campaignId) return [];
+        
+        try {
+            const response = await fetch(`/builder/${this.campaignId}/versions`);
+            if (response.ok) {
+                const result = await response.json();
+                return result.versions || [];
+            }
+        } catch (error) {
+            console.error('Error loading version history:', error);
+        }
+        return [];
+    }
+    
+    async restoreVersion(versionIndex) {
+        const versions = await this.loadVersionHistory();
         const version = versions[versionIndex];
         
         if (!version) return;
@@ -508,8 +980,8 @@ class PageBuilder {
         }
     }
     
-    compareVersion(versionIndex) {
-        const versions = JSON.parse(localStorage.getItem('campaignVersions') || '[]');
+    async compareVersion(versionIndex) {
+        const versions = await this.loadVersionHistory();
         const version = versions[versionIndex];
         
         if (!version) return;
@@ -547,11 +1019,21 @@ class PageBuilder {
         document.body.appendChild(modal);
     }
     
-    clearVersionHistory() {
+    async clearVersionHistory() {
         if (confirm('Clear all version history? This cannot be undone.')) {
-            localStorage.removeItem('campaignVersions');
-            this.updateVersionHistoryUI([]);
-            this.showMessage('Version history cleared', 'info');
+            try {
+                const response = await fetch(`/builder/${this.campaignId}/versions`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    this.updateVersionHistoryUI([]);
+                    this.showMessage('Version history cleared', 'info');
+                }
+            } catch (error) {
+                console.error('Error clearing version history:', error);
+                this.showMessage('Failed to clear version history', 'error');
+            }
         }
     }
     
@@ -591,13 +1073,49 @@ class PageBuilder {
     }
 
     async preview() {
+        const previewBtn = document.getElementById('previewBtn');
+        
         if (!this.campaignId) {
             this.showMessage('Please save your campaign first to preview', 'warning');
+            // Shake animation to draw attention to why it's disabled
+            if (previewBtn) {
+                previewBtn.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    previewBtn.style.animation = '';
+                }, 500);
+            }
             return;
         }
         
         // Open preview in same window to maintain authentication
         window.location.href = `/builder/${this.campaignId}/preview`;
+    }
+
+    updatePreviewButtonState() {
+        const previewBtn = document.getElementById('previewBtn');
+        if (!previewBtn) return;
+        
+        if (!this.campaignId) {
+            // Disable and dim the button
+            previewBtn.disabled = true;
+            previewBtn.classList.add('disabled');
+            previewBtn.style.opacity = '0.5';
+            previewBtn.style.cursor = 'not-allowed';
+            
+            // Add tooltip explaining why
+            previewBtn.title = 'Please save your campaign first before previewing';
+            previewBtn.setAttribute('data-tooltip', 'Save campaign first');
+        } else {
+            // Enable the button
+            previewBtn.disabled = false;
+            previewBtn.classList.remove('disabled');
+            previewBtn.style.opacity = '1';
+            previewBtn.style.cursor = 'pointer';
+            
+            // Remove tooltip
+            previewBtn.title = 'Preview your campaign';
+            previewBtn.removeAttribute('data-tooltip');
+        }
     }
 
     loadExistingData() {
@@ -612,7 +1130,9 @@ class PageBuilder {
         }
     }
 
-    filterTemplates(category) {
+    filterTemplates(category, event) {
+        if (!event) return;
+        
         document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
         
@@ -701,6 +1221,64 @@ class PageBuilder {
                     ],
                     buttonText: 'Donate Now'
                 }
+            },
+            {
+                id: 'text-basic',
+                type: 'text',
+                content: {
+                    heading: 'Text Section',
+                    body: 'This is a basic text section. You can use this section to add descriptive content about your campaign, mission, or any information you want to share with your audience.'
+                }
+            },
+            {
+                id: 'image-basic',
+                type: 'image',
+                content: {
+                    src: 'https://via.placeholder.com/800x400',
+                    alt: 'Campaign image',
+                    caption: 'Image caption goes here'
+                }
+            },
+            {
+                id: 'gallery-grid',
+                type: 'gallery',
+                content: {
+                    title: 'Photo Gallery',
+                    images: [
+                        'https://via.placeholder.com/400x300',
+                        'https://via.placeholder.com/400x300',
+                        'https://via.placeholder.com/400x300'
+                    ]
+                }
+            },
+            {
+                id: 'video-youtube',
+                type: 'video',
+                content: {
+                    url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                    caption: 'Video caption or description'
+                }
+            },
+            {
+                id: 'cta-basic',
+                type: 'cta',
+                content: {
+                    heading: 'Take Action Now',
+                    description: 'Encourage visitors to take the next step and support your cause.',
+                    buttonText: 'Get Involved',
+                    buttonLink: '#donate'
+                }
+            },
+            {
+                id: 'faq-basic',
+                type: 'faq',
+                content: {
+                    title: 'Frequently Asked Questions',
+                    faqs: [
+                        { question: 'What is this campaign about?', answer: 'This campaign aims to make a positive impact by addressing an important issue.' },
+                        { question: 'How can I contribute?', answer: 'You can contribute by donating, sharing our campaign, or volunteering your time.' }
+                    ]
+                }
             }
         ];
         
@@ -760,53 +1338,110 @@ class PageBuilder {
             toast.remove();
         }, 3000);
     }
+
+    // Dynamic feature management
+    addFeature() {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.features.push({
+            icon: '✨',
+            title: 'New Feature',
+            description: 'Feature description here'
+        });
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    removeFeature(index) {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.features.splice(index, 1);
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    // Dynamic testimonial management
+    addTestimonial() {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.testimonials.push({
+            name: 'Person Name',
+            role: 'Supporter',
+            quote: 'Great testimonial text here',
+            avatar: ''
+        });
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    removeTestimonial(index) {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.testimonials.splice(index, 1);
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    // Dynamic form field management
+    addFormField() {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.fields.push({
+            type: 'text',
+            label: 'New Field',
+            required: false
+        });
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    removeFormField(index) {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.fields.splice(index, 1);
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    // Dynamic FAQ management
+    addFaq() {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.faqs.push({
+            question: 'New Question?',
+            answer: 'Answer to the question goes here.'
+        });
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    removeFaq(index) {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.faqs.splice(index, 1);
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    // Dynamic gallery image management
+    addGalleryImage() {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.images.push('https://via.placeholder.com/400x300');
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
+
+    removeGalleryImage(index) {
+        if (!this.selectedSection) return;
+        this.selectedSection.content.images.splice(index, 1);
+        this.openPropertiesPanel(this.selectedSection);
+        this.updateSectionPreview(this.selectedSection);
+        this.saveToHistory();
+    }
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.pageBuilder = new PageBuilder();
 });
-
-// Add SortableJS for drag and drop sorting
-// In a real implementation, you'd include SortableJS library
-class Sortable {
-    constructor(element, options) {
-        this.element = element;
-        this.options = options;
-        this.init();
-    }
-    
-    init() {
-        // Basic sortable implementation
-        let draggedElement = null;
-        
-        this.element.addEventListener('dragstart', (e) => {
-            if (e.target.classList.contains('builder-section')) {
-                draggedElement = e.target;
-                e.target.style.opacity = '0.5';
-            }
-        });
-        
-        this.element.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const target = e.target.closest('.builder-section');
-            if (target && target !== draggedElement) {
-                const rect = target.getBoundingClientRect();
-                const midpoint = rect.top + rect.height / 2;
-                if (e.clientY < midpoint) {
-                    target.parentNode.insertBefore(draggedElement, target);
-                } else {
-                    target.parentNode.insertBefore(draggedElement, target.nextSibling);
-                }
-            }
-        });
-        
-        this.element.addEventListener('dragend', (e) => {
-            if (draggedElement) {
-                draggedElement.style.opacity = '1';
-                draggedElement = null;
-                if (this.options.onEnd) this.options.onEnd();
-            }
-        });
-    }
-}

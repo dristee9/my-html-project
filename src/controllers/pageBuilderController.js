@@ -1,4 +1,5 @@
 const Campaign = require('../models/Campaign');
+const CampaignVersion = require('../models/CampaignVersion');
 
 // Get page builder interface for creating new campaign
 exports.getPageBuilder = async (req, res) => {
@@ -12,7 +13,8 @@ exports.getPageBuilder = async (req, res) => {
     } catch (error) {
         console.error('Error loading page builder:', error);
         res.status(500).render('pages/error', { 
-            error: 'Failed to load page builder' 
+            error: 'Failed to load page builder',
+            user: req.user || null
         });
     }
 };
@@ -31,7 +33,8 @@ exports.editPageBuilder = async (req, res) => {
         // Check if user owns this campaign
         if (campaign.creator._id.toString() !== req.user._id.toString()) {
             return res.status(403).render('pages/error', { 
-                error: 'You can only edit your own campaigns' 
+                error: 'You can only edit your own campaigns',
+                user: req.user || null
             });
         }
 
@@ -44,7 +47,8 @@ exports.editPageBuilder = async (req, res) => {
     } catch (error) {
         console.error('Error loading edit page builder:', error);
         res.status(500).render('pages/error', { 
-            error: 'Failed to load page builder' 
+            error: 'Failed to load page builder',
+            user: req.user || null
         });
     }
 };
@@ -58,45 +62,60 @@ exports.savePageBuilder = async (req, res) => {
             category, 
             fundingGoal, 
             deadline,
-            pageBuilderData,
-            status = 'draft'
+            pageBuilderData
         } = req.body;
 
-        const campaignData = {
-            title,
-            description,
-            category,
-            fundingGoal: parseInt(fundingGoal),
-            deadline: new Date(deadline),
-            creator: req.user._id,
-            status
-        };
-
-        // Add page builder data if provided
-        if (pageBuilderData) {
-            campaignData.pageBuilder = {
-                enabled: true,
-                sections: pageBuilderData.sections || [],
-                globalStyles: pageBuilderData.globalStyles || {},
-                customCSS: pageBuilderData.customCSS || '',
-                versionHistory: [{
-                    version: 1,
-                    data: pageBuilderData,
-                    createdBy: req.user._id
-                }]
-            };
-        }
-
         let campaign;
+        
         if (req.params.id) {
-            // Update existing campaign
+            // Update existing campaign - use $set to avoid overwriting sensitive fields
+            const updateData = {
+                $set: {
+                    title,
+                    description,
+                    category,
+                    fundingGoal: parseInt(fundingGoal),
+                    deadline: new Date(deadline)
+                }
+            };
+            
+            // Add page builder data if provided
+            if (pageBuilderData) {
+                updateData.$set['pageBuilder.enabled'] = true;
+                updateData.$set['pageBuilder.sections'] = pageBuilderData.sections || [];
+                updateData.$set['pageBuilder.globalStyles'] = pageBuilderData.globalStyles || {};
+                updateData.$set['pageBuilder.customCSS'] = pageBuilderData.customCSS || '';
+            }
+            
+            // IMPORTANT: Do NOT update status, backers, or currentFunding from page builder
+            // These fields are managed by donation and campaign management logic
             campaign = await Campaign.findByIdAndUpdate(
                 req.params.id,
-                campaignData,
+                updateData,
                 { new: true, runValidators: true }
             );
         } else {
             // Create new campaign
+            const campaignData = {
+                title,
+                description,
+                category,
+                fundingGoal: parseInt(fundingGoal),
+                deadline: new Date(deadline),
+                creator: req.user._id,
+                status: 'draft'
+            };
+            
+            // Add page builder data if provided
+            if (pageBuilderData) {
+                campaignData.pageBuilder = {
+                    enabled: true,
+                    sections: pageBuilderData.sections || [],
+                    globalStyles: pageBuilderData.globalStyles || {},
+                    customCSS: pageBuilderData.customCSS || ''
+                };
+            }
+            
             campaign = new Campaign(campaignData);
             await campaign.save();
         }
@@ -171,7 +190,9 @@ exports.previewCampaign = async (req, res) => {
             .lean();
 
         if (!campaign) {
-            return res.status(404).render('pages/404');
+            return res.status(404).render('pages/404', {
+                user: req.user || null
+            });
         }
 
         // Render with custom page builder if enabled
@@ -193,7 +214,61 @@ exports.previewCampaign = async (req, res) => {
     } catch (error) {
         console.error('Error previewing campaign:', error);
         res.status(500).render('pages/error', { 
-            error: 'Failed to preview campaign' 
+            error: 'Failed to preview campaign',
+            user: req.user || null
         });
+    }
+};
+
+// Get campaign version history
+exports.getVersionHistory = async (req, res) => {
+    try {
+        const versions = await CampaignVersion.findByCampaign(req.params.id);
+        res.json({ versions });
+    } catch (error) {
+        console.error('Error fetching version history:', error);
+        res.status(500).json({ error: 'Failed to fetch version history' });
+    }
+};
+
+// Save version to campaign history
+exports.saveVersion = async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).json({ error: 'Campaign not found' });
+        }
+        
+        const { version, timestamp, status, sections, campaignData } = req.body;
+        
+        // Create new version in separate collection
+        const versionDoc = new CampaignVersion({
+            campaign: campaign._id,
+            version,
+            data: { sections, ...campaignData },
+            createdBy: req.user._id
+        });
+        
+        await versionDoc.saveVersion(); // Auto-cleanup old versions
+        
+        // Get updated version list
+        const versions = await CampaignVersion.findByCampaign(req.params.id);
+        res.json({ success: true, versions });
+    } catch (error) {
+        console.error('Error saving version:', error);
+        res.status(500).json({ error: 'Failed to save version' });
+    }
+};
+
+// Clear version history
+exports.clearVersionHistory = async (req, res) => {
+    try {
+        await CampaignVersion.deleteMany({ campaign: req.params.id });
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error clearing version history:', error);
+        res.status(500).json({ error: 'Failed to clear version history' });
     }
 };

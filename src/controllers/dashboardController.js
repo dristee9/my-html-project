@@ -8,17 +8,69 @@ exports.getDashboard = async (req, res) => {
             .sort({ createdAt: -1 });
         
         // Calculate user statistics
+        const activeCampaigns = campaigns.filter(c => c.status === 'active');
         const userStats = {
-            campaignsCount: campaigns.length,
+            campaignsCount: activeCampaigns.length,
             totalRaised: campaigns.reduce((sum, camp) => sum + camp.currentFunding, 0),
             donationsCount: campaigns.reduce((sum, camp) => sum + camp.backers.length, 0)
         };
+        
+        // Find campaigns expiring in next 3 days
+        const threeDaysFromNow = new Date();
+        threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+        const expiringSoon = activeCampaigns.filter(c => 
+            c.deadline <= threeDaysFromNow && c.deadline > new Date()
+        ).sort((a, b) => a.deadline - b.deadline);
+        
+        // Build recent activity feed (last 5 actions)
+        const recentActivity = [];
+        
+        // Add recent donations received
+        campaigns.forEach(campaign => {
+            campaign.backers.forEach(backer => {
+                recentActivity.push({
+                    type: 'donation_received',
+                    campaignTitle: campaign.title,
+                    donorName: backer.user?.username || 'Anonymous',
+                    amount: backer.amount,
+                    date: backer.donatedAt,
+                    icon: '💰'
+                });
+            });
+        });
+        
+        // Add campaign status changes
+        campaigns.forEach(campaign => {
+            if (campaign.status === 'completed') {
+                recentActivity.push({
+                    type: 'campaign_completed',
+                    campaignTitle: campaign.title,
+                    message: 'Campaign completed successfully',
+                    date: campaign.updatedAt,
+                    icon: '✅'
+                });
+            } else if (campaign.status === 'expired') {
+                recentActivity.push({
+                    type: 'campaign_expired',
+                    campaignTitle: campaign.title,
+                    message: 'Campaign deadline passed',
+                    date: campaign.updatedAt,
+                    icon: '⏰'
+                });
+            }
+        });
+        
+        // Sort by date and take last 5
+        recentActivity.sort((a, b) => b.date - a.date);
+        const recentActivities = recentActivity.slice(0, 5);
         
         res.render('pages/dashboard', {
             title: 'Dashboard - FundMyIdea BD',
             user: req.user,
             campaigns: campaigns,
-            userStats: userStats
+            userStats: userStats,
+            expiringSoon: expiringSoon,
+            recentActivities: recentActivities
         });
     } catch (error) {
         console.error('Error fetching user dashboard:', error);
@@ -43,24 +95,32 @@ exports.updateProfile = async (req, res) => {
     try {
         const { username, email, university } = req.body;
         
-        // Build update data
-        const updateData = {
-            username,
-            email,
-            university
-        };
+        // Fetch-then-save pattern to ensure pre-save hooks run
+        const user = await User.findById(req.user._id);
+        
+        if (!user) {
+            return res.status(404).render('pages/error', {
+                title: 'User Not Found - FundMyIdea BD',
+                error: 'User not found',
+                user: req.user
+            });
+        }
+        
+        // Update user fields
+        user.username = username;
+        user.email = email;
+        user.university = university;
         
         // Handle profile image upload if file exists
         if (req.file) {
-            updateData.profileImage = '/uploads/profiles/' + req.file.filename;
+            user.profileImage = '/uploads/profiles/' + req.file.filename;
         }
         
-        // Update user
-        await User.findByIdAndUpdate(req.user._id, updateData);
+        // Save to trigger pre-save hooks and validation
+        await user.save();
         
         // Refresh user data
-        const updatedUser = await User.findById(req.user._id);
-        req.user = updatedUser;
+        req.user = user;
         
         res.redirect('/dashboard/profile');
     } catch (error) {

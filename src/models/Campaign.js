@@ -11,7 +11,7 @@ const campaignSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Campaign description is required'],
         trim: true,
-        maxlength: [2000, 'Description cannot exceed 2000 characters']
+        maxlength: [10000, 'Description cannot exceed 10000 characters']
     },
     category: {
         type: String,
@@ -87,13 +87,8 @@ const campaignSchema = new mongoose.Schema({
             accentColor: String,
             backgroundColor: String
         },
-        customCSS: String,
-        versionHistory: [{
-            version: Number,
-            data: mongoose.Schema.Types.Mixed,
-            createdAt: { type: Date, default: Date.now },
-            createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-        }]
+        customCSS: String
+        // Note: Version history is now stored in separate CampaignVersion collection
     },
     status: {
         type: String,
@@ -107,16 +102,15 @@ const campaignSchema = new mongoose.Schema({
         },
         amount: Number,
         message: String,
-        bkashNumber: String,
+        bkashNumberLast4: String, // Store only last 4 digits for privacy
+        transactionId: String, // For future bKash API integration
         donatedAt: {
             type: Date,
             default: Date.now
         }
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+    }]
+}, {
+    timestamps: true // Automatically adds createdAt and updatedAt
 });
 
 // Virtual for funding percentage
@@ -141,5 +135,32 @@ campaignSchema.virtual('daysLeftText').get(function() {
 // Index for better querying
 campaignSchema.index({ status: 1, createdAt: -1 });
 campaignSchema.index({ category: 1, status: 1 });
+campaignSchema.index({ 'backers.user': 1 }); // Index for efficient donation queries
+campaignSchema.index({ title: 'text', description: 'text' }); // Text index for full-text search
+
+// Method to check and update campaign expiration
+campaignSchema.methods.checkAndUpdateExpiration = async function() {
+    // Auto-expire if deadline has passed and status is still active
+    if (this.status === 'active' && this.deadline < new Date()) {
+        this.status = 'expired';
+        await this.save();
+    }
+    return this;
+};
+
+// Static method to bulk expire old campaigns
+campaignSchema.statics.expireOldCampaigns = async function() {
+    const result = await this.updateMany(
+        {
+            status: 'active',
+            deadline: { $lt: new Date() }
+        },
+        {
+            $set: { status: 'expired' }
+        }
+    );
+    console.log(`Expired ${result.modifiedCount} campaigns`);
+    return result;
+};
 
 module.exports = mongoose.model('Campaign', campaignSchema);

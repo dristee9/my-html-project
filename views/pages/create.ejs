@@ -2,6 +2,7 @@
 <% title = 'Create Campaign - FundMyIdea BD' -%>
 
 <form class="auth-form campaign-form" method="POST" action="/campaigns/create" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <h2 class="form-title">Create Your Student Campaign</h2>
     
     <div class="form-group">
@@ -41,10 +42,10 @@
     <div class="form-group">
         <label class="form-label">Campaign Image</label>
         <input type="file" name="image" class="form-control" accept="image/*">
-        <small style="color: var(--gray-500); font-size: 0.875rem;">Upload a compelling image that represents your campaign (JPG, PNG, max 5MB)</small>
+        <small class="form-helper">Upload a compelling image that represents your campaign (JPG, PNG, max 5MB)</small>
     </div>
     
-    <button type="submit" class="submit-button" style="background-color: var(--secondary-green);">Launch Campaign</button>
+    <button type="submit" class="submit-button btn-success">Launch Campaign</button>
     
     <div class="form-footer">
         By creating a campaign, you agree to our <a href="#" class="form-link">Terms of Service</a> and <a href="#" class="form-link">Community Guidelines</a>

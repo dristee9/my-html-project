@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const multer = require('multer');
+const path = require('path');
+const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
+const Campaign = require('../models/Campaign');
 const campaignController = require('../controllers/campaignController');
 
 // Configure multer for file uploads
@@ -10,7 +14,10 @@ const storage = multer.diskStorage({
         cb(null, 'public/uploads/')
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname)
+        // Use random filename with original extension to prevent path traversal
+        const ext = path.extname(file.originalname);
+        const randomName = crypto.randomBytes(8).toString('hex');
+        cb(null, Date.now() + '-' + randomName + ext);
     }
 });
 
@@ -31,6 +38,15 @@ const upload = multer({
 // Apply optionalAuth middleware
 router.use(optionalAuth);
 
+// Rate limiter for donation routes
+const donationLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5, // Limit each IP to 5 donations per hour
+    message: 'Too many donation attempts from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // Explore campaigns route
 router.get('/', campaignController.getAllCampaigns);
 
@@ -39,7 +55,7 @@ router.get('/search', campaignController.searchCampaigns);
 
 // Dedicated donation page routes
 router.get('/:id/donate', authenticateToken, campaignController.getDonationPage);
-router.post('/:id/donate', authenticateToken, campaignController.processDonation);
+router.post('/:id/donate', authenticateToken, donationLimiter, campaignController.processDonation);
 
 // Create campaign route (GET)
 router.get('/create', authenticateToken, (req, res) => {

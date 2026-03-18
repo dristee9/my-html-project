@@ -1,10 +1,10 @@
 <% layout('layouts/main') -%>
 <% title = 'Something Went Wrong - FundMyIdea BD' -%>
 
-<div style="text-align: center; padding: 4rem 1rem;">
-    <h1 style="font-size: 3rem; font-weight: 800; color: var(--primary-blue); margin-bottom: 1rem;">Oops!</h1>
-    <h2 style="font-size: 2rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem;">Something Went Wrong</h2>
-    <p style="color: var(--gray-600); margin-bottom: 2rem; font-size: 1.125rem;">
+<div class="page-404">
+    <h1 class="page-404-title">Oops!</h1>
+    <h2 class="page-404-subtitle">Something Went Wrong</h2>
+    <p class="page-404-text">
         <%= typeof error !== 'undefined' ? error : 'We encountered an unexpected error.' %>
     </p>
     <a href="/" class="primary-button">Go Home</a>

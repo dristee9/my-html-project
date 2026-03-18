@@ -37,6 +37,9 @@ exports.getCampaignById = async (req, res) => {
             });
         }
         
+        // Auto-expire campaign if deadline has passed
+        await campaign.checkAndUpdateExpiration();
+        
         // Add virtual properties for template usage
         const campaignData = campaign.toObject();
         campaignData.daysLeftText = campaign.daysLeftText;
@@ -47,10 +50,16 @@ exports.getCampaignById = async (req, res) => {
             backer.user && backer.user._id.toString() === req.user._id.toString()
         );
         
+        // Check for donation success message from redirect
+        const donationSuccess = req.query.donated === 'true' ? 
+            `Thank you for your generous donation! Your support means everything to ${campaign.creator.username}.` : 
+            null;
+        
         res.render('pages/campaign', {
             title: `${campaign.title} - FundMyIdea BD`,
             campaign: campaignData,
             hasDonated: hasDonated,
+            donationSuccess: donationSuccess,
             user: req.user
         });
     } catch (error) {
@@ -104,68 +113,6 @@ exports.createCampaign = async (req, res) => {
 };
 
 // Process donation
-exports.donateToCampaign = async (req, res) => {
-    try {
-        const { amount, message, bkashNumber } = req.body;
-        const campaignId = req.params.id;
-        
-        // Validate amount
-        const donationAmount = parseInt(amount);
-        if (donationAmount < 100) {
-            return res.status(400).render('pages/campaign', {
-                title: 'Donate - FundMyIdea BD',
-                user: req.user,
-                error: 'Minimum donation amount is 100 BDT'
-            });
-        }
-        
-        const campaign = await Campaign.findById(campaignId);
-        if (!campaign) {
-            return res.status(404).render('pages/404', {
-                title: 'Campaign Not Found - FundMyIdea BD',
-                user: req.user
-            });
-        }
-        
-        // Check if campaign is still active
-        if (campaign.status !== 'active' || campaign.deadline < new Date()) {
-            return res.status(400).render('pages/campaign', {
-                title: campaign.title + ' - FundMyIdea BD',
-                campaign: campaign,
-                user: req.user,
-                error: 'This campaign is no longer accepting donations'
-            });
-        }
-        
-        // Add donation to campaign
-        campaign.backers.push({
-            user: req.user._id,
-            amount: donationAmount,
-            message: message || '',
-            bkashNumber: bkashNumber
-        });
-        
-        campaign.currentFunding += donationAmount;
-        
-        // Check if funding goal is reached
-        if (campaign.currentFunding >= campaign.fundingGoal) {
-            campaign.status = 'completed';
-        }
-        
-        await campaign.save();
-        
-        console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
-        res.redirect(`/campaigns/${campaignId}`);
-    } catch (error) {
-        console.error('Error processing donation:', error);
-        res.status(500).render('pages/campaign', {
-            title: 'Donate - FundMyIdea BD',
-            user: req.user,
-            error: 'Failed to process donation'
-        });
-    }
-};
-
 // Get user's campaigns for dashboard
 exports.getUserCampaigns = async (req, res) => {
     try {
@@ -208,6 +155,9 @@ exports.getDonationPage = async (req, res) => {
                 user: req.user
             });
         }
+        
+        // Auto-expire campaign if deadline has passed
+        await campaign.checkAndUpdateExpiration();
         
         // Add virtual properties for template usage
         const campaignData = campaign.toObject();
@@ -258,6 +208,20 @@ exports.processDonation = async (req, res) => {
             });
         }
         
+        // Auto-expire campaign if deadline has passed
+        await campaign.checkAndUpdateExpiration();
+        
+        // Check if campaign is still active after expiration check
+        if (campaign.status !== 'active') {
+            console.log('Campaign not active or expired');
+            return res.status(400).render('pages/donate', {
+                title: `Donate to ${campaign.title} - FundMyIdea BD`,
+                campaign: campaignData,
+                user: req.user,
+                error: 'This campaign is no longer accepting donations'
+            });
+        }
+        
         // Add virtual properties for template usage
         const campaignData = campaign.toObject();
         campaignData.daysLeftText = campaign.daysLeftText;
@@ -297,28 +261,14 @@ exports.processDonation = async (req, res) => {
             });
         }
         
-        // Check if user has already donated
-        const hasAlreadyDonated = campaign.backers.some(backer => 
-            backer.user && backer.user._id.toString() === req.user._id.toString()
-        );
-        
-        if (hasAlreadyDonated) {
-            console.log('User has already donated');
-            return res.status(400).render('pages/donate', {
-                title: `Donate to ${campaign.title} - FundMyIdea BD`,
-                campaign: campaignData,
-                user: req.user,
-                error: 'You have already donated to this campaign'
-            });
-        }
-        
         console.log('Adding donation to campaign');
-        // Add donation to campaign
+        // Add donation to campaign - store only last 4 digits for privacy
         campaign.backers.push({
             user: req.user._id,
             amount: donationAmount,
             message: message || '',
-            bkashNumber: bkashNumber
+            bkashNumberLast4: bkashNumber.slice(-4), // Store only last 4 digits
+            transactionId: null // Placeholder for future bKash API integration
         });
         
         campaign.currentFunding += donationAmount;
@@ -333,13 +283,8 @@ exports.processDonation = async (req, res) => {
         
         console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
         
-        // Redirect to success page or back to campaign with success message
-        res.render('pages/donate', {
-            title: `Thank You - FundMyIdea BD`,
-            campaign: campaign,
-            user: req.user,
-            success: `Thank you for your generous donation of ${donationAmount} BDT! Your support means everything to ${campaign.creator.username}.`
-        });
+        // Redirect to campaign page with success flag (POST-Redirect-GET pattern)
+        res.redirect(`/campaigns/${campaignId}?donated=true`);
     } catch (error) {
         console.error('Error processing donation:', error);
         res.status(500).render('pages/donate', {
@@ -353,30 +298,82 @@ exports.processDonation = async (req, res) => {
 // Search campaigns
 exports.searchCampaigns = async (req, res) => {
     try {
-        const { q, category } = req.query;
+        const { q, category, sort, page } = req.query;
+        
+        // Pagination settings
+        const currentPage = parseInt(page) || 1;
+        const pageSize = 9; // Show 9 campaigns per page
+        const skip = (currentPage - 1) * pageSize;
+        
+        // Build query
         let query = { status: 'active' };
         
-        if (q) {
-            query.$or = [
-                { title: { $regex: q, $options: 'i' } },
-                { description: { $regex: q, $options: 'i' } }
-            ];
+        // Use text search if query exists
+        if (q && q.trim() !== '') {
+            // Try text search first (requires text index)
+            try {
+                const textSearch = await Campaign.find(
+                    { $text: { $search: q }, status: 'active' },
+                    { score: { $meta: 'textScore' } }
+                ).sort({ score: { $meta: 'textScore' } });
+                
+                // If text search returns results, filter by category and use it
+                if (textSearch.length > 0) {
+                    query = { _id: { $in: textSearch.map(c => c._id) } };
+                } else {
+                    // Fallback to regex search if text search returns nothing
+                    query.$or = [
+                        { title: { $regex: q, $options: 'i' } },
+                        { description: { $regex: q, $options: 'i' } }
+                    ];
+                }
+            } catch (textError) {
+                // Fallback to regex search if text index doesn't exist or fails
+                query.$or = [
+                    { title: { $regex: q, $options: 'i' } },
+                    { description: { $regex: q, $options: 'i' } }
+                ];
+            }
         }
         
         if (category && category !== 'all') {
             query.category = category;
         }
         
+        // Determine sorting
+        let sortOptions = {};
+        if (sort === 'most-funded') {
+            sortOptions = { currentFunding: -1 };
+        } else if (sort === 'ending-soon') {
+            sortOptions = { deadline: 1 };
+        } else if (sort === 'newest' || !sort) {
+            sortOptions = { createdAt: -1 }; // Default to newest
+        }
+        
+        // Get total count for pagination
+        const totalCount = await Campaign.countDocuments(query);
+        const totalPages = Math.ceil(totalCount / pageSize);
+        
+        // Fetch campaigns with pagination and sorting
         const campaigns = await Campaign.find(query)
             .populate('creator', 'username university')
-            .sort({ createdAt: -1 });
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(pageSize);
         
         res.render('pages/explore', {
-            title: 'Search Results - FundMyIdea BD',
+            title: q ? `Search Results - FundMyIdea BD` : 'Explore Campaigns - FundMyIdea BD',
             campaigns: campaigns,
             user: req.user,
-            searchQuery: q,
-            searchCategory: category
+            searchQuery: q || '',
+            searchCategory: category || 'all',
+            sortBy: sort || 'newest',
+            currentPage: currentPage,
+            totalPages: totalPages,
+            hasPrevPage: currentPage > 1,
+            hasNextPage: currentPage < totalPages,
+            prevPage: currentPage - 1,
+            nextPage: currentPage + 1
         });
     } catch (error) {
         console.error('Error searching campaigns:', error);

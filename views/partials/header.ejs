@@ -1,12 +1,22 @@
 <nav class="site-navigation">
     <div class="nav-wrapper">
         <a href="/" class="site-logo">FundMyIdea BD</a>
-        <div class="nav-links">
+        
+        <!-- Mobile hamburger menu button -->
+        <button class="nav-toggle" aria-label="Menu" id="navToggle">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+        
+        <div class="nav-links" id="navLinks">
             <% if (typeof user !== 'undefined' && user) { %>
                 <a href="/campaigns" class="nav-item">Explore Campaigns</a>
                 <a href="/builder/create" class="nav-item">Create Campaign</a>
                 <a href="/dashboard" class="nav-item">Dashboard</a>
-                <a href="/logout" class="nav-item">Logout</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="nav-item logout-button">Logout</button>
+                </form>
             <% } else { %>
                 <a href="/campaigns" class="nav-item">Explore Campaigns</a>
                 <a href="/login" class="nav-item">Login</a>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= typeof title !== 'undefined' ? title : 'FundMyIdea BD' %></title>
+    <link rel="stylesheet" href="/styles/base.css">
     <link rel="stylesheet" href="/styles/main.css">
 </head>
 <body class="app-container">
@@ -12,5 +13,20 @@
         <%- body %>
     </main>
     <%- include('../partials/footer') %>
+    
+    <!-- Mobile Navigation Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const siteNav = document.querySelector('.site-navigation');
+            
+            if (navToggle) {
+                navToggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    siteNav.classList.toggle('nav-open');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

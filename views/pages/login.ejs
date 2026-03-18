@@ -2,10 +2,11 @@
 <% title = 'Login - FundMyIdea BD' -%>
 
 <form class="auth-form" method="POST" action="/login">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <h2 class="form-title">Login to FundMyIdea BD</h2>
     
     <% if (typeof error !== 'undefined' && error) { %>
-        <div style="background-color: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border: 1px solid #fecaca;">
+        <div class="error-banner mb-4">
             <%= error %>
         </div>
     <% } %>

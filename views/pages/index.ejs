@@ -7,6 +7,18 @@
         <h1 class="hero-title">Empower Student Innovation</h1>
         <p class="hero-subtitle">FundMyIdea BD connects passionate students with supporters to bring groundbreaking ideas to life. Join our community of innovators and changemakers today.</p>
         
+        <!-- Search Bar -->
+        <form action="/campaigns/search" method="GET" class="search-form" style="max-width: 600px; margin: 2rem auto; display: flex; gap: 0.5rem;">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Search campaigns..." 
+                class="form-control" 
+                style="flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--gray-300); border-radius: var(--border-radius-lg); font-size: 1rem;"
+            >
+            <button type="submit" class="primary-button" style="padding: 0.75rem 2rem;">Search</button>
+        </form>
+        
         <div class="hero-actions">
             <% if (typeof user !== 'undefined' && user) { %>
                 <a href="/builder/create" class="primary-button">Start Your Campaign</a>
@@ -19,17 +31,130 @@
 
         <div class="stats-overview">
             <div class="stat-card">
-                <div class="stat-value">150+</div>
+                <div class="stat-value"><%= stats.activeCampaigns %>+</div>
                 <div class="stat-label">Active Campaigns</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">2.5M+</div>
+                <div class="stat-value"><%=(stats.totalRaised / 1000).toFixed(1)%>K+</div>
                 <div class="stat-label">BDT Raised</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">50+</div>
+                <div class="stat-value"><%= stats.universities %>+</div>
                 <div class="stat-label">Universities</div>
             </div>
         </div>
+    </div>
+</section>
+
+<!-- Recommended Campaigns (For Logged-in Users) -->
+<% if (typeof recommendedCampaigns !== 'undefined' && recommendedCampaigns.length > 0) { %>
+<section class="page-section">
+    <div class="section-header">
+        <h2 class="section-title">Recommended For You</h2>
+        <a href="/campaigns" class="view-all-link">View All →</a>
+    </div>
+    <div class="campaign-grid">
+        <% recommendedCampaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <a href="/campaigns/<%= campaign._id %>">
+                    <img src="<%= campaign.imageUrl || '/images/default-campaign.jpg' %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <div class="campaign-content">
+                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                        <div class="campaign-meta">
+                            <span class="campaign-category"><%= campaign.category %></span>
+                            <span class="campaign-creator">by <%= campaign.creator?.username || 'Unknown' %></span>
+                        </div>
+                        <div class="campaign-stats">
+                            <div class="funding-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                </div>
+                                <div class="funding-amount">
+                                    <span><%= campaign.currentFunding %> BDT</span>
+                                    <span>of <%= campaign.fundingGoal %> BDT</span>
+                                </div>
+                            </div>
+                            <div class="days-left"><%= campaign.daysLeftText %></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <% }) %>
+    </div>
+</section>
+<% } %>
+
+<!-- Trending Campaigns -->
+<section class="page-section">
+    <div class="section-header">
+        <h2 class="section-title">🔥 Trending Campaigns</h2>
+        <a href="/campaigns" class="view-all-link">View All →</a>
+    </div>
+    <div class="campaign-grid">
+        <% trendingCampaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <a href="/campaigns/<%= campaign._id %>">
+                    <img src="<%= campaign.imageUrl || '/images/default-campaign.jpg' %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <div class="campaign-content">
+                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                        <div class="campaign-meta">
+                            <span class="campaign-category"><%= campaign.category %></span>
+                            <span class="campaign-creator">by <%= campaign.creator?.username || 'Unknown' %></span>
+                        </div>
+                        <div class="campaign-stats">
+                            <div class="funding-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                </div>
+                                <div class="funding-amount">
+                                    <span><%= campaign.currentFunding %> BDT</span>
+                                    <span>of <%= campaign.fundingGoal %> BDT</span>
+                                </div>
+                            </div>
+                            <div class="days-left"><%= campaign.daysLeftText %></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <% }) %>
+    </div>
+</section>
+
+<!-- Newest Campaigns -->
+<section class="page-section">
+    <div class="section-header">
+        <h2 class="section-title">✨ Newest Campaigns</h2>
+        <a href="/campaigns" class="view-all-link">View All →</a>
+    </div>
+    <div class="campaign-grid">
+        <% newestCampaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <a href="/campaigns/<%= campaign._id %>">
+                    <img src="<%= campaign.imageUrl || '/images/default-campaign.jpg' %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <div class="campaign-content">
+                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                        <div class="campaign-meta">
+                            <span class="campaign-category"><%= campaign.category %></span>
+                            <span class="campaign-creator">by <%= campaign.creator?.username || 'Unknown' %></span>
+                        </div>
+                        <div class="campaign-stats">
+                            <div class="funding-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                </div>
+                                <div class="funding-amount">
+                                    <span><%= campaign.currentFunding %> BDT</span>
+                                    <span>of <%= campaign.fundingGoal %> BDT</span>
+                                </div>
+                            </div>
+                            <div class="days-left"><%= campaign.daysLeftText %></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <% }) %>
     </div>
 </section>
