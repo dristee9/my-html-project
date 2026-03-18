@@ -69,6 +69,9 @@ class PageBuilder {
 
     handleDragStart(e) {
         const templateCard = e.target.closest('.template-card');
+        if (!templateCard) return;
+        
+        e.dataTransfer.setData('text/plain', templateCard.dataset.template);
         e.dataTransfer.setData('template-id', templateCard.dataset.template);
         e.dataTransfer.effectAllowed = 'copy';
     }
