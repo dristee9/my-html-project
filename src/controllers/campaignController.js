@@ -58,6 +58,18 @@ exports.getCampaignById = async (req, res) => {
             `Thank you for your generous donation! Your support means everything to ${campaign.creator.username}.` : 
             null;
         
+        // Render custom page builder view if enabled
+        if (campaign.pageBuilder?.enabled && campaign.pageBuilder?.sections?.length > 0) {
+            return res.render('pages/custom-campaign', {
+                title: `${campaign.title} - FundMyIdea BD`,
+                campaign: campaignData,
+                hasDonated: hasDonated,
+                donationSuccess: donationSuccess,
+                user: req.user
+            });
+        }
+        
+        // Otherwise render traditional campaign view
         res.render('pages/campaign', {
             title: `${campaign.title} - FundMyIdea BD`,
             campaign: campaignData,

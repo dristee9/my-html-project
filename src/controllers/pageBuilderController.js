@@ -67,6 +67,57 @@ exports.savePageBuilder = async (req, res) => {
             pageBuilderData
         } = req.body;
 
+        // Sanitize section content to prevent XSS
+        if (pageBuilderData && pageBuilderData.sections) {
+            pageBuilderData.sections.forEach(section => {
+                // Sanitize text content in sections
+                if (section.content) {
+                    Object.keys(section.content).forEach(key => {
+                        if (typeof section.content[key] === 'string') {
+                            // Basic HTML escaping for user-provided strings
+                            section.content[key] = section.content[key]
+                                .replace(/&/g, '&amp;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;')
+                                .replace(/"/g, '&quot;')
+                                .replace(/'/g, '&#x27;');
+                        }
+                    });
+                }
+                
+                // Sanitize nested arrays (like features, testimonials)
+                if (Array.isArray(section.content.features)) {
+                    section.content.features.forEach(feature => {
+                        Object.keys(feature).forEach(key => {
+                            if (typeof feature[key] === 'string') {
+                                feature[key] = feature[key]
+                                    .replace(/&/g, '&amp;')
+                                    .replace(/</g, '&lt;')
+                                    .replace(/>/g, '&gt;')
+                                    .replace(/"/g, '&quot;')
+                                    .replace(/'/g, '&#x27;');
+                            }
+                        });
+                    });
+                }
+                
+                if (Array.isArray(section.content.testimonials)) {
+                    section.content.testimonials.forEach(testimonial => {
+                        Object.keys(testimonial).forEach(key => {
+                            if (typeof testimonial[key] === 'string') {
+                                testimonial[key] = testimonial[key]
+                                    .replace(/&/g, '&amp;')
+                                    .replace(/</g, '&lt;')
+                                    .replace(/>/g, '&gt;')
+                                    .replace(/"/g, '&quot;')
+                                    .replace(/'/g, '&#x27;');
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
         let campaign;
         
         if (req.params.id) {
