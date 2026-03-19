@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    savedCampaigns: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Campaign'
+    }],
     createdAt: {
         type: Date,
         default: Date.now

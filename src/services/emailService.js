@@ -284,6 +284,54 @@ const templates = {
             </div>
         </body>
         </html>
+    `,
+
+    extensionRequest: (campaign, reason, newDeadline) => `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+                .info-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb; }
+                .button { display: inline-block; background: #f59e0b; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>📋 Extension Request Received</h1>
+                </div>
+                <div class="content">
+                    <p>A campaign creator has requested a deadline extension:</p>
+                    
+                    <div class="info-box">
+                        <h2 style="color: #f59e0b; margin-bottom: 10px;">${campaign.title}</h2>
+                        <p><strong>Creator:</strong> ${campaign.creator.username}</p>
+                        <p><strong>Current Deadline:</strong> ${new Date(campaign.deadline).toLocaleDateString()}</p>
+                        <p><strong>Requested New Deadline:</strong> ${new Date(newDeadline).toLocaleDateString()}</p>
+                        <p><strong>Funding Progress:</strong> ৳${campaign.currentFunding.toLocaleString()} / ৳${campaign.fundingGoal.toLocaleString()} (${campaign.fundingPercentage}%)</p>
+                        <p style="margin-top: 15px;"><strong>Reason:</strong></p>
+                        <p style="white-space: pre-wrap; line-height: 1.6;">${reason}</p>
+                    </div>
+                    
+                    <p>Please review this extension request and take appropriate action.</p>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="${process.env.APP_URL || 'http://localhost:3000'}/dashboard" class="button">View Dashboard</a>
+                    </div>
+                    
+                    <p style="margin-top: 30px;">The FundMyIdea BD Team</p>
+                </div>
+                <div class="footer">
+                    <p>&copy; ${new Date().getFullYear()} FundMyIdea BD. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
     `
 };
 
@@ -425,11 +473,35 @@ async function sendMilestoneReached(backerEmail, campaign, milestone) {
     }
 }
 
+/**
+ * Send campaign extension request notification to admin
+ */
+async function sendExtensionRequest(campaign, reason, newDeadline) {
+    try {
+        const transporter = createTransporter();
+        
+        const mailOptions = {
+            from: `"FundMyIdea BD" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+            to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+            subject: `📋 Extension Request: ${campaign.title}`,
+            html: templates.extensionRequest(campaign, reason, newDeadline)
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log('Extension request notification sent to admin');
+        return { success: true };
+    } catch (error) {
+        console.error('Error sending extension request notification:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 module.exports = {
     sendWelcomeEmail,
     sendDonationConfirmation,
     sendPasswordResetEmail,
     sendEmailVerification,
     sendCampaignUpdate,
-    sendMilestoneReached
+    sendMilestoneReached,
+    sendExtensionRequest
 };

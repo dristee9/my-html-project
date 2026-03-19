@@ -896,3 +896,139 @@ exports.getCampaignUpdates = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch updates' });
     }
 };
+
+// Request campaign deadline extension
+exports.requestExtension = async (req, res) => {
+    try {
+        const { newDeadline, reason } = req.body;
+        const campaignId = req.params.id;
+        
+        // Validate input
+        if (!newDeadline || !reason) {
+            return res.status(400).json({
+                success: false,
+                error: 'New deadline and reason are required'
+            });
+        }
+        
+        const campaign = await Campaign.findById(campaignId);
+        
+        if (!campaign) {
+            return res.status(404).json({
+                success: false,
+                error: 'Campaign not found'
+            });
+        }
+        
+        // Check ownership
+        if (String(campaign.creator._id) !== String(req.user._id)) {
+            return res.status(403).json({
+                success: false,
+                error: 'Only campaign creator can request extension'
+            });
+        }
+        
+        // Validation rules
+        if (campaign.status !== 'active') {
+            return res.status(400).json({
+                success: false,
+                error: 'Only active campaigns can request extension'
+            });
+        }
+        
+        const daysUntilDeadline = (campaign.deadline - new Date()) / (1000 * 60 * 60 * 24);
+        if (daysUntilDeadline > 3) {
+            return res.status(400).json({
+                success: false,
+                error: 'Extension can only be requested within 3 days of deadline'
+            });
+        }
+        
+        if (campaign.extensionRequest && campaign.extensionRequest.approved) {
+            return res.status(400).json({
+                success: false,
+                error: 'This campaign already has an approved extension'
+            });
+        }
+        
+        const fundingPercentage = (campaign.currentFunding / campaign.fundingGoal) * 100;
+        if (fundingPercentage < 25) {
+            return res.status(400).json({
+                success: false,
+                error: 'Campaign must have at least 25% funding to request extension'
+            });
+        }
+        
+        // Auto-approve if > 50% funded and < 48 hours to deadline
+        const shouldAutoApprove = fundingPercentage > 50 && daysUntilDeadline < 2;
+        
+        campaign.extensionRequest = {
+            requested: true,
+            requestedAt: new Date(),
+            newDeadline: new Date(newDeadline),
+            approved: shouldAutoApprove,
+            reason
+        };
+        
+        await campaign.save();
+        
+        // Send email notification for manual review
+        if (!shouldAutoApprove) {
+            emailService.sendExtensionRequest(campaign, reason, newDeadline).catch(console.error);
+        }
+        
+        res.json({
+            success: true,
+            message: shouldAutoApprove ? 'Extension automatically approved!' : 'Extension request submitted for review',
+            approved: shouldAutoApprove,
+            newDeadline
+        });
+        
+    } catch (error) {
+        console.error('Error requesting extension:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to process extension request'
+        });
+    }
+};
+
+// Toggle save campaign to wishlist
+exports.toggleSaveCampaign = async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const user = await User.findById(req.user._id);
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+        
+        const campaignId = req.params.id;
+        const idx = user.savedCampaigns.indexOf(campaignId);
+        
+        if (idx > -1) {
+            // Already saved, so remove it
+            user.savedCampaigns.splice(idx, 1);
+        } else {
+            // Not saved yet, so add it
+            user.savedCampaigns.push(campaignId);
+        }
+        
+        await user.save();
+        
+        res.json({
+            success: true,
+            saved: idx === -1 // true if we just saved it, false if we unsaved it
+        });
+        
+    } catch (error) {
+        console.error('Error toggling saved campaign:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to toggle saved campaign'
+        });
+    }
+};

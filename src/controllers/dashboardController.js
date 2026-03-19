@@ -315,3 +315,37 @@ exports.deleteAccount = async (req, res) => {
         });
     }
 };
+
+// Get saved campaigns
+exports.getSavedCampaigns = async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const user = await User.findById(req.user._id)
+            .populate({
+                path: 'savedCampaigns',
+                populate: { path: 'creator', select: 'username university' }
+            });
+        
+        if (!user) {
+            return res.status(404).render('pages/404', {
+                title: 'User Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        res.render('pages/saved-campaigns', {
+            title: 'Saved Campaigns - FundMyIdea BD',
+            savedCampaigns: user.savedCampaigns || [],
+            user: req.user,
+            currentPage: 'dashboard'
+        });
+        
+    } catch (error) {
+        console.error('Error loading saved campaigns:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to load saved campaigns',
+            user: req.user
+        });
+    }
+};

@@ -21,6 +21,7 @@ router.post('/profile', upload.single('profileImage'), validateProfileUpdate, da
 // User campaigns and donations
 router.get('/my-campaigns', dashboardController.getMyCampaigns);
 router.get('/my-donations', dashboardController.getMyDonations);
+router.get('/saved', dashboardController.getSavedCampaigns);
 
 // Settings routes with validation
 router.get('/settings', dashboardController.getSettings);

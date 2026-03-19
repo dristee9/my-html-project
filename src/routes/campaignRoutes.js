@@ -63,4 +63,10 @@ router.get('/:id/analytics', authenticateToken, campaignController.getCampaignAn
 router.post('/:id/updates', authenticateToken, campaignController.postCampaignUpdate);
 router.get('/:id/updates', campaignController.getCampaignUpdates);
 
+// Campaign extension request route
+router.post('/:id/request-extension', authenticateToken, campaignController.requestExtension);
+
+// Toggle save campaign to wishlist
+router.post('/:id/save', authenticateToken, campaignController.toggleSaveCampaign);
+
 module.exports = router;

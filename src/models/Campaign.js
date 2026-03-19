@@ -203,7 +203,27 @@ const campaignSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         }
-    }]
+    }],
+    // Campaign extension request
+    extensionRequest: {
+        requested: {
+            type: Boolean,
+            default: false
+        },
+        requestedAt: {
+            type: Date
+        },
+        newDeadline: {
+            type: Date
+        },
+        approved: {
+            type: Boolean
+        },
+        reason: {
+            type: String,
+            maxlength: 1000
+        }
+    }
 }, {
     timestamps: true, // Automatically adds createdAt and updatedAt
     toObject: { virtuals: true },
