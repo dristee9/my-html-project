@@ -1,0 +1,17 @@
+<!-- Campaign Stats Bar Partial -->
+<!-- Usage: <%- include('../partials/campaign-stats', { campaign: campaign }) %> -->
+
+<div class="funding-summary">
+    <div class="progress-container">
+        <div class="progress-track">
+            <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+        </div>
+    </div>
+    <div class="funding-amount">
+        <span><%= campaign.currentFunding %> BDT</span>
+        <span>raised of <%= campaign.fundingGoal %> BDT goal</span>
+    </div>
+    <div class="supporters-count">
+        Supported by <%= campaign.backers.length %> generous <%= campaign.backers.length === 1 ? 'backer' : 'backers' %>
+    </div>
+</div>

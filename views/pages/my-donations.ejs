@@ -13,14 +13,14 @@
     <p class="dashboard-subtitle">Track your contributions to student campaigns</p>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 3fr; gap: 2rem; max-width: 1200px; margin: 0 auto;">
+<div class="dashboard-layout">
     <!-- Sidebar Navigation -->
     <%- include('../partials/dashboard-sidebar', { currentPage: 'my-donations' }) %>
 
     <!-- Donations List -->
     <div>
-        <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
-            <h2 style="margin-bottom: 1.5rem; color: var(--gray-800);">Recent Donations</h2>
+        <div class="card card--lg">
+            <h2 class="heading-md mb-6">Recent Donations</h2>
             
             <% if (typeof donations !== 'undefined' && donations.length > 0) { %>
                 <div style="overflow-x: auto;">
@@ -59,20 +59,20 @@
             <% } %>
         </div>
 
-        <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem; margin-top: 2rem;">
-            <h2 style="margin-bottom: 1.5rem; color: var(--gray-800);">Donation Statistics</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
-                    <div style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);">0</div>
-                    <div style="color: var(--gray-600);">Total Donations</div>
+        <div class="card card--lg mt-6">
+            <h2 class="heading-md mb-6">Donation Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card__value" style="color: var(--primary-blue);">0</div>
+                    <div class="stat-card__label">Total Donations</div>
                 </div>
-                <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
-                    <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-green);">0 BDT</div>
-                    <div style="color: var(--gray-600);">Total Amount</div>
+                <div class="stat-card">
+                    <div class="stat-card__value" style="color: var(--secondary-green);">0 BDT</div>
+                    <div class="stat-card__label">Total Amount</div>
                 </div>
-                <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
-                    <div style="font-size: 2rem; font-weight: 700; color: var(--purple-600);">0</div>
-                    <div style="color: var(--gray-600);">Campaigns Supported</div>
+                <div class="stat-card">
+                    <div class="stat-card__value" style="color: var(--purple-600);">0</div>
+                    <div class="stat-card__label">Campaigns Supported</div>
                 </div>
             </div>
         </div>

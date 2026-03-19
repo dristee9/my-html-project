@@ -88,71 +88,139 @@ exports.getCampaignById = async (req, res) => {
 };
 
 // Create new campaign
-exports.createCampaign = async (req, res) => {
+
+// Get edit campaign page
+exports.getEditCampaign = async (req, res) => {
     try {
-        const { title, description, category, fundingGoal, deadline } = req.body;
+        const campaign = await Campaign.findById(req.params.id).lean();
         
-        // Validate deadline
-        const deadlineDate = new Date(deadline);
-        if (deadlineDate <= new Date()) {
-            return res.status(400).render('pages/create', {
-                title: 'Create Campaign - FundMyIdea BD',
-                user: req.user,
-                error: 'Deadline must be in the future'
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
             });
         }
         
-        // Create campaign
-        const campaign = new Campaign({
-            title,
-            description,
-            category,
-            fundingGoal: parseInt(fundingGoal),
-            deadline: deadlineDate,
-            creator: req.user._id,
-            imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined
-        });
+        // Check if user owns this campaign
+        if (campaign.creator.toString() !== req.user._id.toString()) {
+            return res.status(403).render('pages/error', {
+                title: 'Access Denied - FundMyIdea BD',
+                error: 'You can only edit your own campaigns',
+                user: req.user
+            });
+        }
         
-        await campaign.save();
-        
-        console.log('Campaign created successfully:', campaign.title);
-        res.redirect('/dashboard');
-    } catch (error) {
-        console.error('Error creating campaign:', error);
-        res.status(500).render('pages/create', {
-            title: 'Create Campaign - FundMyIdea BD',
+        res.render('pages/edit-campaign', {
+            title: `Edit ${campaign.title} - FundMyIdea BD`,
             user: req.user,
-            error: 'Failed to create campaign'
+            campaign: campaign,
+            currentPage: 'edit'
+        });
+    } catch (error) {
+        console.error('Error loading edit campaign:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to load edit campaign page',
+            user: req.user
         });
     }
 };
 
-// Process donation
-// Get user's campaigns for dashboard
-exports.getUserCampaigns = async (req, res) => {
+// Update campaign
+exports.updateCampaign = async (req, res) => {
     try {
-        const campaigns = await Campaign.find({ creator: req.user._id })
-            .sort({ createdAt: -1 });
+        const { title, description, category, fundingGoal, deadline } = req.body;
         
-        // Calculate user statistics
-        const userStats = {
-            campaignsCount: campaigns.length,
-            totalRaised: campaigns.reduce((sum, camp) => sum + camp.currentFunding, 0),
-            donationsCount: campaigns.reduce((sum, camp) => sum + camp.backers.length, 0)
+        // Validate required fields
+        if (!title || !description || !category || !fundingGoal || !deadline) {
+            return res.status(400).render('pages/error', {
+                title: 'Validation Error - FundMyIdea BD',
+                error: 'All fields are required',
+                user: req.user
+            });
+        }
+        
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Check if user owns this campaign
+        if (campaign.creator.toString() !== req.user._id.toString()) {
+            return res.status(403).render('pages/error', {
+                title: 'Access Denied - FundMyIdea BD',
+                error: 'You can only edit your own campaigns',
+                user: req.user
+            });
+        }
+        
+        // Build update data
+        const updateData = {
+            title,
+            description,
+            category,
+            fundingGoal: parseInt(fundingGoal),
+            deadline: new Date(deadline)
         };
         
-        res.render('pages/dashboard', {
-            title: 'Dashboard - FundMyIdea BD',
-            user: req.user,
-            campaigns: campaigns,
-            userStats: userStats,
-            currentPage: 'dashboard'
-        });
+        // Handle image update if new image is uploaded
+        if (req.file) {
+            updateData.imageUrl = `/uploads/${req.file.filename}`;
+        }
+        
+        // Update campaign
+        const updatedCampaign = await Campaign.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+        
+        console.log('Campaign updated successfully:', req.params.id);
+        res.redirect(`/campaigns/${req.params.id}`);
     } catch (error) {
-        console.error('Error fetching user campaigns:', error);
+        console.error('Error updating campaign:', error);
         res.status(500).render('pages/error', {
             title: 'Error - FundMyIdea BD',
-            error: 'Failed to load dashboard',
+            error: 'Failed to update campaign',
+            user: req.user
+        });
+    }
+};
+
+// Delete campaign
+exports.deleteCampaign = async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Check if user owns this campaign
+        if (campaign.creator.toString() !== req.user._id.toString()) {
+            return res.status(403).render('pages/error', {
+                title: 'Access Denied - FundMyIdea BD',
+                error: 'You can only delete your own campaigns',
+                user: req.user
+            });
+        }
+        
+        await Campaign.findByIdAndDelete(req.params.id);
+        console.log('Campaign deleted successfully:', req.params.id);
+        
+        res.redirect('/dashboard');
+    } catch (error) {
+        console.error('Error deleting campaign:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to delete campaign',
             user: req.user
         });
     }

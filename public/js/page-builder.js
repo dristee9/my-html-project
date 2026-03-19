@@ -4,7 +4,10 @@ class PageBuilder {
         this.selectedSection = null;
         this.history = [];
         this.historyIndex = -1;
-        this.campaignId = window.campaignId || '';
+        
+        // Get campaign ID from data attribute on root element (not global variable)
+        const builderContainer = document.getElementById('pageBuilderContainer');
+        this.campaignId = builderContainer ? builderContainer.dataset.campaignId : '';
         
         this.init();
     }

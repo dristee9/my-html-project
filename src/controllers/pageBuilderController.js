@@ -187,6 +187,47 @@ exports.savePageBuilder = async (req, res) => {
     }
 };
 
+// Render section preview for page builder (server-side rendering)
+exports.renderSectionPreview = async (req, res) => {
+    try {
+        const { sectionData } = req.body;
+        
+        if (!sectionData || !sectionData.type || !sectionData.content) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid section data'
+            });
+        }
+        
+        // Render the section using EJS partial
+        const html = await new Promise((resolve, reject) => {
+            require('ejs').renderFile(
+                require('path').join(__dirname, '../../views/components', `section-${sectionData.type}.ejs`),
+                {
+                    content: sectionData.content,
+                    settings: sectionData.settings || {},
+                    campaign: null // Not available in preview
+                },
+                (err, str) => {
+                    if (err) reject(err);
+                    else resolve(str);
+                }
+            );
+        });
+        
+        res.json({
+            success: true,
+            html: html
+        });
+    } catch (error) {
+        console.error('Error rendering section preview:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to render section preview'
+        });
+    }
+};
+
 // Get section templates
 exports.getTemplates = async () => {
     return [

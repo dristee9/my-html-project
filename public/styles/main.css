@@ -17,6 +17,47 @@
     outline: none;
 }
 
+/* Dashboard Layout Utilities */
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Stats Grid for Statistics Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* Stat Card Styles */
+.stat-card {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--gray-50);
+    border-radius: var(--border-radius-lg);
+}
+
+.stat-card__value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card__label {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
 /* Skip to Content Link */
 .skip-link {
     position: absolute;
@@ -324,6 +365,23 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
+}
+
+/* Card Component with Shadow and Border Radius */
+.card {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: 1.75rem;
+}
+
+/* Card Size Variants */
+.card--lg {
+    padding: 2rem;
+}
+
+.card--compact {
+    padding: 1.25rem;
 }
 
 /* ================================================
