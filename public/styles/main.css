@@ -97,6 +97,63 @@
 }
 
 /* ================================================
+   SCROLL ANIMATIONS
+   ================================================ */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity var(--duration-slow) var(--ease-out),
+              transform var(--duration-slow) var(--ease-out);
+}
+
+.animate-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-on-scroll[data-delay="1"] { transition-delay: 100ms; }
+.animate-on-scroll[data-delay="2"] { transition-delay: 200ms; }
+.animate-on-scroll[data-delay="3"] { transition-delay: 300ms; }
+
+/* Stagger children */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--duration-normal) var(--ease-out),
+              transform var(--duration-normal) var(--ease-out);
+}
+
+.stagger-children.is-visible > *:nth-child(1) { transition-delay: 0ms; opacity:1; transform:none; }
+.stagger-children.is-visible > *:nth-child(2) { transition-delay: 80ms; opacity:1; transform:none; }
+.stagger-children.is-visible > *:nth-child(3) { transition-delay: 160ms; opacity:1; transform:none; }
+.stagger-children.is-visible > *:nth-child(4) { transition-delay: 240ms; opacity:1; transform:none; }
+.stagger-children.is-visible > *:nth-child(5) { transition-delay: 320ms; opacity:1; transform:none; }
+.stagger-children.is-visible > *:nth-child(6) { transition-delay: 400ms; opacity:1; transform:none; }
+.stagger-children.is-visible > *:nth-child(7) { transition-delay: 480ms; opacity:1; transform:none; }
+.stagger-children.is-visible > *:nth-child(8) { transition-delay: 560ms; opacity:1; transform:none; }
+
+/* ================================================
+   SKELETON LOADING ANIMATIONS
+   ================================================ */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes skeletonPulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card { height: 380px; width: 100%; }
+.skeleton-text { height: 1em; margin-bottom: 0.5em; }
+.skeleton-text.short { width: 60%; }
+.skeleton-title { height: 1.5em; margin-bottom: 0.75em; width: 80%; }
+.skeleton-image { height: 200px; width: 100%; border-radius: var(--radius-lg); }
+
+/* ================================================
    GLOBAL ACCESSIBILITY STYLES
    ================================================ */
 

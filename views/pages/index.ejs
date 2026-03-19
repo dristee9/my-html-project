@@ -3,7 +3,8 @@
 
 <!-- Hero Section -->
 <section class="landing-hero">
-    <div class="hero-content">
+    <canvas id="particleCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+    <div class="hero-content" style="position:relative;z-index:1;">
         <h1 class="heading-1">Empower Student Innovation</h1>
         <p class="hero-subtitle">FundMyIdea BD connects passionate students with supporters to bring groundbreaking ideas to life. Join our community of innovators and changemakers today.</p>
         
@@ -53,7 +54,7 @@
         <h2 class="heading-2">Recommended For You</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
-    <div class="campaign-grid">
+    <div class="campaign-grid stagger-children" style="perspective: 1000px; transform-style: preserve-3d;">
         <% recommendedCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
@@ -91,7 +92,7 @@
         <h2 class="heading-2">🔥 Trending Campaigns</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
-    <div class="campaign-grid">
+    <div class="campaign-grid stagger-children" style="perspective: 1000px; transform-style: preserve-3d;">
         <% trendingCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
@@ -153,7 +154,7 @@
         <h2 class="heading-2">✨ Newest Campaigns</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
-    <div class="campaign-grid">
+    <div class="campaign-grid stagger-children" style="perspective: 1000px; transform-style: preserve-3d;">
         <% newestCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
