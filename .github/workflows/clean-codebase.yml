@@ -1,0 +1,121 @@
+name: Clean Codebase for LLM
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean-codebase:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install dependencies
+      run: |
+        npm install --save-dev minify
+        npm install --save-dev clean-css-cli
+        npm install --save-dev html-minifier-terser
+    
+    - name: Create cleaned directory
+      run: mkdir -p cleaned
+    
+    - name: Clean JavaScript files
+      run: |
+        find . -type f -name "*.js" ! -path "./node_modules/*" ! -path "./cleaned/*" | while read file; do
+          # Get relative path
+          rel_path="${file#./}"
+          dir_path=$(dirname "$rel_path")
+          
+          # Create directory structure in cleaned folder
+          mkdir -p "cleaned/$dir_path"
+          
+          # Remove comments and empty lines, minify
+          npx minify "$file" > "cleaned/$rel_path" 2>/dev/null || \
+            sed -e 's|//.*$||g' -e 's|/\*.*\*/||g' -e '/^\s*$/d' "$file" > "cleaned/$rel_path"
+        done
+    
+    - name: Clean CSS files
+      run: |
+        find . -type f -name "*.css" ! -path "./node_modules/*" ! -path "./cleaned/*" | while read file; do
+          rel_path="${file#./}"
+          dir_path=$(dirname "$rel_path")
+          mkdir -p "cleaned/$dir_path"
+          
+          # Minify CSS and remove empty lines
+          npx cleancss -o "cleaned/$rel_path" "$file" || \
+            sed -e 's|/\*.*\*/||g' -e '/^\s*$/d' "$file" > "cleaned/$rel_path"
+        done
+    
+    - name: Clean HTML/EJS files
+      run: |
+        find . -type f \( -name "*.html" -o -name "*.ejs" \) ! -path "./node_modules/*" ! -path "./cleaned/*" | while read file; do
+          rel_path="${file#./}"
+          dir_path=$(dirname "$rel_path")
+          mkdir -p "cleaned/$dir_path"
+          
+          # Remove HTML comments and empty lines
+          sed -e 's|<!--.*-->||g' -e '/^\s*$/d' "$file" > "cleaned/$rel_path"
+        done
+    
+    - name: Clean JSON files (except package-lock.json)
+      run: |
+        find . -type f -name "*.json" ! -name "package-lock.json" ! -path "./node_modules/*" ! -path "./cleaned/*" | while read file; do
+          rel_path="${file#./}"
+          dir_path=$(dirname "$rel_path")
+          mkdir -p "cleaned/$dir_path"
+          
+          # Minify JSON
+          python3 -c "import json, sys; f=open('$file'); data=json.load(f); open('cleaned/$rel_path','w').write(json.dumps(data, separators=(',', ':')))"
+        done
+    
+    - name: Copy essential config files
+      run: |
+        # Copy package.json (minified)
+        python3 -c "import json; f=open('package.json'); data=json.load(f); open('cleaned/package.json','w').write(json.dumps(data, separators=(',', ':')))"
+        
+        # Copy README if exists
+        [ -f README.md ] && cp README.md cleaned/
+        
+        # Copy .env.example if exists
+        [ -f .env.example ] && cp .env.example cleaned/
+    
+    - name: Configure Git
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+    
+    - name: Deploy to Cleaned branch
+      run: |
+        echo "Force pushing to Cleaned branch..."
+        git checkout --orphan Cleaned
+        git reset --hard
+        cp -r cleaned/* .
+        git add -A
+        git commit -m "🧹 Cleaned codebase for LLM use
+        
+        Removed:
+        - All comments
+        - All empty lines
+        - Unnecessary whitespace
+        
+        Compressed:
+        - JS, CSS, JSON files"
+        git push -f origin Cleaned
+    
+    - name: Cleanup
+      run: |
+        rm -rf cleaned
+        git checkout main || git checkout master || true
