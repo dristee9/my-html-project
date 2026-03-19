@@ -1,0 +1,140 @@
+<% layout("layouts/main") -%>
+<% title = 'Saved Campaigns - FundMyIdea BD' -%>
+
+<div class="saved-campaigns-page">
+    <div class="page-header">
+        <h1 class="heading-1">💝 My Saved Campaigns</h1>
+        <p class="page-subtitle">Campaigns you've bookmarked for later</p>
+    </div>
+
+    <% if (typeof savedCampaigns !== 'undefined' && savedCampaigns.length > 0) { %>
+        <div class="campaign-grid" style="margin-top: 2rem;">
+            <% savedCampaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" 
+                     alt="<%= campaign.title %>" 
+                     class="campaign-image">
+                
+                <div class="campaign-details">
+                    <div class="campaign-header">
+                        <span class="status-badge badge-active"><%= campaign.status %></span>
+                        <span class="status-badge badge-category"><%= campaign.category %></span>
+                    </div>
+                    
+                    <h3 class="campaign-name"><%= campaign.title %></h3>
+                    <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                    
+                    <div class="creator-info" style="display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; font-size: 0.875rem; color: var(--gray-600);">
+                        <span>by</span>
+                        <strong><%= campaign.creator.username %></strong>
+                        <% if (campaign.creator.university) { %>
+                            <span>, <%= campaign.creator.university %></span>
+                        <% } %>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span><%= campaign.currentFunding %> BDT raised</span>
+                            <span>of <%= campaign.fundingGoal %> BDT goal</span>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-stats-row">
+                        <div class="stat-item">
+                            <span class="stat-icon">🎯</span>
+                            <span class="stat-value"><%= campaign.fundingPercentage %>%</span>
+                            <span class="stat-label">Funded</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">👥</span>
+                            <span class="stat-value"><%= campaign.backers.length %></span>
+                            <span class="stat-label">Backers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">⏰</span>
+                            <span class="stat-value"><%= Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24)) %></span>
+                            <span class="stat-label">Days Left</span>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-footer">
+                        <a href="/campaigns/<%= campaign._id %>" class="btn btn--primary">View Campaign</a>
+                        <button onclick="toggleSave('<%= campaign._id %>')" class="btn btn--secondary" style="padding: 0.5rem 1rem;">
+                            <span style="font-size: 1.25rem;">❤️</span>
+                            <span style="margin-left: 0.25rem;">Remove</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <div class="empty-state" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">💝</div>
+            <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">No saved campaigns yet</h3>
+            <p style="color: var(--gray-600); margin-bottom: 1.5rem;">Start exploring and save campaigns that interest you!</p>
+            <a href="/campaigns" class="btn btn--primary">Browse Campaigns</a>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    // Toggle save campaign
+    async function toggleSave(campaignId) {
+        try {
+            const csrfToken = document.querySelector('[name="_csrf"]')?.value || '<%= typeof csrfToken !== "undefined" ? csrfToken : "" %>';
+            
+            const response = await fetch(`/campaigns/${campaignId}/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'CSRF-Token': csrfToken
+                },
+                credentials: 'same-origin'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Reload page to update list
+                location.reload();
+            } else {
+                alert('Failed to remove campaign: ' + (result.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error removing saved campaign:', error);
+            alert('Failed to remove campaign. Please try again.');
+        }
+    }
+</script>
+
+<style>
+    .saved-campaigns-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .campaign-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .saved-campaigns-page {
+            padding: 1rem;
+        }
+        
+        .campaign-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
