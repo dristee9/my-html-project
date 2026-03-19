@@ -111,6 +111,9 @@ const campaignSchema = new mongoose.Schema({
         donatedAt: {
             type: Date,
             default: Date.now
+        },
+        selectedRewardId: {
+            type: mongoose.Schema.Types.ObjectId
         }
     }],
     // Analytics tracking
@@ -141,6 +144,39 @@ const campaignSchema = new mongoose.Schema({
         notificationSent: {
             type: Boolean,
             default: false
+        }
+    }],
+    // Campaign reward tiers
+    rewards: [{
+        title: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 200
+        },
+        description: {
+            type: String,
+            required: true,
+            maxlength: 1000
+        },
+        minAmount: {
+            type: Number,
+            required: true,
+            min: 100
+        },
+        deliveryDate: {
+            type: Date
+        },
+        limitedQuantity: {
+            type: Number,
+            min: 1
+        },
+        claimedCount: {
+            type: Number,
+            default: 0
+        },
+        imageUrl: {
+            type: String
         }
     }]
 }, {

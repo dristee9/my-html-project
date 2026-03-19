@@ -104,6 +104,43 @@
                             </div>
                         </div>
 
+                        <!-- Reward Tiers Section -->
+                        <% if (campaign.rewards && campaign.rewards.length > 0) { %>
+                        <div class="form-section" style="margin-top: 2rem;">
+                            <h3 class="heading-3">🎁 Choose a Reward Tier (Optional)</h3>
+                            <p style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 1rem;">Select a reward tier that matches your donation amount</p>
+                            
+                            <div class="reward-tiers-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                                <% campaign.rewards.slice().sort((a, b) => a.minAmount - b.minAmount).forEach(reward => { 
+                                    const isAvailable = !reward.limitedQuantity || reward.claimedCount < reward.limitedQuantity;
+                                    const remaining = reward.limitedQuantity ? reward.limitedQuantity - reward.claimedCount : '∞';
+                                %>
+                                    <label class="reward-tier-card" style="border: 2px solid var(--gray-200); border-radius: var(--border-radius-lg); padding: 1rem; cursor: pointer; transition: all var(--transition-fast); position: relative; <%= !isAvailable ? 'opacity: 0.5; cursor: not-allowed;' : '' %>" onclick="<%= !isAvailable ? 'return false;' : '' %>">
+                                        <input type="radio" name="selectedRewardId" value="<%= reward._id %>" style="position: absolute; top: 1rem; right: 1rem; opacity: 0;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                            <div style="font-size: 2rem;"><%= isAvailable ? '🎁' : '❌' %></div>
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 700; color: var(--gray-800); font-size: 1rem;"><%= reward.title %></div>
+                                                <div style="color: var(--secondary-green); font-weight: 700; font-size: 0.875rem;">${<%= reward.minAmount.toLocaleString() %> BDT+</div>
+                                            </div>
+                                        </div>
+                                        <div style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.75rem; line-height: 1.4;"><%= reward.description %></div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--gray-500);">
+                                            <% if (reward.deliveryDate) { %>
+                                                <span>📅 Delivers <%= new Date(reward.deliveryDate).toLocaleDateString() %></span>
+                                            <% } %>
+                                            <% if (reward.limitedQuantity) { %>
+                                                <span style="background: <%= remaining < 10 ? '#fee2e2' : '#f0fdf4' %>; color: <%= remaining < 10 ? '#dc2626' : '#16a34a' %>; padding: 0.25rem 0.5rem; border-radius: var(--border-radius-full); font-weight: 600;">
+                                                    <%= remaining %> left
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                    </label>
+                                <% }); %>
+                            </div>
+                        </div>
+                        <% } %>
+
                         <!-- Payment Instructions -->
                         <div class="payment-instructions">
                             <h3 class="heading-3">How It Works</h3>
@@ -277,6 +314,42 @@ document.getElementById('donationAmount').addEventListener('input', function() {
     // Remove active class from preset buttons when typing custom amount
     document.querySelectorAll('.amount-option:not(.custom-amount)').forEach(btn => {
         btn.classList.remove('active');
+    });
+    
+    // Auto-highlight best matching reward tier
+    highlightMatchingReward(parseInt(this.value) || 0);
+});
+
+// Highlight matching reward based on amount
+function highlightMatchingReward(amount) {
+    const rewardCards = document.querySelectorAll('.reward-tier-card');
+    rewardCards.forEach(card => {
+        const minAmountText = card.querySelector('[style*="color: var(--secondary-green)"]').textContent;
+        const minAmount = parseInt(minAmountText.replace(/[^0-9]/g, ''));
+        
+        if (amount >= minAmount) {
+            card.style.borderColor = 'var(--secondary-green)';
+            card.style.background = '#f0fdf4';
+        } else {
+            card.style.borderColor = 'var(--gray-200)';
+            card.style.background = 'white';
+        }
+    });
+}
+
+// Reward tier selection
+document.querySelectorAll('.reward-tier-card').forEach(card => {
+    card.addEventListener('click', function() {
+        // Deselect other cards
+        document.querySelectorAll('.reward-tier-card').forEach(c => {
+            c.style.borderColor = 'var(--gray-200)';
+            c.style.background = 'white';
+        });
+        
+        // Select this card
+        this.style.borderColor = 'var(--primary-blue)';
+        this.style.background = '#eff6ff';
+        this.querySelector('input[type="radio"]').checked = true;
     });
 });
 

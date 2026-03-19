@@ -368,13 +368,26 @@ exports.processDonation = async (req, res) => {
         
         console.log('Adding donation to campaign');
         // Add donation to campaign - store only last 4 digits for privacy
-        campaign.backers.push({
+        const backerData = {
             user: req.user._id,
             amount: donationAmount,
             message: message || '',
             bkashNumberLast4: bkashNumber.slice(-4), // Store only last 4 digits
             transactionId: null // Placeholder for future bKash API integration
-        });
+        };
+        
+        // Add selected reward if provided
+        const { selectedRewardId } = req.body;
+        if (selectedRewardId) {
+            // Verify reward exists and is available
+            const reward = campaign.rewards.id(selectedRewardId);
+            if (reward && (!reward.limitedQuantity || reward.claimedCount < reward.limitedQuantity)) {
+                backerData.selectedRewardId = selectedRewardId;
+                reward.claimedCount += 1;
+            }
+        }
+        
+        campaign.backers.push(backerData);
         
         campaign.currentFunding += donationAmount;
         

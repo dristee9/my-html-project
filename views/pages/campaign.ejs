@@ -185,6 +185,32 @@
                     </script>
                 <% } %>
                 
+                <!-- Rewards Section -->
+                <% if (campaign.rewards && campaign.rewards.length > 0) { %>
+                <div class="rewards-section" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: var(--border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; box-shadow: var(--shadow-md);">
+                    <h4 style="color: #92400e; font-size: 1.125rem; margin-bottom: 1rem; font-weight: 700;">🎁 Earn Rewards</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <% campaign.rewards.slice().sort((a, b) => a.minAmount - b.minAmount).forEach(reward => { 
+                            const isAvailable = !reward.limitedQuantity || reward.claimedCount < reward.limitedQuantity;
+                            const remaining = reward.limitedQuantity ? reward.limitedQuantity - reward.claimedCount : null;
+                        %>
+                            <div style="background: white; border-radius: var(--border-radius-md); padding: 1rem; border-left: 3px solid <%= isAvailable ? 'var(--secondary-green)' : '#dc2626' %>;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div style="font-weight: 700; color: var(--gray-800); font-size: 0.875rem;"><%= reward.title %></div>
+                                    <div style="color: var(--secondary-green); font-weight: 700; font-size: 0.75rem;">${<%= reward.minAmount.toLocaleString() %>+</div>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); line-height: 1.4; margin-bottom: 0.5rem;"><%= reward.description %></div>
+                                <% if (remaining !== null) { %>
+                                    <div style="font-size: 0.625rem; color: <%= remaining < 10 ? '#dc2626' : '#16a34a' %>; font-weight: 600;">
+                                        <%= remaining < 10 ? '⚠️ Only ' + remaining + ' left!' : remaining + ' available' %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+                <% } %>
+                
                 <!-- Enhanced Backer Statistics -->
                 <% if (campaign.backers.length > 0) { %>
                     <% 
