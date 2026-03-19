@@ -145,12 +145,32 @@
                     <% }); %>
                     
                     <% if (allBackers.length > 0) { %>
+                        <!-- Sort by date descending -->
+                        <% allBackers.sort((a, b) => new Date(b.backer.donatedAt || 0) - new Date(a.backer.donatedAt || 0)); %>
                         <% allBackers.slice(0, 10).forEach(donation => { %>
                             <tr>
                                 <td><a href="/campaigns/<%= donation.campaign._id %>" style="color: var(--primary-blue); text-decoration: none;"><%= donation.campaign.title.substring(0, 30) %></a></td>
-                                <td><%= donation.backer.user ? donation.backer.user.username : 'Anonymous' %></td>
-                                <td><%= donation.backer.amount %> BDT</td>
-                                <td><%= new Date(donation.backer.date || Date.now()).toLocaleDateString() %></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span><%= donation.backer.user ? donation.backer.user.username : 'Anonymous' %></span>
+                                        <% if (donation.backer.paymentMethod === 'bkash') { %>
+                                            <span style="background: #ec4899; color: white; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.625rem; font-weight: 600;">bKash</span>
+                                        <% } else { %>
+                                            <span style="background: #6b7280; color: white; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.625rem; font-weight: 600;">Manual</span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td style="font-weight: 600; color: var(--secondary-green);"><%= donation.backer.amount %> BDT</td>
+                                <td>
+                                    <div style="font-size: 0.875rem; color: var(--gray-600);">
+                                        <%= new Date(donation.backer.donatedAt || Date.now()).toLocaleDateString() %>
+                                    </div>
+                                    <% if (donation.backer.bkashTrxID) { %>
+                                        <div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.25rem;">
+                                            TrxID: <%= donation.backer.bkashTrxID %>
+                                        </div>
+                                    <% } %>
+                                </td>
                             </tr>
                         <% }); %>
                     <% } else { %>

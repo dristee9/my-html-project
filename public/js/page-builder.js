@@ -91,14 +91,24 @@ class PageBuilder {
             e.preventDefault();
             dropZone.classList.remove('drag-over');
             
-            const templateId = e.dataTransfer.getData('template-id');
+            // Use only 'text/plain' for cross-browser compatibility
+            const templateId = e.dataTransfer.getData('text/plain');
             this.addSectionFromTemplate(templateId);
         });
         
-        // Make sections sortable
-        new Sortable(container, {
+        // Make sections sortable - initialize after elements exist
+        this.setupSortable();
+    }
+    
+    setupSortable() {
+        const container = document.getElementById('sectionsContainer');
+        if (!container) return;
+        
+        this.sortable = new Sortable(container, {
             animation: 150,
-            onEnd: (evt) => this.reorderSections()
+            handle: '.section-header', // drag by header only
+            filter: '.template-card', // don't sort template cards
+            onEnd: () => this.reorderSections()
         });
     }
 
@@ -106,8 +116,8 @@ class PageBuilder {
         const templateCard = e.target.closest('.template-card');
         if (!templateCard) return;
         
+        // Use only 'text/plain' for cross-browser compatibility
         e.dataTransfer.setData('text/plain', templateCard.dataset.template);
-        e.dataTransfer.setData('template-id', templateCard.dataset.template);
         e.dataTransfer.effectAllowed = 'copy';
     }
 

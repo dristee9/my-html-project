@@ -30,7 +30,8 @@
                                 <th style="padding: 1rem; text-align: left; font-weight: 600;">Campaign</th>
                                 <th style="padding: 1rem; text-align: left; font-weight: 600;">Amount</th>
                                 <th style="padding: 1rem; text-align: left; font-weight: 600;">Date</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Status</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Payment Method</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Transaction ID</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -41,9 +42,26 @@
                                     <div style="color: var(--gray-500); font-size: 0.875rem;">by <%= donation.creatorName %></div>
                                 </td>
                                 <td style="padding: 1rem; font-weight: 600; color: var(--secondary-green);"><%= donation.amount %> BDT</td>
-                                <td style="padding: 1rem; color: var(--gray-600);"><%= donation.date %></td>
+                                <td style="padding: 1rem; color: var(--gray-600);">
+                                    <div><%= donation.date %></div>
+                                </td>
                                 <td style="padding: 1rem;">
-                                    <span style="background: var(--success-green); color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Completed</span>
+                                    <% if (donation.paymentMethod === 'bkash') { %>
+                                        <span style="background: #ec4899; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">bKash</span>
+                                    <% } else if (donation.paymentMethod === 'manual') { %>
+                                        <span style="background: #6b7280; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Manual</span>
+                                    <% } else { %>
+                                        <span style="background: var(--success-green); color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Completed</span>
+                                    <% } %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <% if (donation.bkashTrxID) { %>
+                                        <div style="font-family: monospace; background: var(--gray-100); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">
+                                            <%= donation.bkashTrxID %>
+                                        </div>
+                                    <% } else { %>
+                                        <span style="color: var(--gray-400); font-size: 0.875rem;">N/A</span>
+                                    <% } %>
                                 </td>
                             </tr>
                             <% }) %>
