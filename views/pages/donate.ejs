@@ -3,6 +3,14 @@
 
 <div class="donate-page">
     <% if (typeof campaign !== 'undefined' && campaign) { %>
+        <%- include('../partials/breadcrumbs', {
+            breadcrumbs: [
+                { label: 'Campaigns', href: '/campaigns' },
+                { label: campaign.title, href: '/campaigns/' + campaign._id },
+                { label: 'Donate' }
+            ]
+        }) %>
+        
         <!-- Campaign Header Section -->
         <div class="donate-header">
             <div class="campaign-preview">

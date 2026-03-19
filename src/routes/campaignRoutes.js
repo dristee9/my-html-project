@@ -66,7 +66,8 @@ router.get('/create', authenticateToken, (req, res) => {
     res.render('pages/create', {
         title: 'Create Campaign - FundMyIdea BD',
         user: req.user,
-        error: null
+        error: null,
+        currentPage: 'create'
     });
 });
 
@@ -105,7 +106,8 @@ router.get('/:id/edit', authenticateToken, async (req, res) => {
         res.render('pages/edit-campaign', {
             title: `Edit ${campaign.title} - FundMyIdea BD`,
             user: req.user,
-            campaign: campaign
+            campaign: campaign,
+            currentPage: 'edit'
         });
     } catch (error) {
         console.error('Error loading edit campaign:', error);

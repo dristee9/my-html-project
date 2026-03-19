@@ -3,6 +3,13 @@
 
 <div class="campaign-detail-page">
     <% if (typeof campaign !== 'undefined' && campaign) { %>
+        <%- include('../partials/breadcrumbs', {
+            breadcrumbs: [
+                { label: 'Campaigns', href: '/campaigns' },
+                { label: campaign.title }
+            ]
+        }) %>
+        
         <div class="campaign-header-image">
             <img src="<%= campaign.imageUrl || 'https://placehold.co/1200x400/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-main-image">
         </div>

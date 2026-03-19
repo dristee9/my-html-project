@@ -70,7 +70,8 @@ exports.getDashboard = async (req, res) => {
             campaigns: campaigns,
             userStats: userStats,
             expiringSoon: expiringSoon,
-            recentActivities: recentActivities
+            recentActivities: recentActivities,
+            currentPage: 'dashboard'
         });
     } catch (error) {
         console.error('Error fetching user dashboard:', error);
@@ -86,7 +87,8 @@ exports.getDashboard = async (req, res) => {
 exports.getProfile = (req, res) => {
     res.render('pages/profile', {
         title: 'My Profile - FundMyIdea BD',
-        user: req.user
+        user: req.user,
+        currentPage: 'profile'
     });
 };
 
@@ -142,7 +144,8 @@ exports.getMyCampaigns = async (req, res) => {
         res.render('pages/my-campaigns', {
             title: 'My Campaigns - FundMyIdea BD',
             user: req.user,
-            campaigns: campaigns
+            campaigns: campaigns,
+            currentPage: 'my-campaigns'
         });
     } catch (error) {
         console.error('Error fetching user campaigns:', error);
@@ -180,7 +183,8 @@ exports.getMyDonations = async (req, res) => {
         res.render('pages/my-donations', {
             title: 'My Donations - FundMyIdea BD',
             user: req.user,
-            donations: donations
+            donations: donations,
+            currentPage: 'my-donations'
         });
     } catch (error) {
         console.error('Error fetching user donations:', error);
@@ -198,7 +202,8 @@ exports.getSettings = (req, res) => {
         title: 'Account Settings - FundMyIdea BD',
         user: req.user,
         success: null,
-        error: null
+        error: null,
+        currentPage: 'settings'
     });
 };
 

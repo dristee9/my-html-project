@@ -183,7 +183,11 @@ exports.getLogin = (req, res) => {
     if (req.user) {
         return res.redirect('/dashboard');
     }
-    res.render('pages/login', { error: null, formData: {} });
+    res.render('pages/login', { 
+        error: null, 
+        formData: {},
+        currentPage: 'login'
+    });
 };
 
 // Render register page
@@ -191,7 +195,11 @@ exports.getRegister = (req, res) => {
     if (req.user) {
         return res.redirect('/dashboard');
     }
-    res.render('pages/register', { error: null, formData: {} });
+    res.render('pages/register', { 
+        error: null, 
+        formData: {},
+        currentPage: 'register'
+    });
 };
 
 // Refresh JWT token endpoint for AJAX requests

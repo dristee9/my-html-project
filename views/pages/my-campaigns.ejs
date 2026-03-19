@@ -1,6 +1,13 @@
 <% layout('layouts/main') -%>
 <% title = 'My Campaigns - FundMyIdea BD' -%>
 
+<%- include('../partials/breadcrumbs', {
+    breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'My Campaigns' }
+    ]
+}) %>
+
 <div class="dashboard-header">
     <h1 class="heading-1">My Campaigns</h1>
     <p class="dashboard-subtitle">Manage your fundraising campaigns</p>

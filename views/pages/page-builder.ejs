@@ -2,6 +2,13 @@
 <% title = typeof campaign !== 'undefined' && campaign ? 'Edit Campaign - Page Builder' : 'Create Campaign - Page Builder' -%>
 <% extraStyles = ['page-builder'] -%>
 
+<%- include('../partials/breadcrumbs', {
+    breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: campaign ? 'Edit Campaign' : 'Create Campaign' }
+    ]
+}) %>
+
 <div class="page-builder-container">
     <!-- Top Toolbar -->
     <div class="builder-toolbar">

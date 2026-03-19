@@ -82,7 +82,8 @@ exports.getHomePage = async (req, res) => {
             trendingCampaigns: trendingCampaigns,
             newestCampaigns: newestCampaigns,
             recommendedCampaigns: recommendedCampaigns,
-            user: req.user
+            user: req.user,
+            currentPage: 'home'
         });
     } catch (error) {
         console.error('Error fetching homepage data:', error);
@@ -97,7 +98,8 @@ exports.getHomePage = async (req, res) => {
             trendingCampaigns: [],
             newestCampaigns: [],
             recommendedCampaigns: [],
-            user: req.user
+            user: req.user,
+            currentPage: 'home'
         });
     }
 };

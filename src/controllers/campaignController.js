@@ -13,7 +13,8 @@ exports.getAllCampaigns = async (req, res) => {
         res.render('pages/explore', {
             title: 'Explore Campaigns - FundMyIdea BD',
             campaigns: campaigns,
-            user: req.user
+            user: req.user,
+            currentPage: 'explore'
         });
     } catch (error) {
         console.error('Error fetching campaigns:', error);
@@ -132,7 +133,8 @@ exports.getUserCampaigns = async (req, res) => {
             title: 'Dashboard - FundMyIdea BD',
             user: req.user,
             campaigns: campaigns,
-            userStats: userStats
+            userStats: userStats,
+            currentPage: 'dashboard'
         });
     } catch (error) {
         console.error('Error fetching user campaigns:', error);
@@ -384,6 +386,7 @@ exports.searchCampaigns = async (req, res) => {
             title: q ? `Search Results - FundMyIdea BD` : 'Explore Campaigns - FundMyIdea BD',
             campaigns: campaigns,
             user: req.user,
+            currentPage: 'explore',
             searchQuery: q || '',
             searchCategory: category || 'all',
             sortBy: sort || 'newest',
