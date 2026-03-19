@@ -31,15 +31,15 @@
 
         <div class="stats-overview">
             <div class="stat-card">
-                <div class="stat-value"><%= stats.activeCampaigns %>+</div>
+                <div class="stat-value count-up" data-target="<%= stats.activeCampaigns %>">0</div>
                 <div class="stat-label">Active Campaigns</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value"><%=(stats.totalRaised / 1000).toFixed(1)%>K+</div>
-                <div class="stat-label">BDT Raised</div>
+                <div class="stat-value count-up" data-target="<%= Math.round(stats.totalRaised / 1000) %>">0</div>
+                <div class="stat-label">BDT Raised (K)</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value"><%= stats.universities %>+</div>
+                <div class="stat-value count-up" data-target="<%= stats.universities %>">0</div>
                 <div class="stat-label">Universities</div>
             </div>
         </div>
