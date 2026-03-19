@@ -21,7 +21,7 @@
     <!-- Settings Content -->
     <div class="settings-container">
         <% if (typeof success !== 'undefined' && success) { %>
-            <div class="success-banner" style="background: #dcfce7; color: #16a34a; padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem;">
+            <div class="success-banner" style="background: var(--success-light, #dcfce7); color: var(--secondary-green); padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem;">
                 <%= success %>
             </div>
         <% } %>

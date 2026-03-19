@@ -7,7 +7,7 @@
         <h1 class="verify-title">Check Your Email</h1>
         
         <% if (typeof success !== 'undefined' && success) { %>
-            <div class="success-banner" style="background: #dcfce7; color: #16a34a; padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem; text-align: center;">
+            <div class="success-banner" style="background: var(--success-light, #dcfce7); color: var(--secondary-green); padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem; text-align: center;">
                 <%= success %>
             </div>
         <% } %>
