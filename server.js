@@ -6,6 +6,7 @@ const fs = require('fs');
 const connectDB = require('./src/config/database');
 const { optionalAuth } = require('./src/middleware/auth');
 const helmet = require('helmet');
+const session = require('express-session');
 require('dotenv').config();
 
 const app = express();
@@ -31,6 +32,19 @@ if (!fs.existsSync(uploadsDir)) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Session middleware for email verification and password reset flows
+app.use(session({
+    secret: process.env.JWT_SECRET || 'fallback-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
 
 // Security Headers with Helmet
 app.use(helmet({

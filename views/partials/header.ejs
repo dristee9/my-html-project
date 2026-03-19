@@ -12,6 +12,7 @@
         <div class="nav-links" id="navLinks">
             <% if (typeof user !== 'undefined' && user) { %>
                 <a href="/campaigns" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'explore' ? 'active' : '' %>">Explore Campaigns</a>
+                <a href="/dashboard/my-campaigns" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'my-campaigns' ? 'active' : '' %>">My Campaigns</a>
                 <a href="/builder/create" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'create' ? 'active' : '' %>">Create Campaign</a>
                 <a href="/dashboard" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">Dashboard</a>
                 <form method="POST" action="/logout" style="display: inline;">
