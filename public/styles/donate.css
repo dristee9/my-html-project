@@ -285,7 +285,7 @@
 .donation-submit-button {
     width: 100%;
     padding: 1.25rem 2rem;
-    background: linear-gradient(135deg, var(--secondary-green), #15803d);
+    background: linear-gradient(135deg, var(--secondary-green), var(--secondary-green-dark));
     color: white;
     border: none;
     border-radius: var(--border-radius-lg);
@@ -397,7 +397,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--secondary-green), #15803d);
+    background: linear-gradient(90deg, var(--secondary-green), var(--secondary-green-dark));
     border-radius: var(--border-radius-full);
     transition: width var(--transition-normal);
 }

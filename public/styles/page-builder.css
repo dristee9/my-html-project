@@ -250,8 +250,8 @@
 }
 
 .btn-primary:hover {
-    background: #2563eb;
-    border-color: #2563eb;
+    background: var(--primary-blue-light);
+    border-color: var(--primary-blue-light);
 }
 
 .btn-secondary {
