@@ -396,6 +396,40 @@ exports.processDonation = async (req, res) => {
             campaign.status = 'completed';
         }
         
+        // Check and process milestones
+        const prevPct = Math.floor(((campaign.currentFunding - donationAmount) / campaign.fundingGoal) * 100);
+        const newPct = Math.floor((campaign.currentFunding / campaign.fundingGoal) * 100);
+        
+        let milestoneReached = false;
+        for (const ms of campaign.milestones) {
+            if (!ms.reachedAt && ms.percentage <= newPct && ms.percentage > prevPct) {
+                ms.reachedAt = new Date();
+                ms.notificationSent = false; // Queue for notification
+                milestoneReached = true;
+                
+                // Send milestone notification to all backers
+                const uniqueBackerEmails = [...new Set(
+                    campaign.backers
+                        .map(b => b.user?.email)
+                        .filter(Boolean)
+                )];
+                
+                if (uniqueBackerEmails.length > 0) {
+                    const emailPromises = uniqueBackerEmails.map(email => {
+                        return emailService.sendMilestoneReached(email, campaign, ms)
+                            .catch(err => console.error(`Failed to send milestone email to ${email}:`, err));
+                    });
+                    
+                    Promise.all(emailPromises).then(() => {
+                        ms.notificationSent = true;
+                        campaign.save().catch(console.error);
+                    }).catch(console.error);
+                } else {
+                    ms.notificationSent = true;
+                }
+            }
+        }
+        
         await campaign.save();
         console.log('Campaign saved successfully');
         
@@ -429,7 +463,11 @@ exports.processDonation = async (req, res) => {
         console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
         
         // Redirect to campaign page with success flag (POST-Redirect-GET pattern)
-        res.redirect(`/campaigns/${campaignId}?donated=true`);
+        let redirectUrl = `/campaigns/${campaignId}?donated=true`;
+        if (milestoneReached) {
+            redirectUrl += '&milestone=true';
+        }
+        res.redirect(redirectUrl);
     } catch (error) {
         console.error('Error processing donation:', error);
         res.status(500).render('pages/donate', {

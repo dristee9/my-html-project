@@ -178,6 +178,31 @@ const campaignSchema = new mongoose.Schema({
         imageUrl: {
             type: String
         }
+    }],
+    // Campaign funding milestones
+    milestones: [{
+        percentage: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 100
+        },
+        title: {
+            type: String,
+            trim: true,
+            maxlength: 200
+        },
+        description: {
+            type: String,
+            maxlength: 1000
+        },
+        reachedAt: {
+            type: Date
+        },
+        notificationSent: {
+            type: Boolean,
+            default: false
+        }
     }]
 }, {
     timestamps: true, // Automatically adds createdAt and updatedAt

@@ -122,6 +122,40 @@
                     <%- include('../partials/campaign-stats', { campaign: campaign }) %>
                 </div>
                 
+                <!-- Milestone Progress Track -->
+                <% if (campaign.milestones && campaign.milestones.length > 0) { %>
+                <div class="milestone-progress-track" style="background: white; border-radius: var(--border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; box-shadow: var(--shadow-md);">
+                    <h4 style="color: var(--gray-800); font-size: 1.125rem; margin-bottom: 1.5rem; font-weight: 700; text-align: center;">🎯 Funding Milestones</h4>
+                    <div style="position: relative; padding: 2rem 0;">
+                        <!-- Progress Line -->
+                        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: var(--gray-200); transform: translateY(-50%); border-radius: 2px;">
+                            <div id="milestone-progress-line" style="height: 100%; background: linear-gradient(90deg, var(--secondary-green), var(--primary-blue)); width: <%= campaign.fundingPercentage %>%; border-radius: 2px; transition: width 1s ease;"></div>
+                        </div>
+                        
+                        <!-- Milestone Nodes -->
+                        <div style="display: flex; justify-content: space-between; position: relative;">
+                            <% campaign.milestones.slice().sort((a, b) => a.percentage - b.percentage).forEach((ms, index) => { 
+                                const isReached = ms.reachedAt || campaign.fundingPercentage >= ms.percentage;
+                            %>
+                                <div class="milestone-node" data-milestone="<%= index %>" style="flex: 1; text-align: center; position: relative;">
+                                    <div class="milestone-dot <%= isReached ? 'reached' : '' %>" style="width: 40px; height: 40px; border-radius: 50%; background: <%= isReached ? 'var(--secondary-green)' : 'var(--gray-300)' %>; border: 4px solid <%= isReached ? 'var(--secondary-green)' : 'var(--gray-200)' %>; margin: 0 auto 0.75rem; transition: all 0.5s ease; box-shadow: <%= isReached ? '0 0 20px rgba(16, 185, 129, 0.4)' : 'none' %>;">
+                                        <% if (isReached) { %>
+                                            <span style="color: white; font-size: 1.25rem; line-height: 32px;">✓</span>
+                                        <% } else { %>
+                                            <span style="color: var(--gray-500); font-size: 0.875rem; line-height: 32px; font-weight: 700;"><%= ms.percentage %>%</span>
+                                        <% } %>
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-600); font-weight: 600;"><%= ms.title || ms.percentage + '% Goal' %></div>
+                                    <% if (ms.description) { %>
+                                        <div style="font-size: 0.625rem; color: var(--gray-500); margin-top: 0.25rem; max-width: 150px; margin-left: auto; margin-right: auto;"><%= ms.description.substring(0, 50) %><%= ms.description.length > 50 ? '...' : '' %></div>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                
                 <!-- Countdown Timer -->
                 <% if (campaign.status === 'active' && campaign.daysRemaining > 0) { %>
                     <div id="countdown-timer" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: var(--border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; text-align: center; box-shadow: var(--shadow-md);">
@@ -431,6 +465,12 @@
                     progressFill.style.width = msg.percentage + '%';
                 }
                 
+                // Update milestone progress line
+                const milestoneLine = document.getElementById('milestone-progress-line');
+                if (milestoneLine) {
+                    milestoneLine.style.width = msg.percentage + '%';
+                }
+                
                 // Show toast notification
                 showToast(msg.donor, msg.amount);
             }
@@ -558,6 +598,56 @@
             document.getElementById(tabName + '-tab').style.display = 'block';
         });
     });
+    
+    // Check if we should show milestone celebration
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('milestone') === 'true' && <%= campaign.milestones ? campaign.milestones.filter(m => m.reachedAt).length : 0 %> > 0) {
+        // Trigger confetti celebration
+        triggerConfetti();
+    }
+    
+    // Confetti celebration for milestones
+    function triggerConfetti() {
+        const colors = ['#10b981', '#34d399', '#f59e0b', '#fbbf24', '#4f46e5', '#6366f1'];
+        
+        for (let i = 0; i < 150; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: fixed;
+                width: ${10 + Math.random() * 10}px;
+                height: ${10 + Math.random() * 10}px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                left: ${Math.random() * 100}vw;
+                top: -20px;
+                z-index: 9999;
+                border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                animation: confettiFall ${2 + Math.random() * 2}s ease-in ${Math.random() * 2}s forwards,
+                           confettiSpin ${3 + Math.random() * 2}s linear infinite;
+                pointer-events: none;
+            `;
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => confetti.remove(), 6000);
+        }
+        
+        // Add keyframes if not already present
+        if (!document.getElementById('confetti-styles')) {
+            const style = document.createElement('style');
+            style.id = 'confetti-styles';
+            style.innerHTML = `
+                @keyframes confettiFall {
+                    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+                }
+                @keyframes confettiSpin {
+                    0% { transform: rotate(0deg) scale(1, 1); }
+                    50% { transform: rotate(180deg) scale(1.2, 0.8); }
+                    100% { transform: rotate(360deg) scale(1, 1); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
     
     // Show update modal
     function showUpdateModal() {

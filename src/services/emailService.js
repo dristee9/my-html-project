@@ -223,6 +223,67 @@ const templates = {
             </div>
         </body>
         </html>
+    `,
+
+    milestoneReached: (campaign, milestone) => `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+                .milestone-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981; text-align: center; }
+                .progress-bar { background: #e5e7eb; height: 20px; border-radius: 10px; overflow: hidden; margin: 20px 0; }
+                .progress-fill { background: linear-gradient(90deg, #10b981, #34d399); height: 100%; width: ${campaign.fundingPercentage}%; transition: width 0.5s ease; }
+                .button { display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+                .confetti { font-size: 2rem; margin: 0 0.5rem; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🎉 Milestone Reached!</h1>
+                    <div style="font-size: 3rem; margin-top: 1rem;">
+                        <span class="confetti">🎊</span>
+                        <span class="confetti">🎈</span>
+                        <span class="confetti">🎁</span>
+                    </div>
+                </div>
+                <div class="content">
+                    <p>Congratulations! Thanks to supporters like you, <strong>"${campaign.title}"</strong> has reached an exciting milestone!</p>
+                    
+                    <div class="milestone-box">
+                        <h2 style="color: #10b981; margin-bottom: 10px; font-size: 1.5rem;">${milestone.title || milestone.percentage + '% Funded!'}</h2>
+                        ${milestone.description ? `<p style="color: #6b7280; line-height: 1.6;">${milestone.description}</p>` : ''}
+                        <div style="margin-top: 20px;">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: #10b981;">${campaign.fundingPercentage}%</div>
+                            <div style="color: #6b7280; font-size: 0.875rem;">of funding goal reached</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    
+                    <p style="text-align: center; margin: 20px 0;"><strong>Current Funding:</strong> ৳${campaign.currentFunding.toLocaleString()} BDT / ৳${campaign.fundingGoal.toLocaleString()} BDT</p>
+                    
+                    <p>Your support has helped bring this project closer to reality! Let's keep the momentum going and help ${campaign.creator.username} reach the ultimate goal.</p>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="${process.env.APP_URL || 'http://localhost:3000'}/campaigns/${campaign._id}" class="button">View Campaign Progress</a>
+                    </div>
+                    
+                    <p style="margin-top: 30px; text-align: center;">Together, we're making student innovation happen!<br>The FundMyIdea BD Team</p>
+                </div>
+                <div class="footer">
+                    <p>&copy; ${new Date().getFullYear()} FundMyIdea BD. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
     `
 };
 
@@ -341,10 +402,34 @@ async function sendCampaignUpdate(backerEmail, campaign, title, content) {
     }
 }
 
+/**
+ * Send milestone reached notification to backers
+ */
+async function sendMilestoneReached(backerEmail, campaign, milestone) {
+    try {
+        const transporter = createTransporter();
+        
+        const mailOptions = {
+            from: `"FundMyIdea BD" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+            to: backerEmail,
+            subject: `🎉 Milestone Reached: ${campaign.title} is ${milestone.percentage}% funded!`,
+            html: templates.milestoneReached(campaign, milestone)
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Milestone notification sent to ${backerEmail}`);
+        return { success: true };
+    } catch (error) {
+        console.error('Error sending milestone notification:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 module.exports = {
     sendWelcomeEmail,
     sendDonationConfirmation,
     sendPasswordResetEmail,
     sendEmailVerification,
-    sendCampaignUpdate
+    sendCampaignUpdate,
+    sendMilestoneReached
 };
