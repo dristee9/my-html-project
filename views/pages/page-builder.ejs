@@ -145,13 +145,13 @@
                         <h2>Basic Campaign Information</h2>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>Campaign Title *</label>
+                                <label for="campaignTitle">Campaign Title *</label>
                                 <input type="text" id="campaignTitle" class="form-control" 
                                        value="<%= typeof campaign !== 'undefined' && campaign ? campaign.title : '' %>" 
                                        placeholder="Enter your campaign title" required>
                             </div>
                             <div class="form-group">
-                                <label>Category *</label>
+                                <label for="campaignCategory">Category *</label>
                                 <select id="campaignCategory" class="form-control" required>
                                     <option value="">Select a category</option>
                                     <option value="Technology" <%= typeof campaign !== 'undefined' && campaign && campaign.category === 'Technology' ? 'selected' : '' %>>Technology</option>
@@ -163,19 +163,19 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Funding Goal (BDT) *</label>
+                                <label for="fundingGoal">Funding Goal (BDT) *</label>
                                 <input type="number" id="fundingGoal" class="form-control" 
                                        value="<%= typeof campaign !== 'undefined' && campaign ? campaign.fundingGoal : '' %>" 
                                        placeholder="e.g. 50000" min="1000" required>
                             </div>
                             <div class="form-group">
-                                <label>Deadline *</label>
+                                <label for="campaignDeadline">Deadline *</label>
                                 <input type="date" id="campaignDeadline" class="form-control" 
                                        value="<%= typeof campaign !== 'undefined' && campaign ? campaign.deadline.toISOString().split('T')[0] : '' %>" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Description *</label>
+                            <label for="campaignDescription">Description *</label>
                             <textarea id="campaignDescription" class="form-control" rows="4" 
                                       placeholder="Describe your campaign, its goals, and how the funds will be used..." required><%= typeof campaign !== 'undefined' && campaign ? campaign.description : '' %></textarea>
                         </div>

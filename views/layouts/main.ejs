@@ -13,8 +13,11 @@
     <link rel="stylesheet" href="/styles/main.css">
 </head>
 <body class="app-container">
+    <!-- Skip to Content Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <%- include('../partials/header') %>
-    <main class="main-content <%= typeof fullBleed !== 'undefined' && fullBleed ? 'main-content--full' : '' %>">
+    <main id="main-content" class="main-content <%= typeof fullBleed !== 'undefined' && fullBleed ? 'main-content--full' : '' %>">
         <%- body %>
     </main>
     <%- include('../partials/footer') %>

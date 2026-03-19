@@ -118,9 +118,9 @@ class PageBuilder {
                     <span>${this.formatSectionType(section.type)}</span>
                 </div>
                 <div class="section-actions">
-                    <button class="btn-icon" onclick="pageBuilder.editSection('${section.id}')">✏️</button>
-                    <button class="btn-icon" onclick="pageBuilder.duplicateSection('${section.id}')">📋</button>
-                    <button class="btn-icon" onclick="pageBuilder.deleteSection('${section.id}')">🗑️</button>
+                    <button class="btn-icon" onclick="pageBuilder.editSection('${section.id}')" aria-label="Edit section">✏️</button>
+                    <button class="btn-icon" onclick="pageBuilder.duplicateSection('${section.id}')" aria-label="Duplicate section">📋</button>
+                    <button class="btn-icon" onclick="pageBuilder.deleteSection('${section.id}')" aria-label="Delete section">🗑️</button>
                 </div>
             </div>
             <div class="section-content">
@@ -409,7 +409,7 @@ class PageBuilder {
                                     <div class="feature-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <strong>Feature ${index + 1}</strong>
-                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFeature(${index})" title="Remove feature">🗑️</button>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFeature(${index})" aria-label="Remove feature" title="Remove feature">🗑️</button>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 8px;">
                                             <label style="font-size: 12px;">Icon</label>
@@ -447,7 +447,7 @@ class PageBuilder {
                                     <div class="testimonial-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <strong>Testimonial ${index + 1}</strong>
-                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeTestimonial(${index})" title="Remove testimonial">🗑️</button>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeTestimonial(${index})" aria-label="Remove testimonial" title="Remove testimonial">🗑️</button>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 8px;">
                                             <label style="font-size: 12px;">Name</label>
@@ -493,7 +493,7 @@ class PageBuilder {
                                     <div class="field-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <strong>Field ${index + 1}</strong>
-                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFormField(${index})" title="Remove field">🗑️</button>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFormField(${index})" aria-label="Remove field" title="Remove field">🗑️</button>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 8px;">
                                             <label style="font-size: 12px;">Label</label>
@@ -599,7 +599,7 @@ class PageBuilder {
                                     <div class="faq-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <strong>Q&A ${index + 1}</strong>
-                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFaq(${index})" title="Remove FAQ">🗑️</button>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFaq(${index})" aria-label="Remove FAQ" title="Remove FAQ">🗑️</button>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 8px;">
                                             <label style="font-size: 12px;">Question</label>
@@ -634,7 +634,7 @@ class PageBuilder {
                                         <div style="flex: 1;">
                                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                                 <strong>Image ${index + 1}</strong>
-                                                <button type="button" class="btn-icon" onclick="pageBuilder.removeGalleryImage(${index})" title="Remove image">🗑️</button>
+                                                <button type="button" class="btn-icon" onclick="pageBuilder.removeGalleryImage(${index})" aria-label="Remove image" title="Remove image">🗑️</button>
                                             </div>
                                             <div class="form-group" style="margin-bottom: 8px;">
                                                 <label style="font-size: 12px;">Image URL</label>
@@ -942,8 +942,8 @@ class PageBuilder {
                             <span class="version-time">${new Date(version.timestamp).toLocaleString()}</span>
                         </div>
                         <div class="version-actions">
-                            <button class="btn-icon" onclick="pageBuilder.restoreVersion(${index})" title="Restore this version">🔄</button>
-                            <button class="btn-icon" onclick="pageBuilder.compareVersion(${index})" title="Compare with current">🔍</button>
+                            <button class="btn-icon" onclick="pageBuilder.restoreVersion(${index})" aria-label="Restore this version" title="Restore this version">🔄</button>
+                            <button class="btn-icon" onclick="pageBuilder.compareVersion(${index})" aria-label="Compare with current" title="Compare with current">🔍</button>
                         </div>
                     </div>
                 `).reverse().join('')}
