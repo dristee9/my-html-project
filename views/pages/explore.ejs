@@ -24,6 +24,14 @@
                     <option value="Research" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Research' ? 'selected' : '' %>>Research</option>
                     <option value="Other" <%= typeof searchCategory !== 'undefined' && searchCategory === 'Other' ? 'selected' : '' %>>Other</option>
                 </select>
+                <select name="university" class="form-control" style="min-width: 200px;">
+                    <option value="all">All Universities</option>
+                    <% if (typeof universities !== 'undefined' && universities.length > 0) { %>
+                        <% universities.forEach(uni => { %>
+                            <option value="<%= uni %>" <%= typeof searchUniversity !== 'undefined' && searchUniversity === uni ? 'selected' : '' %>><%= uni %></option>
+                        <% }); %>
+                    <% } %>
+                </select>
                 <select name="sort" class="form-control" style="min-width: 180px;">
                     <option value="newest" <%= typeof sortBy !== 'undefined' && sortBy === 'newest' ? 'selected' : '' %>>Newest First</option>
                     <option value="most-funded" <%= typeof sortBy !== 'undefined' && sortBy === 'most-funded' ? 'selected' : '' %>>Most Funded</option>
@@ -35,42 +43,61 @@
         
         <!-- Quick Category Filters -->
         <div class="category-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
-            <a href="/campaigns/search?category=all&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+            <a href="/campaigns/search?category=all&university=<%= typeof searchUniversity !== 'undefined' ? searchUniversity : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
                class="category-tag <%= typeof searchCategory === 'undefined' || searchCategory === 'all' ? 'active' : '' %>"
                style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory === 'undefined' || searchCategory === 'all' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
                All
             </a>
-            <a href="/campaigns/search?category=Technology&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+            <a href="/campaigns/search?category=Technology&university=<%= typeof searchUniversity !== 'undefined' ? searchUniversity : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
                class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Technology' ? 'active' : '' %>"
                style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Technology' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
                Technology
             </a>
-            <a href="/campaigns/search?category=Education&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+            <a href="/campaigns/search?category=Education&university=<%= typeof searchUniversity !== 'undefined' ? searchUniversity : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
                class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Education' ? 'active' : '' %>"
                style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Education' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
                Education
             </a>
-            <a href="/campaigns/search?category=Social Impact&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+            <a href="/campaigns/search?category=Social Impact&university=<%= typeof searchUniversity !== 'undefined' ? searchUniversity : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
                class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Social Impact' ? 'active' : '' %>"
                style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Social Impact' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
                Social Impact
             </a>
-            <a href="/campaigns/search?category=Arts & Culture&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+            <a href="/campaigns/search?category=Arts & Culture&university=<%= typeof searchUniversity !== 'undefined' ? searchUniversity : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
                class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Arts & Culture' ? 'active' : '' %>"
                style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Arts & Culture' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
                Arts & Culture
             </a>
-            <a href="/campaigns/search?category=Research&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+            <a href="/campaigns/search?category=Research&university=<%= typeof searchUniversity !== 'undefined' ? searchUniversity : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
                class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Research' ? 'active' : '' %>"
                style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Research' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
                Research
             </a>
-            <a href="/campaigns/search?category=Other&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+            <a href="/campaigns/search?category=Other&university=<%= typeof searchUniversity !== 'undefined' ? searchUniversity : 'all' %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
                class="category-tag <%= typeof searchCategory !== 'undefined' && searchCategory === 'Other' ? 'active' : '' %>"
                style="padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem; transition: all var(--transition-fast); <%= typeof searchCategory !== 'undefined' && searchCategory === 'Other' ? 'background: var(--primary-blue); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
                Other
             </a>
         </div>
+        
+        <!-- Quick University Filters -->
+        <% if (typeof universities !== 'undefined' && universities.length > 0) { %>
+            <div class="university-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">🎓 Universities:</span>
+                <a href="/campaigns/search?category=<%= typeof searchCategory !== 'undefined' ? searchCategory : 'all' %>&university=all&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+                   class="category-tag <%= typeof searchUniversity === 'undefined' || searchUniversity === 'all' ? 'active' : '' %>"
+                   style="padding: 0.375rem 0.875rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.75rem; transition: all var(--transition-fast); <%= typeof searchUniversity === 'undefined' || searchUniversity === 'all' ? 'background: var(--secondary-green); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+                   All
+                </a>
+                <% universities.slice(0, 8).forEach(uni => { %>
+                    <a href="/campaigns/search?category=<%= typeof searchCategory !== 'undefined' ? searchCategory : 'all' %>&university=<%= uni %>&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" 
+                       class="category-tag <%= typeof searchUniversity !== 'undefined' && searchUniversity === uni ? 'active' : '' %>"
+                       style="padding: 0.375rem 0.875rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.75rem; transition: all var(--transition-fast); <%= typeof searchUniversity !== 'undefined' && searchUniversity === uni ? 'background: var(--secondary-green); color: white;' : 'background: var(--gray-100); color: var(--gray-700);' %>">
+                       <%= uni.split(' ').slice(0, 2).join(' ') %>
+                    </a>
+                <% }); %>
+            </div>
+        <% } %>
     </div>
 
     <div class="campaign-grid">
@@ -95,9 +122,10 @@
                         %>
                         <span class="status-badge <%= statusBadgeClass %>"><%= statusText %></span>
                         <span class="status-badge badge-category"><%= campaign.category %></span>
+                        <span class="status-badge badge-university" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; font-size: 0.7rem;">🎓 <%= campaign.creator.university ? campaign.creator.university.split(' ').slice(0, 2).join(' ') : 'University' %></span>
                     </div>
                     <h3 class="campaign-name"><%= campaign.title %></h3>
-                    <p class="campaign-author">by <%= campaign.creator.username %></p>
+                    <p class="campaign-author">by <%= campaign.creator.username %> <span style="color: var(--gray-500); font-size: 0.875rem;">• <%= campaign.creator.university || 'Unknown University' %></span></p>
                     <div class="progress-container">
                         <div class="progress-track">
                             <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>

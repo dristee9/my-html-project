@@ -402,12 +402,15 @@ exports.processDonation = async (req, res) => {
 // Search campaigns
 exports.searchCampaigns = async (req, res) => {
     try {
-        const { q, category, sort, page } = req.query;
+        const { q, category, university, sort, page } = req.query;
         
         // Pagination settings
         const currentPage = parseInt(page) || 1;
         const pageSize = 9; // Show 9 campaigns per page
         const skip = (currentPage - 1) * pageSize;
+        
+        // Get unique universities for filter dropdown
+        const universities = await User.distinct('university');
         
         // Build query
         let query = { status: 'active' };
@@ -448,6 +451,11 @@ exports.searchCampaigns = async (req, res) => {
             query.category = category;
         }
         
+        // Filter by university if selected
+        if (university && university !== 'all') {
+            query['creator.university'] = university;
+        }
+        
         // Determine sorting
         let sortOptions = {};
         if (sort === 'most-funded') {
@@ -473,9 +481,11 @@ exports.searchCampaigns = async (req, res) => {
             title: q ? `Search Results - FundMyIdea BD` : 'Explore Campaigns - FundMyIdea BD',
             campaigns: campaigns,
             user: req.user,
+            universities: universities,
             currentPage: 'explore',
             searchQuery: q || '',
             searchCategory: category || 'all',
+            searchUniversity: university || '',
             sortBy: sort || 'newest',
             pageNum: currentPage,
             totalPages: totalPages,

@@ -122,6 +122,31 @@
     </div>
 </section>
 
+<!-- Universities Showcase -->
+<section class="universities-section" style="padding: 3rem 0; background: linear-gradient(135deg, #f8fafc, #e2e8f0);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+        <h2 style="text-align: center; font-size: 2rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem;">🎓 Universities on Platform</h2>
+        <p style="text-align: center; color: var(--gray-600); margin-bottom: 2rem;">Supporting student innovators across Bangladesh</p>
+        
+        <% if (typeof stats.universities !== 'undefined' && stats.universities > 0) { %>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-blue);"><%= stats.universities %>+</div>
+                    <div style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">Universities Represented</div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--secondary-green);"><%= stats.activeCampaigns %>+</div>
+                    <div style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">Active Campaigns</div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #8b5cf6;"><%= stats.totalCampaigns %>+</div>
+                    <div style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">Total Campaigns</div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</section>
+
 <!-- Newest Campaigns -->
 <section class="page-section">
     <div class="section-header">
