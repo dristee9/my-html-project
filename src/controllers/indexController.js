@@ -19,7 +19,8 @@ exports.getHomePage = async (req, res) => {
         ]);
 
         // Fetch unique universities count
-        const universitiesCount = await User.distinct('university').count();
+        const universityList = await User.distinct('university');
+        const universitiesCount = universityList.length;
 
         // Format statistics with defaults
         const platformStats = {

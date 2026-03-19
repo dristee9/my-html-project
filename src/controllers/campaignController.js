@@ -216,6 +216,11 @@ exports.processDonation = async (req, res) => {
         // Auto-expire campaign if deadline has passed
         await campaign.checkAndUpdateExpiration();
         
+        // Add virtual properties for template usage
+        const campaignData = campaign.toObject();
+        campaignData.daysLeftText = campaign.daysLeftText;
+        campaignData.fundingPercentage = campaign.fundingPercentage;
+        
         // Check if campaign is still active after expiration check
         if (campaign.status !== 'active') {
             console.log('Campaign not active or expired');
@@ -227,11 +232,6 @@ exports.processDonation = async (req, res) => {
                 pageStyles: ['donate']
             });
         }
-        
-        // Add virtual properties for template usage
-        const campaignData = campaign.toObject();
-        campaignData.daysLeftText = campaign.daysLeftText;
-        campaignData.fundingPercentage = campaign.fundingPercentage;
         
         // Validate amount
         const donationAmount = parseInt(amount);

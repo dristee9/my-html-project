@@ -89,4 +89,9 @@ userSchema.statics.verifyEmailToken = async function(hashedToken, verificationTo
     return await bcrypt.compare(verificationToken, hashedToken);
 };
 
+// Verify password reset token
+userSchema.statics.verifyResetToken = async function(hashedToken, resetToken) {
+    return await bcrypt.compare(resetToken, hashedToken);
+};
+
 module.exports = mongoose.model('User', userSchema);

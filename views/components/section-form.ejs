@@ -121,7 +121,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Show success message or handle submission
-            const submitButton = form.querySelector('.submit-button');
+            const submitButton = form.querySelector('[type="submit"]');
+            if (!submitButton) return;
+            
             const originalText = submitButton.textContent;
             submitButton.textContent = 'Submitting...';
             submitButton.disabled = true;

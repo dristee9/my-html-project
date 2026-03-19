@@ -124,10 +124,27 @@ router.get('/verify-email/:token', async (req, res) => {
     try {
         const User = require('../models/User');
         
-        // Find user with non-expired verification token (we'll check all users since we don't have expiry)
-        const user = await User.findOne({
+        // Find all users with verification tokens
+        const users = await User.find({
             emailVerificationToken: { $exists: true }
         });
+        
+        if (!users || users.length === 0) {
+            return res.status(400).render('pages/error', {
+                title: 'Invalid Verification Link - FundMyIdea BD',
+                error: 'Email verification link is invalid or has already been used'
+            });
+        }
+        
+        // Find the matching user by comparing tokens
+        let user = null;
+        for (const u of users) {
+            const isValid = await User.verifyEmailToken(u.emailVerificationToken, req.params.token);
+            if (isValid) {
+                user = u;
+                break;
+            }
+        }
         
         if (!user) {
             return res.status(400).render('pages/error', {
@@ -186,9 +203,28 @@ router.get('/verify-email/:token', async (req, res) => {
 router.get('/reset-password/:token', async (req, res) => {
     try {
         const User = require('../models/User');
-        const user = await User.findOne({
+        
+        // Find all users with non-expired reset tokens
+        const users = await User.find({
             resetPasswordExpire: { $gt: Date.now() }
         });
+        
+        if (!users || users.length === 0) {
+            return res.status(400).render('pages/error', {
+                title: 'Invalid Reset Link - FundMyIdea BD',
+                error: 'Password reset link is invalid or has expired'
+            });
+        }
+        
+        // Find the matching user by comparing tokens
+        let user = null;
+        for (const u of users) {
+            const isValid = await User.verifyResetToken(u.resetPasswordToken, req.params.token);
+            if (isValid) {
+                user = u;
+                break;
+            }
+        }
         
         if (!user) {
             return res.status(400).render('pages/error', {
@@ -241,9 +277,28 @@ router.post('/reset-password/:token', async (req, res) => {
         }
         
         const User = require('../models/User');
-        const user = await User.findOne({
+        
+        // Find all users with non-expired reset tokens
+        const users = await User.find({
             resetPasswordExpire: { $gt: Date.now() }
         });
+        
+        if (!users || users.length === 0) {
+            return res.status(400).render('pages/error', {
+                title: 'Invalid Reset Link - FundMyIdea BD',
+                error: 'Password reset link is invalid or has expired'
+            });
+        }
+        
+        // Find the matching user by comparing tokens
+        let user = null;
+        for (const u of users) {
+            const isValid = await User.verifyResetToken(u.resetPasswordToken, req.params.token);
+            if (isValid) {
+                user = u;
+                break;
+            }
+        }
         
         if (!user) {
             return res.status(400).render('pages/error', {
