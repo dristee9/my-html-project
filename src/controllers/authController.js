@@ -80,7 +80,6 @@ exports.register = [
 
             // Generate email verification token
             const verificationToken = await user.generateEmailVerificationToken();
-            await user.save();
             
             // Send verification email (non-blocking)
             emailService.sendEmailVerification(user, verificationToken).catch(err => {
@@ -159,7 +158,8 @@ exports.login = [
             res.cookie('token', token, {
                 httpOnly: true,
                 maxAge: 7 * 24 * 60 * 60 * 1000,
-                secure: process.env.NODE_ENV === 'production'
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
             });
 
             // Redirect to intended destination or dashboard

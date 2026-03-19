@@ -24,7 +24,8 @@
     </style>
     
     <!-- Render Custom Sections -->
-    <% campaign.pageBuilder.sections.sort((a, b) => a.order - b.order).forEach(section => { %>
+    <% const orderedSections = campaign.pageBuilder.sections.slice().sort((a, b) => a.order - b.order); %>
+    <% orderedSections.forEach(section => { %>
         <section class="custom-section <%= section.settings.customClass || '' %>" 
                  style="
                      background-color: <%= section.settings.backgroundColor || '#ffffff' %>;
@@ -106,7 +107,7 @@
     <div class="campaign-detail-page">
         <!-- Same content as original campaign.ejs -->
         <div class="campaign-header-image">
-            <img src="<%= campaign.imageUrl || 'https://placehold.co/1200x400/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-main-image">
+            <img src="<%= campaign.imageUrl || 'https://placehold.co/1200x400/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-main-image">
         </div>
         
         <div class="campaign-content">
@@ -134,11 +135,26 @@
             <% if (typeof user !== 'undefined' && user && campaign.creator._id.toString() !== user._id.toString()) { %>
             <div class="donation-section">
                 <h2 class="heading-3">Support this Project</h2>
-                <%- include('../partials/donation-form', { 
-                    campaign: campaign, 
-                    user: user,
-                    hasDonated: typeof hasDonated !== 'undefined' ? hasDonated : false
-                }) %>
+                <% if (typeof hasDonated !== 'undefined' && hasDonated) { %>
+                    <div class="success-banner mb-6 text-center">
+                        <h3 class="mb-2">Thank You for Your Support!</h3>
+                        <p>You've already contributed to this campaign. Your support means the world to the creator.</p>
+                    </div>
+                <% } else if (campaign.status === 'active') { %>
+                    <div class="donate-cta-card" style="background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light)); color: white; padding: 2.5rem; border-radius: var(--border-radius-xl); text-align: center; margin: 2rem 0; box-shadow: var(--shadow-lg);">
+                        <h3 class="heading-4" style="margin-bottom: 1rem;">Ready to Make a Difference?</h3>
+                        <p style="margin-bottom: 1.5rem; opacity: 0.95;">Your contribution can help bring this student's innovative idea to life.</p>
+                        <a href="/campaigns/<%= campaign._id %>/donate" class="btn btn--success btn--lg" style="display: inline-flex; align-items: center; gap: 0.75rem; background: white; color: var(--primary-blue); font-weight: 700; padding: 1rem 2.5rem; border-radius: var(--border-radius-full); text-decoration: none; transition: all var(--transition-fast);">
+                            <span style="font-size: 1.5rem;">💰</span>
+                            <span>Donate Now via bKash</span>
+                        </a>
+                        <p style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.85;">
+                            <i class="security-icon">🔒</i> Secure payment processing
+                        </p>
+                    </div>
+                <% } else { %>
+                    <p style="text-align: center; color: var(--gray-600); margin: 2rem 0;">This campaign is no longer accepting donations.</p>
+                <% } %>
             </div>
             <% } %>
         </div>

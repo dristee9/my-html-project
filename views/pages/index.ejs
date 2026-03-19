@@ -57,7 +57,7 @@
         <% recommendedCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
-                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
                         <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
@@ -95,7 +95,7 @@
         <% trendingCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
-                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
                         <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
@@ -132,7 +132,7 @@
         <% newestCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
-                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
                         <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>

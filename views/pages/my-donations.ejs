@@ -61,17 +61,21 @@
 
         <div class="card card--lg mt-6">
             <h2 class="heading-md mb-6">Donation Statistics</h2>
+            <%
+                const totalDonated = donations.reduce((sum, d) => sum + d.amount, 0);
+                const uniqueCampaigns = new Set(donations.map(d => String(d.campaignId))).size;
+            %>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-card__value" style="color: var(--primary-blue);">0</div>
+                    <div class="stat-card__value" style="color: var(--primary-blue);"><%= donations.length %></div>
                     <div class="stat-card__label">Total Donations</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card__value" style="color: var(--secondary-green);">0 BDT</div>
+                    <div class="stat-card__value" style="color: var(--secondary-green);"><%= totalDonated %> BDT</div>
                     <div class="stat-card__label">Total Amount</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card__value" style="color: var(--purple-600);">0</div>
+                    <div class="stat-card__value" style="color: var(--purple-600);"><%= uniqueCampaigns %></div>
                     <div class="stat-card__label">Campaigns Supported</div>
                 </div>
             </div>

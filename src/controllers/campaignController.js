@@ -486,7 +486,7 @@ exports.searchCampaigns = async (req, res) => {
             searchQuery: q || '',
             searchCategory: category || 'all',
             sortBy: sort || 'newest',
-            currentPage: currentPage,
+            pageNum: currentPage,
             totalPages: totalPages,
             hasPrevPage: currentPage > 1,
             hasNextPage: currentPage < totalPages,

@@ -133,9 +133,10 @@ async function executePayment(paymentID) {
     try {
         const token = await grantToken();
         
+        // bKash API expects paymentID in request body, not URL path
         const response = await axios.post(
-            `${config.baseUrl}/tokenized/checkout/execute/${paymentID}`,
-            {},
+            `${config.baseUrl}/tokenized/checkout/execute`,
+            { paymentID: paymentID },
             {
                 headers: {
                     'Content-Type': 'application/json',

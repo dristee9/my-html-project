@@ -96,6 +96,7 @@
                             <div class="form-group">
                                 <label class="form-label">Your Message (Optional)</label>
                                 <textarea name="message" 
+                                          id="donationMessage"
                                           class="form-control" 
                                           rows="4" 
                                           placeholder="Leave an encouraging message for the campaign creator..."></textarea>
@@ -305,7 +306,7 @@ document.querySelector('.donation-form').addEventListener('submit', function(e) 
 // Handle bKash payment button
 document.getElementById('bkashPaymentBtn').addEventListener('click', async function() {
     const amount = document.getElementById('donationAmount').value;
-    const message = document.getElementById('donationMessage').value;
+    const message = document.getElementById('donationMessage').value || '';
     
     // Validate amount
     const donationAmount = parseInt(amount);
@@ -314,6 +315,9 @@ document.getElementById('bkashPaymentBtn').addEventListener('click', async funct
         return;
     }
     
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name="_csrf"]').value;
+    
     try {
         // Disable button and show loading state
         const bkashBtn = document.getElementById('bkashPaymentBtn');
@@ -321,13 +325,13 @@ document.getElementById('bkashPaymentBtn').addEventListener('click', async funct
         bkashBtn.innerHTML = '<span>Initiating Payment...</span>';
         bkashBtn.style.opacity = '0.7';
         
-        // Call backend to initiate bKash payment
+        // Call backend to initiate bKash payment with CSRF token
         const response = await fetch(`/campaigns/${'<%= campaign._id %>'}/bkash/initiate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ amount: donationAmount, message })
+            body: JSON.stringify({ amount: donationAmount, message, _csrf: csrfToken })
         });
         
         const result = await response.json();

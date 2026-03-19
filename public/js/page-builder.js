@@ -25,9 +25,26 @@ class PageBuilder {
     }
 
     init() {
+        this.loadTemplatesFromDOM();
         this.setupEventListeners();
         this.loadExistingData();
         this.setupDragAndDrop();
+    }
+
+    loadTemplatesFromDOM() {
+        this.templates = [];
+        const templateCards = document.querySelectorAll('.template-card');
+        templateCards.forEach(card => {
+            const templateId = card.dataset.template;
+            const templateType = card.dataset.type;
+            if (templateId && templateType) {
+                this.templates.push({
+                    id: templateId,
+                    type: templateType,
+                    element: card
+                });
+            }
+        });
     }
 
     setupEventListeners() {
@@ -1181,142 +1198,91 @@ class PageBuilder {
     }
 
     getTemplateById(id) {
-        // In a real implementation, this would fetch from the server
-        const templates = [
-            {
-                id: 'hero-basic',
-                type: 'hero',
-                content: {
-                    title: 'Your Campaign Title',
-                    subtitle: 'A compelling subtitle that explains your mission',
-                    description: 'Detailed description of your campaign...',
-                    image: '',
-                    ctaText: 'Support This Campaign',
-                    ctaLink: '#donate'
-                }
-            },
-            {
-                id: 'features-three-col',
-                type: 'features',
-                content: {
-                    title: 'Key Features',
-                    features: [
-                        { icon: '💡', title: 'Feature One', description: 'First feature description' },
-                        { icon: '🚀', title: 'Feature Two', description: 'Second feature description' },
-                        { icon: '🎯', title: 'Feature Three', description: 'Third feature description' }
-                    ]
-                }
-            },
-            {
-                id: 'hero-image',
-                type: 'hero',
-                content: {
-                    title: 'Campaign with Image',
-                    subtitle: 'Showcase your vision with compelling visuals',
-                    description: 'Add an impactful image to grab attention',
-                    image: '',
-                    ctaText: 'Learn More',
-                    ctaLink: '#'
-                }
-            },
-            {
-                id: 'testimonials-slider',
-                type: 'testimonials',
-                content: {
-                    title: 'What People Say',
-                    testimonials: [
-                        { name: 'John Doe', role: 'Supporter', quote: 'This is an amazing initiative!', avatar: '' },
-                        { name: 'Jane Smith', role: 'Mentor', quote: 'Incredible work being done here.', avatar: '' }
-                    ]
-                }
-            },
-            {
-                id: 'contact-form',
-                type: 'form',
-                content: {
-                    title: 'Get In Touch',
-                    fields: [
-                        { type: 'text', label: 'Name', required: true },
-                        { type: 'email', label: 'Email', required: true },
-                        { type: 'textarea', label: 'Message', required: true }
-                    ],
-                    buttonText: 'Send Message'
-                }
-            },
-            {
-                id: 'donation-form',
-                type: 'form',
-                content: {
-                    title: 'Support This Campaign',
-                    fields: [
-                        { type: 'number', label: 'Donation Amount (BDT)', required: true, min: 100 },
-                        { type: 'text', label: 'bKash Number', required: true },
-                        { type: 'textarea', label: 'Your Message (Optional)', required: false }
-                    ],
-                    buttonText: 'Donate Now'
-                }
-            },
-            {
-                id: 'text-basic',
-                type: 'text',
-                content: {
-                    heading: 'Text Section',
-                    body: 'This is a basic text section. You can use this section to add descriptive content about your campaign, mission, or any information you want to share with your audience.'
-                }
-            },
-            {
-                id: 'image-basic',
-                type: 'image',
-                content: {
-                    src: 'https://via.placeholder.com/800x400',
-                    alt: 'Campaign image',
-                    caption: 'Image caption goes here'
-                }
-            },
-            {
-                id: 'gallery-grid',
-                type: 'gallery',
-                content: {
-                    title: 'Photo Gallery',
-                    images: [
-                        'https://via.placeholder.com/400x300',
-                        'https://via.placeholder.com/400x300',
-                        'https://via.placeholder.com/400x300'
-                    ]
-                }
-            },
-            {
-                id: 'video-youtube',
-                type: 'video',
-                content: {
-                    url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                    caption: 'Video caption or description'
-                }
-            },
-            {
-                id: 'cta-basic',
-                type: 'cta',
-                content: {
-                    heading: 'Take Action Now',
-                    description: 'Encourage visitors to take the next step and support your cause.',
-                    buttonText: 'Get Involved',
-                    buttonLink: '#donate'
-                }
-            },
-            {
-                id: 'faq-basic',
-                type: 'faq',
-                content: {
-                    title: 'Frequently Asked Questions',
-                    faqs: [
-                        { question: 'What is this campaign about?', answer: 'This campaign aims to make a positive impact by addressing an important issue.' },
-                        { question: 'How can I contribute?', answer: 'You can contribute by donating, sharing our campaign, or volunteering your time.' }
-                    ]
-                }
-            }
-        ];
+        const template = this.templates.find(t => t.id === id);
+        if (!template) return null;
         
-        return templates.find(t => t.id === id);
+        // Return template with content based on type
+        return {
+            id: template.id,
+            type: template.type,
+            content: this.getDefaultTemplateContent(template.type)
+        };
+    }
+
+    getDefaultTemplateContent(type) {
+        // Default content templates for each section type
+        const defaults = {
+            hero: {
+                title: 'Your Campaign Title',
+                subtitle: 'A compelling subtitle that explains your mission',
+                description: 'Detailed description of your campaign...',
+                image: '',
+                ctaText: 'Support This Campaign',
+                ctaLink: '#donate'
+            },
+            features: {
+                title: 'Key Features',
+                features: [
+                    { icon: '💡', title: 'Feature One', description: 'First feature description' },
+                    { icon: '🚀', title: 'Feature Two', description: 'Second feature description' },
+                    { icon: '🎯', title: 'Feature Three', description: 'Third feature description' }
+                ]
+            },
+            testimonials: {
+                title: 'What People Say',
+                testimonials: [
+                    { name: 'John Doe', role: 'Supporter', quote: 'This is an amazing initiative!', avatar: '' },
+                    { name: 'Jane Smith', role: 'Mentor', quote: 'Incredible work being done here.', avatar: '' }
+                ]
+            },
+            form: {
+                title: 'Get In Touch',
+                fields: [
+                    { type: 'text', label: 'Name', required: true },
+                    { type: 'email', label: 'Email', required: true },
+                    { type: 'textarea', label: 'Message', required: true }
+                ],
+                buttonText: 'Send Message'
+            },
+            text: {
+                heading: 'Text Section',
+                body: 'This is a basic text section. You can use this section to add descriptive content about your campaign, mission, or any information you want to share with your audience.'
+            },
+            image: {
+                src: 'https://via.placeholder.com/800x400',
+                alt: 'Campaign image',
+                caption: 'Image caption goes here'
+            },
+            gallery: {
+                title: 'Photo Gallery',
+                images: [
+                    'https://via.placeholder.com/400x300',
+                    'https://via.placeholder.com/400x300',
+                    'https://via.placeholder.com/400x300'
+                ]
+            },
+            video: {
+                url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                caption: 'Video caption or description'
+            },
+            cta: {
+                heading: 'Take Action Now',
+                description: 'Encourage visitors to take the next step and support your cause.',
+                buttonText: 'Get Involved',
+                buttonLink: '#donate'
+            },
+            faq: {
+                title: 'Frequently Asked Questions',
+                faqs: [
+                    { question: 'What is this campaign about?', answer: 'This campaign aims to make a positive impact by addressing an important issue.' },
+                    { question: 'How can I contribute?', answer: 'You can contribute by donating, sharing our campaign, or volunteering your time.' }
+                ]
+            },
+            divider: {},
+            custom: {}
+        };
+        
+        return defaults[type] || {};
     }
 
     generateId() {

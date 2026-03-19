@@ -107,11 +107,11 @@ router.get('/resend-verification', async (req, res) => {
             return res.redirect('/login');
         }
         
-        // Generate new verification token
+        // Generate new verification token FIRST, then save
         const verificationToken = await user.generateEmailVerificationToken();
         await user.save();
         
-        // Send verification email
+        // Send verification email with the newly generated and saved token
         const emailService = require('../services/emailService');
         await emailService.sendEmailVerification(user, verificationToken);
         

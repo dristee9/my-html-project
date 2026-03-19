@@ -67,9 +67,24 @@ exports.savePageBuilder = async (req, res) => {
             pageBuilderData
         } = req.body;
 
+        // Handle pageBuilderData as either object or JSON string
+        let pageBuilderObj;
+        if (typeof pageBuilderData === 'string') {
+            try {
+                pageBuilderObj = JSON.parse(pageBuilderData);
+            } catch (e) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid pageBuilderData JSON'
+                });
+            }
+        } else {
+            pageBuilderObj = pageBuilderData;
+        }
+
         // Sanitize section content to prevent XSS
-        if (pageBuilderData && pageBuilderData.sections) {
-            pageBuilderData.sections.forEach(section => {
+        if (pageBuilderObj && pageBuilderObj.sections) {
+            pageBuilderObj.sections.forEach(section => {
                 // Sanitize text content in sections
                 if (section.content) {
                     Object.keys(section.content).forEach(key => {
@@ -133,11 +148,11 @@ exports.savePageBuilder = async (req, res) => {
             };
             
             // Add page builder data if provided
-            if (pageBuilderData) {
+            if (pageBuilderObj) {
                 updateData.$set['pageBuilder.enabled'] = true;
-                updateData.$set['pageBuilder.sections'] = pageBuilderData.sections || [];
-                updateData.$set['pageBuilder.globalStyles'] = pageBuilderData.globalStyles || {};
-                updateData.$set['pageBuilder.customCSS'] = pageBuilderData.customCSS || '';
+                updateData.$set['pageBuilder.sections'] = pageBuilderObj.sections || [];
+                updateData.$set['pageBuilder.globalStyles'] = pageBuilderObj.globalStyles || {};
+                updateData.$set['pageBuilder.customCSS'] = pageBuilderObj.customCSS || '';
             }
             
             // IMPORTANT: Do NOT update status, backers, or currentFunding from page builder
@@ -160,12 +175,12 @@ exports.savePageBuilder = async (req, res) => {
             };
             
             // Add page builder data if provided
-            if (pageBuilderData) {
+            if (pageBuilderObj) {
                 campaignData.pageBuilder = {
                     enabled: true,
-                    sections: pageBuilderData.sections || [],
-                    globalStyles: pageBuilderData.globalStyles || {},
-                    customCSS: pageBuilderData.customCSS || ''
+                    sections: pageBuilderObj.sections || [],
+                    globalStyles: pageBuilderObj.globalStyles || {},
+                    customCSS: pageBuilderObj.customCSS || ''
                 };
             }
             

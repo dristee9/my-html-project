@@ -82,7 +82,7 @@
         <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
             <% campaigns.forEach(campaign => { %>
             <div class="campaign-card">
-                <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
+                <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
                 <div class="campaign-details">
                     <div class="campaign-header">
                         <span class="status-badge badge-<%= campaign.status === 'active' ? 'active' : (campaign.status === 'completed' ? 'completed' : 'expired') %>"><%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %><%= campaign.status === 'active' ? ' • ' + campaign.daysLeftText : '' %></span>

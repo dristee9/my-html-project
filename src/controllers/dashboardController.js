@@ -5,6 +5,7 @@ const User = require('../models/User');
 exports.getDashboard = async (req, res) => {
     try {
         const campaigns = await Campaign.find({ creator: req.user._id })
+            .populate('backers.user', 'username')
             .sort({ createdAt: -1 });
         
         // Calculate user statistics - only for ACTIVE campaigns
