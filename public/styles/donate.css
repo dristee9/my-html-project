@@ -165,41 +165,6 @@
     border-style: solid;
 }
 
-/* Form Controls */
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--gray-200);
-    border-radius: var(--border-radius-lg);
-    font-size: 1rem;
-    transition: border-color var(--transition-fast);
-    background: white;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.field-hint {
-    font-size: 0.875rem;
-    color: var(--gray-500);
-    margin-top: 0.5rem;
-}
-
 /* Amount Input Styling */
 .amount-input-container {
     position: relative;

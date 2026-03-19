@@ -1018,13 +1018,6 @@ body {
     width: 90%;
 }
 
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: var(--gray-800);
-}
-
 .form-input {
     width: 100%;
     padding: 0.75rem;
