@@ -40,6 +40,15 @@
                 </div>
                 <% } %>
                 
+                <!-- Donation Success Banner -->
+                <% if (typeof donationSuccess !== 'undefined' && donationSuccess) { %>
+                <div class="donation-success-banner" style="background: #dcfce7; color: #166534; padding: 1.5rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem; border: 2px solid #86efac; text-align: center;">
+                    <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem;">🎉</span>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Thank You for Your Donation!</h3>
+                    <p style="font-size: 1rem; color: #15803d;"><%= donationSuccess %></p>
+                </div>
+                <% } %>
+                
                 <!-- Campaign Expired Message -->
                 <% if (campaign.status !== 'active') { %>
                 <div class="campaign-status-banner <%= campaign.status === 'completed' ? 'status-completed' : 'status-expired' %>">
@@ -151,7 +160,7 @@
             <div class="card-shadow mt-6">
                 <h2 class="heading-3">Creator Tools</h2>
                 <div class="flex gap-4 flex-wrap">
-                    <a href="/campaigns/<%= campaign._id %>/edit" class="btn btn--primary">Edit Campaign</a>
+                    <a href="/builder/<%= campaign._id %>/edit" class="btn btn--primary">Edit Campaign</a>
                     <button onclick="showDeleteModal()" class="btn btn--danger">Delete Campaign</button>
                 </div>
                 

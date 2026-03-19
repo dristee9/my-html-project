@@ -86,7 +86,7 @@
     padding: 2rem;
 }
 
-.form-title {
+.donate-form-title {
     font-size: 1.75rem;
     font-weight: 700;
     color: var(--gray-800);
@@ -545,7 +545,7 @@
         font-size: 1.5rem;
     }
     
-    .form-title {
+    .donate-form-title {
         font-size: 1.5rem;
     }
 }

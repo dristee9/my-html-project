@@ -30,6 +30,10 @@
             <span class="text-xl">➕</span>
             Create New Campaign
         </a>
+        <a href="/campaigns" class="btn btn--secondary inline-flex items-center gap-2">
+            <span class="text-xl">🔍</span>
+            Browse Campaigns
+        </a>
         <a href="/dashboard/my-donations" class="btn btn--secondary inline-flex items-center gap-2">
             <span class="text-xl">💰</span>
             View All Donations
@@ -62,7 +66,7 @@
                 </span>
             </div>
             <div class="mt-3 flex gap-2">
-                <a href="/campaigns/<%= campaign._id %>/edit" class="text-sm btn btn--primary py-1 px-3">Edit Campaign</a>
+                <a href="/builder/<%= campaign._id %>/edit" class="text-sm btn btn--primary py-1 px-3">Edit Campaign</a>
                 <a href="/campaigns/<%= campaign._id %>" class="text-sm btn btn--secondary py-1 px-3">View</a>
             </div>
         </div>
@@ -98,7 +102,7 @@
                         <span class="time-remaining"><%= campaign.daysLeftText %></span>
                         <div class="flex gap-4">
                             <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
-                            <a href="/campaigns/<%= campaign._id %>/edit" class="btn btn--secondary text-sm px-4 py-2">Edit</a>
+                            <a href="/builder/<%= campaign._id %>/edit" class="btn btn--secondary text-sm px-4 py-2">Edit</a>
                         </div>
                     </div>
                 </div>

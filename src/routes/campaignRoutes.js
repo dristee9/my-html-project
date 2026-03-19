@@ -61,14 +61,9 @@ router.post('/:id/donate', authenticateToken, donationLimiter, campaignControlle
 router.post('/:id/bkash/initiate', authenticateToken, campaignController.initiateBkashPayment);
 router.get('/:id/bkash-callback', authenticateToken, campaignController.handleBkashCallback);
 
-// Create campaign route (GET)
+// Create campaign route (GET) - Redirect to page builder
 router.get('/create', authenticateToken, (req, res) => {
-    res.render('pages/create', {
-        title: 'Create Campaign - FundMyIdea BD',
-        user: req.user,
-        error: null,
-        currentPage: 'create'
-    });
+    res.redirect('/builder/create');
 });
 
 // Create campaign route (POST)

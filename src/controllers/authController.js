@@ -116,7 +116,8 @@ exports.login = [
                 return res.status(400).render('pages/login', {
                     error: errors.array()[0].msg,
                     formData: {
-                        email: req.body.email
+                        email: req.body.email,
+                        next: req.body.next
                     }
                 });
             }
@@ -129,7 +130,8 @@ exports.login = [
                 return res.status(400).render('pages/login', {
                     error: 'Invalid email or password',
                     formData: {
-                        email: req.body.email
+                        email: req.body.email,
+                        next: req.body.next
                     }
                 });
             }
@@ -140,7 +142,8 @@ exports.login = [
                 return res.status(400).render('pages/login', {
                     error: 'Invalid email or password',
                     formData: {
-                        email: req.body.email
+                        email: req.body.email,
+                        next: req.body.next
                     }
                 });
             }
@@ -159,7 +162,9 @@ exports.login = [
                 secure: process.env.NODE_ENV === 'production'
             });
 
-            res.redirect('/dashboard');
+            // Redirect to intended destination or dashboard
+            const redirectTo = req.body.next && req.body.next.startsWith('/') ? req.body.next : '/dashboard';
+            res.redirect(redirectTo);
         } catch (error) {
             console.error('Login error:', error);
             res.status(500).render('pages/login', {
@@ -183,9 +188,15 @@ exports.getLogin = (req, res) => {
     if (req.user) {
         return res.redirect('/dashboard');
     }
+    
+    // Get the 'next' parameter from query string if it exists
+    const nextUrl = req.query.next || '';
+    
     res.render('pages/login', { 
         error: null, 
-        formData: {},
+        formData: {
+            next: nextUrl
+        },
         currentPage: 'login'
     });
 };

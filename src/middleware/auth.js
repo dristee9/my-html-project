@@ -10,7 +10,8 @@ const authenticateToken = async (req, res, next) => {
             if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest') {
                 return res.status(401).json({ error: 'Unauthorized', redirect: '/login' });
             }
-            return res.redirect('/login');
+            // Store the requested URL and redirect to login
+            return res.redirect('/login?next=' + encodeURIComponent(req.originalUrl));
         }
         
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -21,7 +22,8 @@ const authenticateToken = async (req, res, next) => {
             if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest') {
                 return res.status(401).json({ error: 'Unauthorized', redirect: '/login' });
             }
-            return res.redirect('/login');
+            // Store the requested URL and redirect to login
+            return res.redirect('/login?next=' + encodeURIComponent(req.originalUrl));
         }
         
         req.user = user;
@@ -41,7 +43,8 @@ const authenticateToken = async (req, res, next) => {
             if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest') {
                 return res.status(403).json({ error: 'Email not verified', redirect: '/verify-email-pending' });
             }
-            return res.redirect('/verify-email-pending');
+            // Store the requested URL and redirect to verify email pending
+            return res.redirect('/verify-email-pending?next=' + encodeURIComponent(req.originalUrl));
         }
         
         // Implement sliding window token refresh
