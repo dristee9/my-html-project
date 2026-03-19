@@ -63,7 +63,10 @@ const csrfProtection = csrf({
 // Apply CSRF protection conditionally
 app.use((req, res, next) => {
     // Skip CSRF for API routes, page builder AJAX requests, and certain paths
-    if (req.path.startsWith('/builder/') && req.accepts('json')) {
+    if (req.path.startsWith('/builder/') || 
+        req.path.startsWith('/api/') ||
+        req.headers['x-requested-with'] === 'XMLHttpRequest' ||
+        req.accepts('json')) {
         // Still provide csrfToken function but skip validation
         req.csrfToken = () => '';
         return next();

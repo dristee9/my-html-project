@@ -31,13 +31,9 @@ const campaignSchema = new mongoose.Schema({
     },
     deadline: {
         type: Date,
-        required: [true, 'Deadline is required'],
-        validate: {
-            validator: function(date) {
-                return date > Date.now();
-            },
-            message: 'Deadline must be in the future'
-        }
+        required: [true, 'Deadline is required']
+        // Note: Future date validation removed to allow fetching expired campaigns
+        // Validation is now only applied during creation/update via controllers
     },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
