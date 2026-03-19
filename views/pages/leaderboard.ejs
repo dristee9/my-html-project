@@ -1,0 +1,227 @@
+<% layout("layouts/main") -%>
+<% title = 'Leaderboard - FundMyIdea BD' -%>
+
+<div class="leaderboard-page">
+    <!-- Page Header -->
+    <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
+        <h1 class="heading-1" style="font-size: 2.5rem; margin-bottom: 1rem;">🏆 Creator Leaderboard</h1>
+        <p class="page-subtitle" style="color: var(--gray-600); font-size: 1.125rem;">Celebrating our top student entrepreneurs</p>
+    </div>
+
+    <!-- Top Creators Section -->
+    <section class="top-creators-section" style="margin-bottom: 4rem;">
+        <h2 class="heading-2" style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
+            🥇 Top 20 Creators by Total Funds Raised
+        </h2>
+
+        <% if (typeof topCreators !== 'undefined' && topCreators.length > 0) { %>
+            <div class="leaderboard-table-container" style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); overflow: hidden;">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Rank</th>
+                            <th>Creator</th>
+                            <th>University</th>
+                            <th style="text-align: right;">Campaigns</th>
+                            <th style="text-align: right;">Total Raised</th>
+                            <th style="text-align: right;">Avg Success</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% topCreators.forEach((entry, index) => { 
+                            const rank = index + 1;
+                            const creator = entry.creator;
+                            let medalIcon = '';
+                            let rowClass = '';
+                            
+                            if (rank === 1) {
+                                medalIcon = '🥇';
+                                rowClass = 'gold-medal';
+                            } else if (rank === 2) {
+                                medalIcon = '🥈';
+                                rowClass = 'silver-medal';
+                            } else if (rank === 3) {
+                                medalIcon = '🥉';
+                                rowClass = 'bronze-medal';
+                            }
+                        %>
+                            <tr class="leaderboard-row <%= rowClass %>" style="<%= rank <= 3 ? 'background: linear-gradient(90deg, rgba(255,215,0,0.05) 0%, transparent 100%);' : '' %>">
+                                <td style="text-align: center; font-size: 1.5rem; font-weight: 700;">
+                                    <%= medalIcon || '#' + rank %>
+                                </td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <% if (creator.profileImage) { %>
+                                            <img src="<%= creator.profileImage %>" alt="<%= creator.username %>" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                        <% } else { %>
+                                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--secondary-green)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem;">
+                                                <%= creator.username.charAt(0).toUpperCase() %>
+                                            </div>
+                                        <% } %>
+                                        <strong style="color: var(--gray-800); font-size: 1rem;"><%= creator.username %></strong>
+                                    </div>
+                                </td>
+                                <td style="color: var(--gray-600); font-size: 0.875rem;">
+                                    <%= creator.university || 'N/A' %>
+                                </td>
+                                <td style="text-align: right; font-weight: 600; color: var(--gray-700);">
+                                    <%= entry.campaignCount %>
+                                </td>
+                                <td style="text-align: right; font-weight: 700; color: var(--secondary-green); font-size: 1.125rem;">
+                                    ৳<%= entry.totalRaised.toLocaleString() %>
+                                </td>
+                                <td style="text-align: right; font-weight: 600; color: var(--primary-blue);">
+                                    <%= Math.round(entry.avgFundingPercentage || 0) %>%
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <div class="empty-state" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
+                <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">No creators yet</h3>
+                <p style="color: var(--gray-600);">Be the first to create a campaign and climb the leaderboard!</p>
+            </div>
+        <% } %>
+    </section>
+
+    <!-- Rising Stars Section -->
+    <section class="rising-stars-section">
+        <h2 class="heading-2" style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
+            ⭐ Rising Stars (Last 30 Days)
+        </h2>
+
+        <% if (typeof risingStars !== 'undefined' && risingStars.length > 0) { %>
+            <div class="rising-stars-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                <% risingStars.forEach((campaign, index) => { 
+                    const rank = index + 1;
+                %>
+                    <div class="rising-star-card" style="background: white; border-radius: var(--border-radius-lg); padding: 1.5rem; box-shadow: var(--shadow-md); border-top: 4px solid <%= rank <= 3 ? '#fbbf24' : '#60a5fa' %>;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span style="font-size: 1.5rem; font-weight: 700; color: var(--gray-700);">#<%= rank %></span>
+                            <span style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 0.25rem 0.75rem; border-radius: var(--border-radius-full); font-size: 0.75rem; font-weight: 700;">🔥 HOT</span>
+                        </div>
+                        
+                        <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem; line-height: 1.4;">
+                            <%= campaign.title %>
+                        </h3>
+                        
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; color: var(--gray-600);">
+                            <span>by</span>
+                            <strong><%= campaign.creator.username %></strong>
+                            <% if (campaign.creator.university) { %>
+                                <span>, <%= campaign.creator.university %></span>
+                            <% } %>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                <span style="color: var(--gray-600);">Funding Progress</span>
+                                <span style="font-weight: 700; color: var(--secondary-green);"><%= campaign.fundingPercentage %>%</span>
+                            </div>
+                            <div style="background: var(--gray-200); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, var(--secondary-green), #34d399); height: 100%; width: <%= campaign.fundingPercentage %>%; transition: width 1s ease;"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                            <div>
+                                <div style="font-size: 0.75rem; color: var(--gray-500);">Raised</div>
+                                <div style="font-weight: 700; color: var(--secondary-green); font-size: 1.125rem;">৳<%= campaign.currentFunding.toLocaleString() %></div>
+                            </div>
+                            <a href="/campaigns/<%= campaign._id %>" class="btn btn--primary btn--sm">View Campaign →</a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="empty-state" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">⭐</div>
+                <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">No rising stars yet</h3>
+                <p style="color: var(--gray-600);">Check back soon for emerging creators!</p>
+            </div>
+        <% } %>
+    </section>
+</div>
+
+<style>
+    .leaderboard-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .leaderboard-table thead {
+        background: linear-gradient(135deg, var(--primary-blue), var(--secondary-green));
+        color: white;
+    }
+    
+    .leaderboard-table th {
+        padding: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    
+    .leaderboard-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .leaderboard-table tbody tr {
+        transition: all var(--transition-fast);
+    }
+    
+    .leaderboard-table tbody tr:hover {
+        background: var(--gray-50);
+        transform: scale(1.01);
+    }
+    
+    .gold-medal {
+        background: linear-gradient(90deg, rgba(255,215,0,0.1) 0%, transparent 100%) !important;
+    }
+    
+    .silver-medal {
+        background: linear-gradient(90deg, rgba(192,192,192,0.1) 0%, transparent 100%) !important;
+    }
+    
+    .bronze-medal {
+        background: linear-gradient(90deg, rgba(205,127,50,0.1) 0%, transparent 100%) !important;
+    }
+    
+    .rising-star-card {
+        transition: all var(--transition-fast);
+    }
+    
+    .rising-star-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    @media (max-width: 768px) {
+        .leaderboard-page {
+            padding: 1rem;
+        }
+        
+        .leaderboard-table {
+            font-size: 0.875rem;
+        }
+        
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 0.5rem;
+        }
+        
+        .rising-stars-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

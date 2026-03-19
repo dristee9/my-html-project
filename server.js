@@ -190,6 +190,7 @@ app.use('/builder', require('./src/routes/pageBuilderRoutes'));
 // Home route
 const indexController = require('./src/controllers/indexController');
 app.get('/', indexController.getHomePage);
+app.get('/leaderboard', indexController.getLeaderboard);
 
 // Redirect old create campaign route to page builder
 app.get('/create-campaign', (req, res) => {

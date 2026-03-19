@@ -214,6 +214,62 @@
             </div>
         <% } %>
     </div>
+
+    <!-- Smart Recommendations Section for Logged-in Users -->
+    <% if (typeof user !== 'undefined' && user) { %>
+    <div class="smart-recommendations-section" style="margin-top: 4rem; padding-top: 3rem; border-top: 2px solid var(--gray-200);">
+        <h2 class="heading-2" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            ✨ You Might Like
+            <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-600);">(Based on your donation history)</span>
+        </h2>
+        
+        <% if (typeof recommendedCampaigns !== 'undefined' && recommendedCampaigns.length > 0) { %>
+            <div class="recommendations-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                <% recommendedCampaigns.slice(0, 6).forEach(campaign => { %>
+                    <div class="recommendation-card" style="background: white; border-radius: var(--border-radius-lg); padding: 1.5rem; box-shadow: var(--shadow-md); transition: all var(--transition-fast); border: 2px solid transparent;">
+                        <div style="position: relative; overflow: hidden; border-radius: var(--border-radius-md); margin-bottom: 1rem;">
+                            <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" 
+                                 alt="<%= campaign.title %>" 
+                                 style="width: 100%; height: 160px; object-fit: cover;">
+                            <div style="position: absolute; top: 0.5rem; right: 0.5rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 0.25rem 0.75rem; border-radius: var(--border-radius-full); font-size: 0.75rem; font-weight: 700; box-shadow: var(--shadow-sm);">
+                                🎯 Match
+                            </div>
+                        </div>
+                        
+                        <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem; line-height: 1.4;"><%= campaign.title %></h3>
+                        
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; color: var(--gray-600);">
+                            <span>by</span>
+                            <strong><%= campaign.creator.username %></strong>
+                            <% if (campaign.creator.university) { %>
+                                <span>, <%= campaign.creator.university %></span>
+                            <% } %>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                <span style="color: var(--gray-600);">Raised</span>
+                                <span style="font-weight: 700; color: var(--secondary-green);"><%= campaign.currentFunding.toLocaleString() %> BDT</span>
+                            </div>
+                            <div style="background: var(--gray-200); height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, var(--secondary-green), #34d399); height: 100%; width: <%= campaign.fundingPercentage %>%; transition: width 0.5s ease;"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                            <span style="font-size: 0.75rem; color: var(--gray-500);"><%= campaign.backers.length %> backers</span>
+                            <a href="/campaigns/<%= campaign._id %>" class="btn btn--primary btn--sm">View →</a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div style="text-align: center; padding: 3rem 2rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
+                <p style="color: var(--gray-600); font-size: 0.875rem;">Start donating to campaigns to get personalized recommendations!</p>
+            </div>
+        <% } %>
+    </div>
+    <% } %>
     
     <!-- Pagination Controls -->
     <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>

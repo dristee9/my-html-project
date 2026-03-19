@@ -69,4 +69,7 @@ router.post('/:id/request-extension', authenticateToken, campaignController.requ
 // Toggle save campaign to wishlist
 router.post('/:id/save', authenticateToken, campaignController.toggleSaveCampaign);
 
+// Campaign comparison routes
+router.get('/compare', campaignController.getComparisonPage);
+
 module.exports = router;

@@ -1032,3 +1032,50 @@ exports.toggleSaveCampaign = async (req, res) => {
         });
     }
 };
+
+// Get campaign comparison page
+exports.getComparisonPage = async (req, res) => {
+    try {
+        const { ids } = req.query;
+        
+        if (!ids) {
+            return res.render('pages/compare', {
+                title: 'Compare Campaigns - FundMyIdea BD',
+                campaigns: [],
+                user: req.user
+            });
+        }
+        
+        // Parse campaign IDs
+        const campaignIds = ids.split(',').map(id => id.trim()).filter(id => id.length > 0);
+        
+        if (campaignIds.length === 0 || campaignIds.length > 3) {
+            return res.status(400).render('pages/error', {
+                title: 'Error - FundMyIdea BD',
+                error: 'Please select between 1 and 3 campaigns to compare',
+                user: req.user
+            });
+        }
+        
+        // Fetch campaigns with creator info
+        const campaigns = await Campaign.find({
+            _id: { $in: campaignIds }
+        })
+        .populate('creator', 'username university')
+        .populate('backers.user', 'username email');
+        
+        res.render('pages/compare', {
+            title: 'Compare Campaigns - FundMyIdea BD',
+            campaigns,
+            user: req.user
+        });
+        
+    } catch (error) {
+        console.error('Error loading comparison page:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to load comparison',
+            user: req.user
+        });
+    }
+};
