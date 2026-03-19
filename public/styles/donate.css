@@ -334,7 +334,7 @@
     background: white;
     border-radius: var(--border-radius-xl);
     box-shadow: var(--shadow-lg);
-    padding: 1.5rem;
+    padding: 1.75rem; /* Standardized from 1.5rem */
 }
 
 .widget-title {

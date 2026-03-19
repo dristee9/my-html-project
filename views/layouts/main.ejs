@@ -14,7 +14,7 @@
 </head>
 <body class="app-container">
     <%- include('../partials/header') %>
-    <main class="main-content">
+    <main class="main-content <%= typeof fullBleed !== 'undefined' && fullBleed ? 'main-content--full' : '' %>">
         <%- body %>
     </main>
     <%- include('../partials/footer') %>

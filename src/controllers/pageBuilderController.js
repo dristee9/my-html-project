@@ -8,6 +8,7 @@ exports.getPageBuilder = async (req, res) => {
             title: 'Create Campaign - Page Builder',
             user: req.user,
             campaign: null,
+            fullBleed: true,
             templates: await exports.getTemplates()
         });
     } catch (error) {
@@ -42,6 +43,7 @@ exports.editPageBuilder = async (req, res) => {
             title: `Edit ${campaign.title} - Page Builder`,
             user: req.user,
             campaign: campaign,
+            fullBleed: true,
             templates: await exports.getTemplates()
         });
     } catch (error) {

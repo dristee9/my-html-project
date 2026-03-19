@@ -90,7 +90,7 @@
     text-align: left;
     background: transparent;
     border: none;
-    border-radius: 0.375rem;
+    border-radius: var(--border-radius-md);
     margin-bottom: 0.25rem;
     cursor: pointer;
     transition: all 0.2s;
@@ -114,7 +114,7 @@
 
 .template-card {
     border: 1px solid var(--gray-200);
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius-md);
     overflow: hidden;
     cursor: grab;
     transition: all 0.2s;
@@ -166,7 +166,7 @@
 
 .basic-info-section {
     background: white;
-    border-radius: 0.75rem;
+    border-radius: var(--border-radius-lg);
     padding: 2rem;
     margin-bottom: 2rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -189,7 +189,7 @@
 .drop-zone {
     min-height: 300px;
     border: 2px dashed var(--gray-300);
-    border-radius: 0.75rem;
+    border-radius: var(--border-radius-lg);
     position: relative;
 }
 
