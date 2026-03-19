@@ -7,9 +7,12 @@ const connectDB = require('./src/config/database');
 const { optionalAuth } = require('./src/middleware/auth');
 const helmet = require('helmet');
 const session = require('express-session');
+const { createServer } = require('http');
+const { WebSocketServer } = require('ws');
 require('dotenv').config();
 
 const app = express();
+const httpServer = createServer(app);
 const PORT = process.env.PORT || 3000;
 
 // Validate required environment variables
@@ -60,7 +63,7 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             imgSrc: ["'self'", "data:", "https:", "http:"],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "ws:", "wss:"], // Allow WebSocket connections
             frameSrc: ["'none'"],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: [],
@@ -124,6 +127,46 @@ app.set('views', path.join(__dirname, 'views'));
 // Apply optionalAuth to make user available in all routes
 app.use(optionalAuth);
 
+// WebSocket Server for live campaign updates
+const wss = new WebSocketServer({ server: httpServer });
+const campaignSubscribers = new Map(); // campaignId → Set of ws clients
+
+wss.on('connection', (ws, req) => {
+    const url = new URL(req.url, 'http://localhost');
+    const campaignId = url.searchParams.get('campaign');
+    if (campaignId) {
+        if (!campaignSubscribers.has(campaignId)) {
+            campaignSubscribers.set(campaignId, new Set());
+        }
+        campaignSubscribers.get(campaignId).add(ws);
+        
+        ws.on('close', () => {
+            const subscribers = campaignSubscribers.get(campaignId);
+            if (subscribers) {
+                subscribers.delete(ws);
+                if (subscribers.size === 0) {
+                    campaignSubscribers.delete(campaignId);
+                }
+            }
+        });
+    }
+});
+
+// Broadcast donation update to all connected clients
+const broadcastDonation = (campaignId, data) => {
+    const subscribers = campaignSubscribers.get(String(campaignId));
+    if (subscribers) {
+        subscribers.forEach(ws => {
+            if (ws.readyState === 1) { // WebSocket.OPEN
+                ws.send(JSON.stringify(data));
+            }
+        });
+    }
+};
+
+// Export broadcast function for use in controllers
+module.exports.broadcastDonation = broadcastDonation;
+
 // Middleware to make user and csrfToken available in all templates
 // This MUST come AFTER CSRF protection but BEFORE routes
 app.use((req, res, next) => {
@@ -183,7 +226,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

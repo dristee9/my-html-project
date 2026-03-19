@@ -384,6 +384,22 @@ exports.processDonation = async (req, res) => {
             console.error('Failed to send donation confirmation email:', err);
         });
         
+        // Broadcast live donation update via WebSocket
+        try {
+            const server = require('../../server');
+            if (server.broadcastDonation) {
+                server.broadcastDonation(campaignId, {
+                    type: 'donation',
+                    amount: donationAmount,
+                    donor: donor.username || 'Anonymous',
+                    newTotal: updatedCampaign.currentFunding,
+                    percentage: updatedCampaign.fundingPercentage
+                });
+            }
+        } catch (err) {
+            console.error('Failed to broadcast donation:', err);
+        }
+        
         console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
         
         // Redirect to campaign page with success flag (POST-Redirect-GET pattern)
@@ -622,6 +638,22 @@ exports.handleBkashCallback = async (req, res) => {
             ).catch(err => {
                 console.error('Failed to send donation confirmation email:', err);
             });
+            
+            // Broadcast live donation update via WebSocket
+            try {
+                const server = require('../../server');
+                if (server.broadcastDonation) {
+                    server.broadcastDonation(campaignId, {
+                        type: 'donation',
+                        amount: parseFloat(paymentResult.amount),
+                        donor: donor.username || 'Anonymous',
+                        newTotal: campaign.currentFunding,
+                        percentage: campaign.fundingPercentage
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to broadcast donation:', err);
+            }
             
             console.log(`bKash donation of ${paymentResult.amount} BDT processed successfully. TrxID: ${paymentResult.trxID}`);
             

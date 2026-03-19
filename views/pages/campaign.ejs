@@ -372,3 +372,62 @@
         <%- include('../partials/modal-delete-campaign', { campaignId: campaign._id }) %>
     <% } %>
 </div>
+
+<!-- Live Updates Toast Notification -->
+<div id="donationToast" style="position: fixed; bottom: 2rem; right: 2rem; background: white; padding: 1.5rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-xl); transform: translateX(400px); transition: transform 0.4s ease-in-out; z-index: 10000; max-width: 400px; border-left: 4px solid var(--secondary-green);">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="font-size: 2rem;">🎉</div>
+        <div>
+            <div id="toastMessage" style="font-weight: 600; color: var(--gray-800); margin-bottom: 0.25rem;"></div>
+            <div id="toastAmount" style="color: var(--secondary-green); font-weight: 700; font-size: 1.125rem;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // WebSocket connection for live donation updates
+    (function() {
+        const ws = new WebSocket(`ws://${location.host}?campaign=<%= campaign._id %>`);
+        
+        ws.onmessage = ({ data }) => {
+            const msg = JSON.parse(data);
+            if (msg.type === 'donation') {
+                // Update funding amount
+                const currentFundingEl = document.querySelector('.current-funding');
+                if (currentFundingEl) {
+                    currentFundingEl.textContent = msg.newTotal.toLocaleString('en-BD') + ' BDT';
+                }
+                
+                // Update progress bar
+                const progressFill = document.querySelector('.progress-fill[data-width]');
+                if (progressFill) {
+                    progressFill.style.width = msg.percentage + '%';
+                }
+                
+                // Show toast notification
+                showToast(msg.donor, msg.amount);
+            }
+        };
+        
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+        
+        function showToast(donor, amount) {
+            const toast = document.getElementById('donationToast');
+            const message = document.getElementById('toastMessage');
+            const amountEl = document.getElementById('toastAmount');
+            
+            message.textContent = `${donor} just donated!`;
+            amountEl.textContent = `${amount.toLocaleString('en-BD')} BDT`;
+            
+            // Slide in
+            toast.style.transform = 'translateX(0)';
+            
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                toast.style.transform = 'translateX(400px)';
+            }, 4000);
+        }
+    })();
+</script>
