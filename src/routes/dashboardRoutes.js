@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const dashboardController = require('../controllers/dashboardController');
+const { validateProfileUpdate, validatePasswordChange } = require('../middleware/validation');
 
 // Configure multer for profile image uploads
 const storage = multer.diskStorage({
@@ -16,7 +17,12 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname)
+        // Sanitize filename to prevent directory traversal attacks
+        // Use only the extension from original name, generate random filename
+        const ext = path.extname(file.originalname).toLowerCase();
+        const crypto = require('crypto');
+        const randomName = crypto.randomBytes(16).toString('hex');
+        cb(null, `${Date.now()}-${randomName}${ext}`);
     }
 });
 
@@ -40,17 +46,17 @@ router.use(authenticateToken);
 // Dashboard route
 router.get('/', dashboardController.getDashboard);
 
-// User profile routes
+// User profile routes with validation
 router.get('/profile', dashboardController.getProfile);
-router.post('/profile', upload.single('profileImage'), dashboardController.updateProfile);
+router.post('/profile', upload.single('profileImage'), validateProfileUpdate, dashboardController.updateProfile);
 
 // User campaigns and donations
 router.get('/my-campaigns', dashboardController.getMyCampaigns);
 router.get('/my-donations', dashboardController.getMyDonations);
 
-// Settings routes
+// Settings routes with validation
 router.get('/settings', dashboardController.getSettings);
-router.post('/settings/password', dashboardController.changePassword);
+router.post('/settings/password', validatePasswordChange, dashboardController.changePassword);
 router.delete('/settings/account', dashboardController.deleteAccount);
 
 module.exports = router;

@@ -1,6 +1,21 @@
 const axios = require('axios');
 require('dotenv').config();
 
+// Validate bKash credentials at startup - fail fast if missing
+const requiredBkashVars = [
+    'BKASH_APP_KEY',
+    'BKASH_APP_SECRET', 
+    'BKASH_USERNAME',
+    'BKASH_PASSWORD'
+];
+
+const missingVars = requiredBkashVars.filter(varName => !process.env[varName]);
+if (missingVars.length > 0) {
+    console.error('FATAL: Missing required bKash credentials:', missingVars.join(', '));
+    console.error('Please set these environment variables in your .env file');
+    process.exit(1);
+}
+
 // bKash API Configuration
 const BKASH_CONFIG = {
     sandbox: {

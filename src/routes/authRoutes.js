@@ -3,6 +3,7 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const authController = require('../controllers/authController');
+const { validateRegistration, validateLogin, handleValidationErrors } = require('../middleware/validation');
 const crypto = require('crypto');
 
 // Rate limiter for authentication routes
@@ -14,6 +15,15 @@ const authLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+// Stricter rate limiter for password reset token validation (brute-force protection)
+const passwordResetLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 attempts per windowMs
+    message: 'Too many password reset attempts from this IP, please try again after 15 minutes.',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // Apply optionalAuth middleware to make user available
 router.use(optionalAuth);
 
@@ -21,10 +31,10 @@ router.use(optionalAuth);
 router.get('/login', authController.getLogin);
 router.get('/register', authController.getRegister);
 
-// POST routes
+// POST routes with validation
 router.post('/logout', authController.logout);
-router.post('/login', authLimiter, authController.login);
-router.post('/register', authLimiter, authController.register);
+router.post('/login', authLimiter, validateLogin, authController.login);
+router.post('/register', authLimiter, validateRegistration, authController.register);
 
 // Token refresh route (for AJAX requests)
 router.post('/refresh', authenticateToken, authController.refreshToken);
@@ -119,8 +129,9 @@ router.get('/resend-verification', async (req, res) => {
     }
 });
 
-// Reset password routes
-router.get('/verify-email/:token', async (req, res) => {
+// Reset password routes with rate limiting to prevent brute-force attacks
+// Apply rate limiting to email verification to prevent token guessing
+router.get('/verify-email/:token', passwordResetLimiter, async (req, res) => {
     try {
         const User = require('../models/User');
         
@@ -200,7 +211,7 @@ router.get('/verify-email/:token', async (req, res) => {
         });
     }
 });
-router.get('/reset-password/:token', async (req, res) => {
+router.get('/reset-password/:token', passwordResetLimiter, async (req, res) => {
     try {
         const User = require('../models/User');
         
@@ -256,7 +267,7 @@ router.get('/reset-password/:token', async (req, res) => {
     }
 });
 
-router.post('/reset-password/:token', async (req, res) => {
+router.post('/reset-password/:token', passwordResetLimiter, async (req, res) => {
     try {
         const { password, confirmPassword } = req.body;
         

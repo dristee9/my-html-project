@@ -9,6 +9,18 @@ class PageBuilder {
         this.init();
     }
 
+    /**
+     * Sanitize user-provided content to prevent XSS
+     * @param {string} str - String to sanitize
+     * @returns {string} - Sanitized string with HTML entities escaped
+     */
+    sanitize(str) {
+        if (typeof str !== 'string') return str;
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
     init() {
         this.setupEventListeners();
         this.loadExistingData();
@@ -136,21 +148,21 @@ class PageBuilder {
             case 'hero':
                 return `
                     <div class="hero-preview" style="background: ${section.settings.backgroundColor}; padding: 2rem; border-radius: 0.5rem;">
-                        <h2 style="color: ${section.settings.textColor}">${section.content.title}</h2>
-                        <p style="color: ${section.settings.textColor}">${section.content.subtitle}</p>
+                        <h2 style="color: ${section.settings.textColor}">${this.sanitize(section.content.title)}</h2>
+                        <p style="color: ${section.settings.textColor}">${this.sanitize(section.content.subtitle)}</p>
                     </div>
                 `;
             
             case 'features':
                 return `
                     <div class="features-preview">
-                        <h3>${section.content.title}</h3>
+                        <h3>${this.sanitize(section.content.title)}</h3>
                         <div class="features-grid">
                             ${section.content.features.map(feature => `
                                 <div class="feature-item">
-                                    <span class="feature-icon">${feature.icon}</span>
-                                    <h4>${feature.title}</h4>
-                                    <p>${feature.description}</p>
+                                    <span class="feature-icon">${this.sanitize(feature.icon)}</span>
+                                    <h4>${this.sanitize(feature.title)}</h4>
+                                    <p>${this.sanitize(feature.description)}</p>
                                 </div>
                             `).join('')}
                         </div>
@@ -160,16 +172,16 @@ class PageBuilder {
             case 'testimonials':
                 return `
                     <div class="testimonials-preview">
-                        <h3>${section.content.title || 'Testimonials'}</h3>
+                        <h3>${this.sanitize(section.content.title || 'Testimonials')}</h3>
                         <div class="testimonials-grid">
                             ${section.content.testimonials.map(testimonial => `
                                 <div class="testimonial-item">
                                     <blockquote class="testimonial-quote">
-                                        "${testimonial.quote}"
+                                        "${this.sanitize(testimonial.quote)}"
                                     </blockquote>
                                     <div class="testimonial-author">
-                                        <strong>${testimonial.name}</strong>
-                                        <span>${testimonial.role}</span>
+                                        <strong>${this.sanitize(testimonial.name)}</strong>
+                                        <span>${this.sanitize(testimonial.role)}</span>
                                     </div>
                                 </div>
                             `).join('')}
@@ -180,19 +192,19 @@ class PageBuilder {
             case 'form':
                 return `
                     <div class="form-preview">
-                        <h3>${section.content.title}</h3>
+                        <h3>${this.sanitize(section.content.title)}</h3>
                         <div class="form-fields">
                             ${section.content.fields.map(field => `
                                 <div class="form-field">
-                                    <label>${field.label}</label>
+                                    <label>${this.sanitize(field.label)}</label>
                                     ${field.type === 'textarea' ? 
                                         '<textarea disabled placeholder="Field preview"></textarea>' :
-                                        `<input type="${field.type}" disabled placeholder="${field.label}">`
+                                        `<input type="${field.type}" disabled placeholder="${this.sanitize(field.label)}">`
                                     }
                                     ${field.required ? '<small style="color: #ef4444;">* Required</small>' : ''}
                                 </div>
                             `).join('')}
-                            <button class="btn btn-primary" disabled>${section.content.buttonText}</button>
+                            <button class="btn btn-primary" disabled>${this.sanitize(section.content.buttonText)}</button>
                         </div>
                     </div>
                 `;
@@ -200,9 +212,9 @@ class PageBuilder {
             case 'text':
                 return `
                     <div class="text-preview" style="padding: 1rem;">
-                        ${section.content.heading ? `<h3>${section.content.heading}</h3>` : ''}
+                        ${section.content.heading ? `<h3>${this.sanitize(section.content.heading)}</h3>` : ''}
                         <div class="text-body" style="line-height: 1.6; color: ${section.settings.textColor};">
-                            ${section.content.body}
+                            ${this.sanitize(section.content.body)}
                         </div>
                     </div>
                 `;
@@ -210,18 +222,18 @@ class PageBuilder {
             case 'image':
                 return `
                     <div class="image-preview">
-                        <img src="${section.content.src}" alt="${section.content.alt}" style="max-width: 100%; height: auto; border-radius: 0.5rem;">
-                        ${section.content.caption ? `<p class="image-caption" style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem;">${section.content.caption}</p>` : ''}
+                        <img src="${this.sanitize(section.content.src)}" alt="${this.sanitize(section.content.alt)}" style="max-width: 100%; height: auto; border-radius: 0.5rem;">
+                        ${section.content.caption ? `<p class="image-caption" style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem;">${this.sanitize(section.content.caption)}</p>` : ''}
                     </div>
                 `;
             
             case 'gallery':
                 return `
                     <div class="gallery-preview">
-                        ${section.content.title ? `<h3>${section.content.title}</h3>` : ''}
+                        ${section.content.title ? `<h3>${this.sanitize(section.content.title)}</h3>` : ''}
                         <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
                             ${section.content.images.map(img => `
-                                <img src="${img}" alt="Gallery image" style="width: 100%; height: 150px; object-fit: cover; border-radius: 0.5rem;">
+                                <img src="${this.sanitize(img)}" alt="Gallery image" style="width: 100%; height: 150px; object-fit: cover; border-radius: 0.5rem;">
                             `).join('')}
                         </div>
                     </div>
@@ -232,22 +244,22 @@ class PageBuilder {
                     <div class="video-preview">
                         <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 0.5rem;">
                             <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-                                src="${section.content.url}" 
+                                src="${this.sanitize(section.content.url)}" 
                                 title="Video preview"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
                             </iframe>
                         </div>
-                        ${section.content.caption ? `<p class="video-caption" style="text-align: center; margin-top: 0.5rem;">${section.content.caption}</p>` : ''}
+                        ${section.content.caption ? `<p class="video-caption" style="text-align: center; margin-top: 0.5rem;">${this.sanitize(section.content.caption)}</p>` : ''}
                     </div>
                 `;
             
             case 'cta':
                 return `
                     <div class="cta-preview" style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0.5rem;">
-                        <h3 style="color: white; margin-bottom: 1rem;">${section.content.heading}</h3>
-                        <p style="color: rgba(255,255,255,0.9); margin-bottom: 1.5rem;">${section.content.description}</p>
+                        <h3 style="color: white; margin-bottom: 1rem;">${this.sanitize(section.content.heading)}</h3>
+                        <p style="color: rgba(255,255,255,0.9); margin-bottom: 1.5rem;">${this.sanitize(section.content.description)}</p>
                         <button class="btn" style="background: white; color: #667eea; padding: 0.75rem 2rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
-                            ${section.content.buttonText}
+                            ${this.sanitize(section.content.buttonText)}
                         </button>
                     </div>
                 `;
@@ -255,12 +267,12 @@ class PageBuilder {
             case 'faq':
                 return `
                     <div class="faq-preview">
-                        ${section.content.title ? `<h3>${section.content.title}</h3>` : ''}
+                        ${section.content.title ? `<h3>${this.sanitize(section.content.title)}</h3>` : ''}
                         <div class="faq-list">
                             ${section.content.faqs.map(faq => `
                                 <div class="faq-item" style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.75rem;">
-                                    <h4 style="font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">❓ ${faq.question}</h4>
-                                    <p style="color: #4b5563; line-height: 1.5;">${faq.answer}</p>
+                                    <h4 style="font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">❓ ${this.sanitize(faq.question)}</h4>
+                                    <p style="color: #4b5563; line-height: 1.5;">${this.sanitize(faq.answer)}</p>
                                 </div>
                             `).join('')}
                         </div>
@@ -283,7 +295,7 @@ class PageBuilder {
                 `;
             
             default:
-                return `<div class="generic-preview">[${this.formatSectionType(section.type)} Section]</div>`;
+                return `<div class="generic-preview">[${this.sanitize(this.formatSectionType(section.type))} Section]</div>`;
         }
     }
 

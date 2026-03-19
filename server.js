@@ -13,9 +13,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Validate required environment variables
-if (!process.env.JWT_SECRET) {
-    console.error('FATAL: JWT_SECRET is not set. Exiting.');
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+    console.error('FATAL: JWT_SECRET must be at least 32 characters long. Please set a secure JWT_SECRET in your .env file.');
     process.exit(1);
+}
+
+// Validate session secret as well
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+    console.warn('WARNING: SESSION_SECRET should be at least 32 characters for better security.');
 }
 
 // Connect to MongoDB
@@ -76,17 +81,16 @@ const csrfProtection = csrf({
 
 // Apply CSRF protection conditionally
 app.use((req, res, next) => {
-    // Skip CSRF for API routes, page builder AJAX requests, and certain paths
-    if (req.path.startsWith('/builder/') || 
-        req.path.startsWith('/api/') ||
-        req.headers['x-requested-with'] === 'XMLHttpRequest' ||
-        req.accepts('json')) {
-        // Still provide csrfToken function but skip validation
+    // Skip CSRF for page builder API routes only
+    // Note: We do NOT skip CSRF based on X-Requested-With header as this is a security bypass
+    if (req.path.startsWith('/builder/api/')) {
+        // For builder API routes that legitimately need AJAX access,
+        // CSRF token should be passed in JSON body or headers
         req.csrfToken = () => '';
         return next();
     }
     
-    // Apply CSRF to all other routes
+    // Apply CSRF to all other routes including forms and standard requests
     csrfProtection(req, res, (err) => {
         if (err) {
             console.error('CSRF Token Error:', err.message);
@@ -157,12 +161,23 @@ app.use((req, res) => {
     });
 });
 
-// Error handler
+// Error handler - never expose internal details in production
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    // Log full error details server-side for debugging
+    console.error('ERROR:', err.stack || err);
+    
+    // Determine appropriate error message based on environment
+    let errorMessage = 'Internal Server Error';
+    
+    if (process.env.NODE_ENV === 'development') {
+        // In development, show more details but still sanitize sensitive info
+        errorMessage = err.message || 'Internal Server Error';
+    }
+    // In production, always show generic message
+    
     res.status(500).render('pages/error', {
         title: 'Something Went Wrong - FundMyIdea BD',
-        error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error',
+        error: errorMessage,
         user: req.user
     });
 });

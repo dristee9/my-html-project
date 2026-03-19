@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const Campaign = require('../models/Campaign');
 const campaignController = require('../controllers/campaignController');
+const { validateCampaignCreation, validateDonation, validateSearch, validateCampaignId } = require('../middleware/validation');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -50,12 +51,12 @@ const donationLimiter = rateLimit({
 // Explore campaigns route
 router.get('/', campaignController.getAllCampaigns);
 
-// Search campaigns route
-router.get('/search', campaignController.searchCampaigns);
+// Search campaigns route with validation
+router.get('/search', validateSearch, campaignController.searchCampaigns);
 
-// Dedicated donation page routes
-router.get('/:id/donate', authenticateToken, campaignController.getDonationPage);
-router.post('/:id/donate', authenticateToken, donationLimiter, campaignController.processDonation);
+// Dedicated donation page routes with validation
+router.get('/:id/donate', authenticateToken, validateCampaignId, campaignController.getDonationPage);
+router.post('/:id/donate', authenticateToken, donationLimiter, validateDonation, campaignController.processDonation);
 
 // bKash payment routes
 router.post('/:id/bkash/initiate', authenticateToken, campaignController.initiateBkashPayment);
@@ -66,8 +67,8 @@ router.get('/create', authenticateToken, (req, res) => {
     res.redirect('/builder/create');
 });
 
-// Create campaign route (POST)
-router.post('/create', authenticateToken, upload.single('image'), campaignController.createCampaign);
+// Create campaign route (POST) with validation
+router.post('/create', authenticateToken, upload.single('image'), validateCampaignCreation, campaignController.createCampaign);
 
 // Single campaign route
 router.get('/:id', campaignController.getCampaignById);

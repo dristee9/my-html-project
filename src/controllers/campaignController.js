@@ -282,6 +282,18 @@ exports.processDonation = async (req, res) => {
             });
         }
         
+        // Prevent self-donation to avoid funding manipulation
+        if (campaign.creator._id.toString() === req.user._id.toString()) {
+            console.log('Self-donation attempt blocked for campaign:', campaignId);
+            return res.status(400).render('pages/donate', {
+                title: `Donate to ${campaign.title} - FundMyIdea BD`,
+                campaign: campaignData,
+                user: req.user,
+                error: 'You cannot donate to your own campaign',
+                pageStyles: ['donate']
+            });
+        }
+        
         console.log('Adding donation to campaign');
         // Add donation to campaign - store only last 4 digits for privacy
         campaign.backers.push({
@@ -343,10 +355,14 @@ exports.searchCampaigns = async (req, res) => {
         
         // Use text search if query exists
         if (q && q.trim() !== '') {
+            // Escape special regex characters to prevent ReDoS attacks
+            const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const escapedQ = escapeRegex(q);
+            
             // Try text search first (requires text index)
             try {
                 const textSearch = await Campaign.find(
-                    { $text: { $search: q }, status: 'active' },
+                    { $text: { $search: escapedQ }, status: 'active' },
                     { score: { $meta: 'textScore' } }
                 ).sort({ score: { $meta: 'textScore' } });
                 
@@ -354,17 +370,17 @@ exports.searchCampaigns = async (req, res) => {
                 if (textSearch.length > 0) {
                     query = { _id: { $in: textSearch.map(c => c._id) } };
                 } else {
-                    // Fallback to regex search if text search returns nothing
+                    // Fallback to safe regex search with escaped query
                     query.$or = [
-                        { title: { $regex: q, $options: 'i' } },
-                        { description: { $regex: q, $options: 'i' } }
+                        { title: { $regex: escapedQ, $options: 'i' } },
+                        { description: { $regex: escapedQ, $options: 'i' } }
                     ];
                 }
             } catch (textError) {
-                // Fallback to regex search if text index doesn't exist or fails
+                // Fallback to safe regex search with escaped query if text index fails
                 query.$or = [
-                    { title: { $regex: q, $options: 'i' } },
-                    { description: { $regex: q, $options: 'i' } }
+                    { title: { $regex: escapedQ, $options: 'i' } },
+                    { description: { $regex: escapedQ, $options: 'i' } }
                 ];
             }
         }
