@@ -91,7 +91,7 @@
                     <h3 class="campaign-name"><%= campaign.title %></h3>
                     <div class="progress-container">
                         <div class="progress-track">
-                            <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                            <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
                         </div>
                         <div class="progress-info">
                             <span><%= campaign.currentFunding %> BDT raised</span>

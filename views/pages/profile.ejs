@@ -13,13 +13,21 @@
     <p class="dashboard-subtitle">Manage your account information</p>
 </div>
 
+<!-- Success Banner -->
+<% if (typeof saved !== 'undefined' && saved) { %>
+<div class="success-banner mb-6 p-4 bg-green-50 border border-green-200 rounded-lg" style="background: #f0fdf4; border-color: #bbf7d0; border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1.5rem;">
+    <h3 class="font-semibold text-green-800" style="color: #166534; font-weight: 600; margin-bottom: 0.25rem;">✓ Profile Updated Successfully!</h3>
+    <p class="text-green-700 text-sm" style="color: #15803d; font-size: 0.875rem;">Your profile information has been saved.</p>
+</div>
+<% } %>
+
 <div class="dashboard-grid">
     <!-- Sidebar Navigation -->
     <%- include('../partials/dashboard-sidebar', { currentPage: 'profile' }) %>
 
     <!-- Profile Form -->
     <div class="card-shadow">
-        <form method="POST" action="/dashboard/profile">
+        <form method="POST" action="/dashboard/profile" class="js-form">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="form-group">
                 <label class="form-label">Username</label>

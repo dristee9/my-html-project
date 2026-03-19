@@ -1,7 +1,7 @@
 <% layout('layouts/main') -%>
 <% title = 'Login - FundMyIdea BD' -%>
 
-<form class="form-card auth-form" method="POST" action="/login">
+<form class="form-card auth-form js-form" method="POST" action="/login">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <input type="hidden" name="next" value="<%= typeof formData !== 'undefined' && formData.next ? formData.next : '' %>">
     <h2 class="heading-2 auth-form-title">Login to FundMyIdea BD</h2>

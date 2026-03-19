@@ -173,6 +173,32 @@
     width: 100%;
 }
 
+/* Loading State for Buttons */
+.btn--loading {
+    opacity: 0.7;
+    cursor: wait;
+    position: relative;
+}
+
+.btn--loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 /* Special Button: Gradient Success (for donate buttons) */
 .btn--success-gradient {
     background: linear-gradient(135deg, var(--secondary-green), var(--secondary-green-dark));
@@ -1207,12 +1233,13 @@ body {
     border-top: 1px solid var(--gray-200);
 }
 
-/* Progress bar - dynamic width via inline style, but base styles here */
+/* Progress bar - dynamic width via data attribute for animation */
 .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--primary-blue), var(--secondary-green));
     border-radius: 9999px;
     transition: width 0.3s ease;
+    width: 0;
 }
 
 /* Button variants */
@@ -1319,8 +1346,26 @@ body {
 
 .empty-state {
     text-align: center;
-    padding: 3rem;
+    padding: 4rem 2rem;
+}
+
+.empty-state__icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state__description {
+    font-size: 1rem;
     color: var(--gray-500);
+    margin-bottom: 1.5rem;
 }
 
 .donor-list-item {
@@ -2234,6 +2279,24 @@ body {
     outline: none;
     border-color: var(--primary-blue-light);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Form Validation Error States */
+.form-control--error {
+    border-color: var(--danger-red);
+}
+
+.form-control--error:focus {
+    border-color: var(--danger-red);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.field-error {
+    display: block;
+    color: var(--danger-red);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
 }
 
 .submit-button {

@@ -85,9 +85,12 @@ exports.getDashboard = async (req, res) => {
 
 // Get user profile
 exports.getProfile = (req, res) => {
+    const saved = req.query.saved === 'true';
+    
     res.render('pages/profile', {
         title: 'My Profile - FundMyIdea BD',
         user: req.user,
+        saved: saved,
         currentPage: 'profile'
     });
 };
@@ -124,7 +127,8 @@ exports.updateProfile = async (req, res) => {
         // Refresh user data
         req.user = user;
         
-        res.redirect('/dashboard/profile');
+        // Redirect with success flag
+        res.redirect('/dashboard/profile?saved=true');
     } catch (error) {
         console.error('Error updating profile:', error);
         res.render('pages/profile', {
