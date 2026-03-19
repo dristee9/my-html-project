@@ -80,7 +80,7 @@
                 <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                 <div class="campaign-details">
                     <div class="campaign-header">
-                        <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
+                        <span class="status-badge badge-<%= campaign.status === 'active' ? 'active' : (campaign.status === 'completed' ? 'completed' : 'expired') %>"><%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %><%= campaign.status === 'active' ? ' • ' + campaign.daysLeftText : '' %></span>
                         <span class="status-badge badge-category"><%= campaign.category %></span>
                     </div>
                     <h3 class="campaign-name"><%= campaign.title %></h3>
@@ -95,7 +95,6 @@
                         </div>
                     </div>
                     <div class="campaign-footer">
-                        <span class="time-remaining"><%= campaign.daysLeftText %></span>
                         <a href="/campaigns/<%= campaign._id %>" class="view-button">View Details</a>
                     </div>
                 </div>

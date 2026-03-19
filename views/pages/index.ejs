@@ -21,11 +21,11 @@
         
         <div class="hero-actions">
             <% if (typeof user !== 'undefined' && user) { %>
-                <a href="/builder/create" class="btn btn--primary">Start Your Campaign</a>
-                <a href="/campaigns" class="btn btn--secondary">Browse Projects</a>
+                <a href="/campaigns" class="btn btn--primary">Explore Campaigns</a>
+                <a href="/builder/create" class="btn btn--secondary">Start a Campaign</a>
             <% } else { %>
-                <a href="/register" class="btn btn--primary">Get Started</a>
-                <a href="/campaigns" class="btn btn--secondary">Explore Campaigns</a>
+                <a href="/campaigns" class="btn btn--primary">Explore Campaigns</a>
+                <a href="/register" class="btn btn--secondary">Get Started</a>
             <% } %>
         </div>
 
@@ -68,7 +68,7 @@
                         <div class="campaign-stats">
                             <div class="funding-progress">
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
                                 </div>
                                 <div class="funding-amount">
                                     <span><%= campaign.currentFunding %> BDT</span>
@@ -106,7 +106,7 @@
                         <div class="campaign-stats">
                             <div class="funding-progress">
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
                                 </div>
                                 <div class="funding-amount">
                                     <span><%= campaign.currentFunding %> BDT</span>
@@ -143,7 +143,7 @@
                         <div class="campaign-stats">
                             <div class="funding-progress">
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
                                 </div>
                                 <div class="funding-amount">
                                     <span><%= campaign.currentFunding %> BDT</span>

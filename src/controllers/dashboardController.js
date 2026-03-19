@@ -7,12 +7,12 @@ exports.getDashboard = async (req, res) => {
         const campaigns = await Campaign.find({ creator: req.user._id })
             .sort({ createdAt: -1 });
         
-        // Calculate user statistics
+        // Calculate user statistics - only for ACTIVE campaigns
         const activeCampaigns = campaigns.filter(c => c.status === 'active');
         const userStats = {
             campaignsCount: activeCampaigns.length,
-            totalRaised: campaigns.reduce((sum, camp) => sum + camp.currentFunding, 0),
-            donationsCount: campaigns.reduce((sum, camp) => sum + camp.backers.length, 0)
+            totalRaised: activeCampaigns.reduce((sum, camp) => sum + camp.currentFunding, 0),
+            donationsCount: activeCampaigns.reduce((sum, camp) => sum + camp.backers.length, 0)
         };
         
         // Find campaigns expiring in next 3 days

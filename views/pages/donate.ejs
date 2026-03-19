@@ -105,27 +105,27 @@
 
                         <!-- Payment Instructions -->
                         <div class="payment-instructions">
-                            <h3 class="heading-3">Payment Instructions</h3>
+                            <h3 class="heading-3">How It Works</h3>
                             <div class="instructions-content">
                                 <div class="instruction-step">
                                     <span class="step-number">1</span>
                                     <div class="step-content">
-                                        <h4>Submit this form</h4>
-                                        <p>Fill in your donation details and click "Process Donation"</p>
+                                        <h4>Enter donation amount</h4>
+                                        <p>Choose a preset amount or enter your custom donation</p>
                                     </div>
                                 </div>
                                 <div class="instruction-step">
                                     <span class="step-number">2</span>
                                     <div class="step-content">
-                                        <h4>Complete bKash payment</h4>
-                                        <p>You'll receive instructions to complete your bKash transaction</p>
+                                        <h4>Provide bKash number</h4>
+                                        <p>We'll use this to process your payment securely</p>
                                     </div>
                                 </div>
                                 <div class="instruction-step">
                                     <span class="step-number">3</span>
                                     <div class="step-content">
-                                        <h4>Your donation is confirmed</h4>
-                                        <p>Once verified, your contribution will appear on the campaign page</p>
+                                        <h4>Submit and support</h4>
+                                        <p>Your contribution will appear on the campaign page once verified</p>
                                     </div>
                                 </div>
                             </div>
@@ -135,7 +135,7 @@
                         <div class="form-actions">
                             <button type="submit" class="btn btn--success-gradient">
                                 <span class="button-text">Process Donation</span>
-                                <span class="button-amount" id="buttonAmount">৳0</span>
+                                <span class="button-amount" id="buttonAmount"></span>
                             </button>
                             
                             <!-- OR Divider -->
@@ -155,7 +155,7 @@
                             
                             <div class="security-note" style="margin-top: 1rem;">
                                 <i class="security-icon">🔒</i>
-                                <span>All transactions are secure and encrypted</span>
+                                <span>Your donation information is secure and will be verified before processing</span>
                             </div>
                         </div>
                     </form>
@@ -180,8 +180,8 @@
                                 <span class="stat-label">Goal</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value"><%= campaign.daysRemaining %></span>
-                                <span class="stat-label"><%= campaign.daysRemaining === 1 ? 'Day' : 'Days' %> Left</span>
+                                <span class="stat-value"><%= typeof campaign.daysRemaining !== 'undefined' ? campaign.daysRemaining : '-' %></span>
+                                <span class="stat-label"><%= typeof campaign.daysRemaining !== 'undefined' && campaign.daysRemaining === 1 ? 'Day' : 'Days' %> Left</span>
                             </div>
                         </div>
                     </div>

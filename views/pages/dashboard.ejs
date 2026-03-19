@@ -9,15 +9,15 @@
 <!-- Statistics Overview -->
 <div class="dashboard-stats">
     <div class="stat-box">
-        <div class="stat-number stat-blue"><%= typeof userStats !== 'undefined' ? userStats.campaignsCount : 0 %></div>
+        <div class="stat-number stat-blue"><%= typeof userStats !== 'undefined' && userStats ? userStats.campaignsCount : 0 %></div>
         <div class="stat-text">Active Campaigns</div>
     </div>
     <div class="stat-box">
-        <div class="stat-number stat-green"><%= typeof userStats !== 'undefined' ? userStats.totalRaised : 0 %> BDT</div>
+        <div class="stat-number stat-green"><%= typeof userStats !== 'undefined' && userStats ? userStats.totalRaised : 0 %> BDT</div>
         <div class="stat-text">Total Funds Raised</div>
     </div>
     <div class="stat-box">
-        <div class="stat-number stat-purple"><%= typeof userStats !== 'undefined' ? userStats.donationsCount : 0 %></div>
+        <div class="stat-number stat-purple"><%= typeof userStats !== 'undefined' && userStats ? userStats.donationsCount : 0 %></div>
         <div class="stat-text">Total Donations</div>
     </div>
 </div>
@@ -85,7 +85,7 @@
                 <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                 <div class="campaign-details">
                     <div class="campaign-header">
-                        <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
+                        <span class="status-badge badge-<%= campaign.status === 'active' ? 'active' : (campaign.status === 'completed' ? 'completed' : 'expired') %>"><%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %><%= campaign.status === 'active' ? ' • ' + campaign.daysLeftText : '' %></span>
                         <span class="status-badge badge-category"><%= campaign.category %></span>
                     </div>
                     <h3 class="campaign-name"><%= campaign.title %></h3>
