@@ -95,8 +95,9 @@
                             <input type="checkbox" checked disabled>
                             <span class="toggle-slider"></span>
                         </label>
+                        <small class="text-xs text-gray-500 mt-1">Coming soon - Essential notifications cannot be disabled</small>
                     </div>
-                    
+                            
                     <div class="notification-option">
                         <div class="notification-info">
                             <h4 class="font-semibold">Donation Alerts</h4>
@@ -106,19 +107,21 @@
                             <input type="checkbox" checked disabled>
                             <span class="toggle-slider"></span>
                         </label>
+                        <small class="text-xs text-gray-500 mt-1">Coming soon - Transaction alerts are always enabled</small>
                     </div>
-                    
+                            
                     <div class="notification-option">
                         <div class="notification-info">
                             <h4 class="font-semibold">Campaign Updates</h4>
                             <p class="text-sm text-gray-600">Receive updates about campaigns you've donated to</p>
                         </div>
                         <label class="toggle-switch">
-                            <input type="checkbox" checked disabled>
+                            <input type="checkbox" disabled>
                             <span class="toggle-slider"></span>
                         </label>
+                        <small class="text-xs text-gray-500 mt-1">Coming soon</small>
                     </div>
-                    
+                            
                     <div class="notification-option">
                         <div class="notification-info">
                             <h4 class="font-semibold">Newsletter</h4>
@@ -128,6 +131,7 @@
                             <input type="checkbox" disabled>
                             <span class="toggle-slider"></span>
                         </label>
+                        <small class="text-xs text-gray-500 mt-1">Coming soon</small>
                     </div>
                 </div>
                 
@@ -454,6 +458,7 @@
         
         const form = event.target;
         const password = document.getElementById('deletePassword').value;
+        const csrfToken = form.querySelector('[name="_csrf"]').value;
         const deleteBtn = form.querySelector('.btn-delete');
         
         try {
@@ -463,15 +468,19 @@
             const response = await fetch('/dashboard/settings/account', {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({ password })
+                body: JSON.stringify({ 
+                    password: password,
+                    _csrf: csrfToken
+                })
             });
             
             const result = await response.json();
             
             if (result.success) {
-                window.location.href = result.redirect;
+                window.location.href = result.redirect || '/';
             } else {
                 alert(result.error || 'Failed to delete account');
                 deleteBtn.disabled = false;
@@ -492,4 +501,31 @@
             hideDeleteModal();
         }
     }
+    
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                const tabContent = document.getElementById(tabId + '-tab');
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                }
+            });
+        });
+        
+        // Activate first tab by default
+        if (tabButtons.length > 0) {
+            tabButtons[0].click();
+        }
+    });
 </script>

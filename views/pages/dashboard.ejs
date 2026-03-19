@@ -131,11 +131,38 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="4" class="empty-state">
-                        No donations received yet
-                    </td>
-                </tr>
+                <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+                    <% const allBackers = []; %>
+                    <% campaigns.forEach(campaign => { %>
+                        <% if (campaign.backers && campaign.backers.length > 0) { %>
+                            <% campaign.backers.forEach(backer => { %>
+                                <% allBackers.push({
+                                    campaign: campaign,
+                                    backer: backer
+                                }); %>
+                            <% }); %>
+                        <% } %>
+                    <% }); %>
+                    
+                    <% if (allBackers.length > 0) { %>
+                        <% allBackers.slice(0, 10).forEach(donation => { %>
+                            <tr>
+                                <td><a href="/campaigns/<%= donation.campaign._id %>" style="color: var(--primary-blue); text-decoration: none;"><%= donation.campaign.title.substring(0, 30) %></a></td>
+                                <td><%= donation.backer.user ? donation.backer.user.username : 'Anonymous' %></td>
+                                <td><%= donation.backer.amount %> BDT</td>
+                                <td><%= new Date(donation.backer.date || Date.now()).toLocaleDateString() %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="empty-state">No donations received yet</td>
+                        </tr>
+                    <% } %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4" class="empty-state">No donations received yet</td>
+                    </tr>
+                <% } %>
             </tbody>
         </table>
     </div>

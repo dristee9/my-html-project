@@ -23,36 +23,45 @@
             <h2 class="sidebar-title">Active Campaigns</h2>
             
             <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
-                <div class="campaign-grid">
-                    <% campaigns.forEach(campaign => { %>
-                    <div class="campaign-card">
-                        <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
-                        <div class="campaign-details">
-                            <div class="campaign-header">
-                                <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
-                                <span class="status-badge badge-category"><%= campaign.category %></span>
-                            </div>
-                            <h3 class="campaign-name"><%= campaign.title %></h3>
-                            <div class="progress-container">
-                                <div class="progress-track">
-                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                <% const activeCampaigns = campaigns.filter(c => c.status === 'active'); %>
+                <% if (activeCampaigns.length > 0) { %>
+                    <div class="campaign-grid">
+                        <% activeCampaigns.forEach(campaign => { %>
+                        <div class="campaign-card">
+                            <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
+                            <div class="campaign-details">
+                                <div class="campaign-header">
+                                    <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
+                                    <span class="status-badge badge-category"><%= campaign.category %></span>
                                 </div>
-                                <div class="progress-info">
-                                    <span><%= campaign.currentFunding %> BDT raised</span>
-                                    <span>of <%= campaign.fundingGoal %> BDT goal</span>
+                                <h3 class="campaign-name"><%= campaign.title %></h3>
+                                <div class="progress-container">
+                                    <div class="progress-track">
+                                        <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span><%= campaign.currentFunding %> BDT raised</span>
+                                        <span>of <%= campaign.fundingGoal %> BDT goal</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="campaign-footer">
-                                <span class="time-remaining"><%= campaign.daysLeftText %></span>
-                                <div class="flex gap-2">
-                                    <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
-                                    <a href="/builder/<%= campaign._id %>/edit" class="btn-success-sm">Edit</a>
+                                <div class="campaign-footer">
+                                    <span class="time-remaining"><%= campaign.daysLeftText %></span>
+                                    <div class="flex gap-2">
+                                        <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
+                                        <a href="/builder/<%= campaign._id %>/edit" class="btn-success-sm">Edit</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <% }) %>
                     </div>
-                    <% }) %>
-                </div>
+                <% } else { %>
+                    <div class="empty-state-box">
+                        <h3 class="empty-state-title">No active campaigns</h3>
+                        <p class="empty-state-text">You haven't created any campaigns yet.</p>
+                        <a href="/builder/create" class="btn btn--primary">Create Your First Campaign</a>
+                    </div>
+                <% } %>
             <% } else { %>
                 <div class="empty-state-box">
                     <h3 class="empty-state-title">No active campaigns</h3>
@@ -64,7 +73,44 @@
 
         <div class="sidebar-card">
             <h2 class="sidebar-title">Completed Campaigns</h2>
-            <p class="empty-state-text text-center py-6">No completed campaigns yet.</p>
+            <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+                <% const completedCampaigns = campaigns.filter(c => c.status === 'completed' || c.status === 'expired'); %>
+                <% if (completedCampaigns.length > 0) { %>
+                    <div class="campaign-grid">
+                        <% completedCampaigns.forEach(campaign => { %>
+                        <div class="campaign-card">
+                            <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
+                            <div class="campaign-details">
+                                <div class="campaign-header">
+                                    <span class="status-badge badge-<%= campaign.status === 'completed' ? 'completed' : 'expired' %>"><%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %></span>
+                                    <span class="status-badge badge-category"><%= campaign.category %></span>
+                                </div>
+                                <h3 class="campaign-name"><%= campaign.title %></h3>
+                                <div class="progress-container">
+                                    <div class="progress-track">
+                                        <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span><%= campaign.currentFunding %> BDT raised</span>
+                                        <span>of <%= campaign.fundingGoal %> BDT goal</span>
+                                    </div>
+                                </div>
+                                <div class="campaign-footer">
+                                    <span class="time-remaining"><%= campaign.status === 'completed' ? 'Completed' : 'Expired' %></span>
+                                    <div class="flex gap-2">
+                                        <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <p class="empty-state-text text-center py-6">No completed campaigns yet.</p>
+                <% } %>
+            <% } else { %>
+                <p class="empty-state-text text-center py-6">No completed campaigns yet.</p>
+            <% } %>
         </div>
     </div>
 </div>

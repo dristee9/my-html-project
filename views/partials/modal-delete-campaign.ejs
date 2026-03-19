@@ -15,9 +15,15 @@
 <script>
 let lastFocusedElement = null;
 
-function showDeleteModal(triggerElement) {
+function showDeleteModal(campaignId, triggerElement) {
     const modal = document.getElementById('deleteModal');
     if (!modal) return;
+    
+    // Update the form action with the campaign ID
+    const form = modal.querySelector('form');
+    if (form) {
+        form.action = `/campaigns/${campaignId}/delete`;
+    }
     
     // Store the element that triggered the modal
     lastFocusedElement = triggerElement || document.activeElement;
