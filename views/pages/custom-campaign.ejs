@@ -4,7 +4,7 @@
 <% if (campaign.pageBuilder && campaign.pageBuilder.enabled) { %>
     <!-- Custom Page Builder Styles -->
     <% if (campaign.pageBuilder.customCSS) { %>
-        <style><%= campaign.pageBuilder.customCSS %></style>
+        <style><%- campaign.pageBuilder.customCSS %></style>
     <% } %>
     
     <!-- Global Styles -->

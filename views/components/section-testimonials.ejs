@@ -56,69 +56,76 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const testimonials = document.querySelectorAll('.testimonial-card');
-    const indicators = document.querySelectorAll('.indicator');
-    const prevButton = document.querySelector('.prev-button');
-    const nextButton = document.querySelector('.next-button');
-    
-    let currentIndex = 0;
-    const totalTestimonials = testimonials.length;
-    
-    function showTestimonial(index) {
-        // Hide all testimonials
-        testimonials.forEach(testimonial => {
-            testimonial.style.display = 'none';
-        });
+    // Scope each slider to its own section container
+    document.querySelectorAll('.testimonials-section').forEach(section => {
+        const testimonials = section.querySelectorAll('.testimonial-card');
+        const indicators = section.querySelectorAll('.indicator');
+        const prevButton = section.querySelector('.prev-button');
+        const nextButton = section.querySelector('.next-button');
         
-        // Show current testimonial
-        if (testimonials[index]) {
-            testimonials[index].style.display = 'block';
+        if (testimonials.length === 0) return;
+        
+        let currentIndex = 0;
+        const totalTestimonials = testimonials.length;
+        
+        function showTestimonial(index) {
+            // Hide all testimonials
+            testimonials.forEach(testimonial => {
+                testimonial.style.display = 'none';
+            });
+            
+            // Show current testimonial
+            if (testimonials[index]) {
+                testimonials[index].style.display = 'block';
+            }
+            
+            // Update indicators
+            indicators.forEach((indicator, i) => {
+                if (i === index) {
+                    indicator.setAttribute('aria-current', 'true');
+                } else {
+                    indicator.removeAttribute('aria-current');
+                }
+            });
+            
+            currentIndex = index;
         }
         
-        // Update indicators
-        indicators.forEach((indicator, i) => {
-            if (i === index) {
-                indicator.setAttribute('aria-current', 'true');
-            } else {
-                indicator.removeAttribute('aria-current');
-            }
+        function nextTestimonial() {
+            const nextIndex = (currentIndex + 1) % totalTestimonials;
+            showTestimonial(nextIndex);
+        }
+        
+        function prevTestimonial() {
+            const prevIndex = (currentIndex - 1 + totalTestimonials) % totalTestimonials;
+            showTestimonial(prevIndex);
+        }
+        
+        // Event listeners
+        if (nextButton) {
+            nextButton.addEventListener('click', nextTestimonial);
+        }
+        
+        if (prevButton) {
+            prevButton.addEventListener('click', prevTestimonial);
+        }
+        
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                showTestimonial(index);
+            });
         });
         
-        currentIndex = index;
-    }
-    
-    function nextTestimonial() {
-        const nextIndex = (currentIndex + 1) % totalTestimonials;
-        showTestimonial(nextIndex);
-    }
-    
-    function prevTestimonial() {
-        const prevIndex = (currentIndex - 1 + totalTestimonials) % totalTestimonials;
-        showTestimonial(prevIndex);
-    }
-    
-    // Event listeners
-    if (nextButton) {
-        nextButton.addEventListener('click', nextTestimonial);
-    }
-    
-    if (prevButton) {
-        prevButton.addEventListener('click', prevTestimonial);
-    }
-    
-    indicators.forEach((indicator, index) => {
-        indicator.addEventListener('click', () => {
-            showTestimonial(index);
-        });
+        // Auto-rotate testimonials
+        if (totalTestimonials > 1) {
+            const intervalId = setInterval(nextTestimonial, 5000);
+            // Store for potential cleanup
+            section.dataset.intervalId = intervalId;
+        }
+        
+        // Initialize
+        showTestimonial(0);
     });
-    
-    // Auto-rotate testimonials
-    if (totalTestimonials > 1) {
-        setInterval(nextTestimonial, 5000);
-    }
-    
-    // Initialize
-    showTestimonial(0);
 });
 </script>
 <% } %>

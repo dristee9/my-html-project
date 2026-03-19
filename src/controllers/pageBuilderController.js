@@ -85,6 +85,14 @@ exports.savePageBuilder = async (req, res) => {
         // Sanitize section content to prevent XSS
         if (pageBuilderObj && pageBuilderObj.sections) {
             pageBuilderObj.sections.forEach(section => {
+                // Sanitize custom CSS - remove dangerous patterns
+                if (pageBuilderObj.customCSS && typeof pageBuilderObj.customCSS === 'string') {
+                    pageBuilderObj.customCSS = pageBuilderObj.customCSS
+                        .replace(/url\s*\(/gi, '')  // Remove url()
+                        .replace(/expression\s*\(/gi, '')  // Remove expression()
+                        .replace(/@import/gi, '');  // Remove @import
+                }
+                
                 // Sanitize text content in sections
                 if (section.content) {
                     Object.keys(section.content).forEach(key => {
