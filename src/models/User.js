@@ -26,7 +26,9 @@ const userSchema = new mongoose.Schema({
     university: {
         type: String,
         required: [true, 'University is required'],
-        enum: ['BUET', 'Dhaka University', 'North South University', 'BRAC University', 'Other']
+        trim: true
+        // Note: Free-text allowed for scalability. Common universities:
+        // BUET, Dhaka University, North South University, BRAC University, etc.
     },
     profileImage: {
         type: String,

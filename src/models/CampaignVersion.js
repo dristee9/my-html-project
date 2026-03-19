@@ -48,23 +48,23 @@ campaignVersionSchema.statics.getLatestVersion = async function(campaignId) {
     return latest ? latest.version : 0;
 };
 
-// Instance method to save new version
+// Instance method to save new version - optimized to reduce N+1 queries
 campaignVersionSchema.methods.saveVersion = async function() {
     const saved = await this.save();
     
     // Optional: Keep only last 20 versions to prevent unbounded growth
-    const count = await this.constructor.countDocuments({ campaign: this.campaign });
-    if (count > 20) {
-        const oldest = await this.constructor.find({ campaign: this.campaign })
-            .sort('-version')
-            .skip(20)
-            .select('_id');
-        
-        if (oldest.length > 0) {
-            await this.constructor.deleteMany({ 
-                _id: { $in: oldest.map(v => v._id) } 
-            });
-        }
+    // Optimized: Fetch only IDs, skip first 20, delete in one operation
+    const oldVersions = await this.constructor
+        .find({ campaign: this.campaign })
+        .sort('-version')
+        .skip(20)
+        .select('_id')
+        .lean();
+    
+    if (oldVersions.length > 0) {
+        await this.constructor.deleteMany({ 
+            _id: { $in: oldVersions.map(v => v._id) } 
+        });
     }
     
     return saved;

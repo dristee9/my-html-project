@@ -114,7 +114,9 @@ const campaignSchema = new mongoose.Schema({
         }
     }]
 }, {
-    timestamps: true // Automatically adds createdAt and updatedAt
+    timestamps: true, // Automatically adds createdAt and updatedAt
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
 });
 
 // Virtual for funding percentage
@@ -137,6 +139,7 @@ campaignSchema.virtual('daysLeftText').get(function() {
 });
 
 // Index for better querying
+campaignSchema.index({ creator: 1 }); // Index for efficient user-based queries
 campaignSchema.index({ status: 1, createdAt: -1 });
 campaignSchema.index({ category: 1, status: 1 });
 campaignSchema.index({ 'backers.user': 1 }); // Index for efficient donation queries

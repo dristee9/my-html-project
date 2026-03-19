@@ -45,14 +45,14 @@
     
     <div class="form-group">
         <label class="form-label">University</label>
-        <select name="university" class="form-control" required>
-            <option value="">Select your university</option>
-            <option value="BUET" <%= typeof formData !== 'undefined' && formData.university === 'BUET' ? 'selected' : '' %>>BUET</option>
-            <option value="Dhaka University" <%= typeof formData !== 'undefined' && formData.university === 'Dhaka University' ? 'selected' : '' %>>Dhaka University</option>
-            <option value="North South University" <%= typeof formData !== 'undefined' && formData.university === 'North South University' ? 'selected' : '' %>>North South University</option>
-            <option value="BRAC University" <%= typeof formData !== 'undefined' && formData.university === 'BRAC University' ? 'selected' : '' %>>BRAC University</option>
-            <option value="Other" <%= typeof formData !== 'undefined' && formData.university === 'Other' ? 'selected' : '' %>>Other</option>
-        </select>
+        <input 
+            type="text" 
+            name="university" 
+            class="form-control" 
+            placeholder="Enter your university name"
+            value="<%= typeof formData !== 'undefined' && formData.university ? formData.university : '' %>"
+            required>
+        <small class="form-help-text">Examples: BUET, Dhaka University, North South University, BRAC University, etc.</small>
     </div>
     
     <button type="submit" class="btn btn--primary btn--full">Create Account</button>
