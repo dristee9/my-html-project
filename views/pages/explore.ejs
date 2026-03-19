@@ -87,7 +87,7 @@
                     <p class="campaign-author">by <%= campaign.creator.username %></p>
                     <div class="progress-container">
                         <div class="progress-track">
-                            <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                            <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
                         </div>
                         <div class="progress-info">
                             <span><%= campaign.currentFunding %> BDT raised</span>
