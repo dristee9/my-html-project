@@ -1,0 +1,1 @@
+let a=require('mongoose');module.exports=async ()=>{try{let A=await a.connect(process.env.MONGODB_URI,{useNewUrlParser:!0,useUnifiedTopology:!0});console.log(`MongoDB Connected: ${A.connection.host}`)}catch(_){console.error(`Error: ${_.message}`);process.exit(1)}};

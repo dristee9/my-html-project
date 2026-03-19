@@ -1,0 +1,222 @@
+<% layout('layouts/main') -%>
+<% title = 'My Campaigns - FundMyIdea BD' -%>
+<%- include('../partials/breadcrumbs', {
+    breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'My Campaigns' }
+    ]
+}) %>
+<div class="dashboard-header">
+    <h1 class="heading-1">My Campaigns</h1>
+    <p class="dashboard-subtitle">Manage your fundraising campaigns</p>
+</div>
+<div class="layout-grid">
+    <%- include('../partials/dashboard-sidebar', { currentPage: 'my-campaigns', showCreateButton: true }) %>
+    <div>
+        <div class="status-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: white; padding: 0.75rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm);">
+            <% 
+                const activeCount = typeof campaigns !== 'undefined' ? campaigns.filter(c => c.status === 'active').length : 0;
+                const completedCount = typeof campaigns !== 'undefined' ? campaigns.filter(c => c.status === 'completed').length : 0;
+                const expiredCount = typeof campaigns !== 'undefined' ? campaigns.filter(c => c.status === 'expired').length : 0;
+                const draftCount = typeof campaigns !== 'undefined' ? campaigns.filter(c => c.status === 'draft').length : 0;
+            %>
+            <button onclick="showCampaignTab('active')" id="tab-active" class="tab-btn active" style="flex: 1; padding: 0.75rem 1rem; border: none; background: var(--primary-blue); color: white; border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">Active (<%= activeCount %>)</button>
+            <button onclick="showCampaignTab('completed')" id="tab-completed" class="tab-btn" style="flex: 1; padding: 0.75rem 1rem; border: none; background: var(--gray-100); color: var(--gray-700); border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">Completed (<%= completedCount %>)</button>
+            <button onclick="showCampaignTab('expired')" id="tab-expired" class="tab-btn" style="flex: 1; padding: 0.75rem 1rem; border: none; background: var(--gray-100); color: var(--gray-700); border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">Expired (<%= expiredCount %>)</button>
+            <button onclick="showCampaignTab('draft')" id="tab-draft" class="tab-btn" style="flex: 1; padding: 0.75rem 1rem; border: none; background: var(--gray-100); color: var(--gray-700); border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">Draft (<%= draftCount %>)</button>
+        </div>
+        <div id="tab-content-active" class="tab-content active">
+            <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+                <% const activeCampaigns = campaigns.filter(c => c.status === 'active'); %>
+                <% if (activeCampaigns.length > 0) { %>
+                    <div class="campaign-grid">
+                        <% activeCampaigns.forEach(campaign => { %>
+                        <div class="campaign-card">
+                            <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
+                            <div class="campaign-details">
+                                <div class="campaign-header">
+                                    <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
+                                    <span class="status-badge badge-category"><%= campaign.category %></span>
+                                </div>
+                                <h3 class="campaign-name"><%= campaign.title %></h3>
+                                <div class="progress-container">
+                                    <div class="progress-track">
+                                        <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span><%= campaign.currentFunding %> BDT raised</span>
+                                        <span>of <%= campaign.fundingGoal %> BDT goal</span>
+                                    </div>
+                                </div>
+                                <div class="campaign-footer">
+                                    <span class="time-remaining"><%= campaign.daysLeftText %></span>
+                                    <div class="flex gap-2">
+                                        <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
+                                        <a href="/builder/<%= campaign._id %>/edit" class="btn-success-sm">Edit</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box">
+                        <h3 class="empty-state-title">No active campaigns</h3>
+                        <p class="empty-state-text">Create a new campaign to get started!</p>
+                        <a href="/builder/create" class="btn btn--primary">Create Your First Campaign</a>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="empty-state-box">
+                    <h3 class="empty-state-title">No active campaigns</h3>
+                    <p class="empty-state-text">You haven't created any campaigns yet.</p>
+                    <a href="/builder/create" class="btn btn--primary">Create Your First Campaign</a>
+                </div>
+            <% } %>
+        </div>
+        <div id="tab-content-completed" class="tab-content">
+            <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+                <% const completedCampaigns = campaigns.filter(c => c.status === 'completed'); %>
+                <% if (completedCampaigns.length > 0) { %>
+                    <div class="campaign-grid">
+                        <% completedCampaigns.forEach(campaign => { %>
+                        <div class="campaign-card">
+                            <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
+                            <div class="campaign-details">
+                                <div class="campaign-header">
+                                    <span class="status-badge badge-completed">✅ Completed</span>
+                                    <span class="status-badge badge-category"><%= campaign.category %></span>
+                                </div>
+                                <h3 class="campaign-name"><%= campaign.title %></h3>
+                                <div class="progress-container">
+                                    <div class="progress-track">
+                                        <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span><%= campaign.currentFunding %> BDT raised</span>
+                                        <span>of <%= campaign.fundingGoal %> BDT goal</span>
+                                    </div>
+                                </div>
+                                <div class="campaign-footer">
+                                    <span class="time-remaining">🎉 Goal Achieved!</span>
+                                    <div class="flex gap-2">
+                                        <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <p class="empty-state-text text-center py-6">No completed campaigns yet.</p>
+                <% } %>
+            <% } else { %>
+                <p class="empty-state-text text-center py-6">No completed campaigns yet.</p>
+            <% } %>
+        </div>
+        <div id="tab-content-expired" class="tab-content">
+            <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+                <% const expiredCampaigns = campaigns.filter(c => c.status === 'expired'); %>
+                <% if (expiredCampaigns.length > 0) { %>
+                    <div class="campaign-grid">
+                        <% expiredCampaigns.forEach(campaign => { %>
+                        <div class="campaign-card">
+                            <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
+                            <div class="campaign-details">
+                                <div class="campaign-header">
+                                    <span class="status-badge badge-expired">⏰ Ended</span>
+                                    <span class="status-badge badge-category"><%= campaign.category %></span>
+                                </div>
+                                <h3 class="campaign-name"><%= campaign.title %></h3>
+                                <div class="progress-container">
+                                    <div class="progress-track">
+                                        <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span><%= campaign.currentFunding %> BDT raised</span>
+                                        <span>of <%= campaign.fundingGoal %> BDT goal</span>
+                                    </div>
+                                </div>
+                                <div class="campaign-footer">
+                                    <span class="time-remaining">Expired <%= new Date(campaign.deadline).toLocaleDateString() %></span>
+                                    <div class="flex gap-2">
+                                        <a href="/campaigns/<%= campaign._id %>" class="view-button">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <p class="empty-state-text text-center py-6">No expired campaigns yet.</p>
+                <% } %>
+            <% } else { %>
+                <p class="empty-state-text text-center py-6">No expired campaigns yet.</p>
+            <% } %>
+        </div>
+        <div id="tab-content-draft" class="tab-content">
+            <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+                <% const draftCampaigns = campaigns.filter(c => c.status === 'draft'); %>
+                <% if (draftCampaigns.length > 0) { %>
+                    <div class="campaign-grid">
+                        <% draftCampaigns.forEach(campaign => { %>
+                        <div class="campaign-card">
+                            <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
+                            <div class="campaign-details">
+                                <div class="campaign-header">
+                                    <span class="status-badge badge-draft">📝 Draft</span>
+                                    <span class="status-badge badge-category"><%= campaign.category %></span>
+                                </div>
+                                <h3 class="campaign-name"><%= campaign.title %></h3>
+                                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 1rem 0;">This campaign is not yet visible to the public</p>
+                                <div class="campaign-footer">
+                                    <div class="flex gap-2">
+                                        <a href="/builder/<%= campaign._id %>/edit" class="btn btn--primary">Continue Editing</a>
+                                        <a href="/campaigns/<%= campaign._id %>" class="view-button">Preview</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <p class="empty-state-text text-center py-6">No draft campaigns.</p>
+                <% } %>
+            <% } else { %>
+                <p class="empty-state-text text-center py-6">No draft campaigns.</p>
+            <% } %>
+        </div>
+    </div>
+</div>
+<script>
+    function showCampaignTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+            content.style.display = 'none';
+        });
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.background = 'var(--gray-100)';
+            btn.style.color = 'var(--gray-700)';
+        });
+        // Show selected tab content
+        const selectedContent = document.getElementById(`tab-content-${tabName}`);
+        if (selectedContent) {
+            selectedContent.classList.add('active');
+            selectedContent.style.display = 'block';
+        }
+        // Set active button style
+        const selectedBtn = document.getElementById(`tab-${tabName}`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('active');
+            selectedBtn.style.background = 'var(--primary-blue)';
+            selectedBtn.style.color = 'white';
+        }
+    }
+    // Initialize - show active tab by default
+    document.addEventListener('DOMContentLoaded', function() {
+        showCampaignTab('active');
+    });
+</script>

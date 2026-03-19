@@ -1,0 +1,31 @@
+<nav class="site-navigation">
+    <div class="nav-wrapper">
+        <a href="/" class="site-logo">FundMyIdea BD</a>
+        <button class="nav-toggle" aria-label="Menu" id="navToggle">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+        <div class="nav-links" id="navLinks">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/campaigns" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'explore' ? 'active' : '' %>">Explore Campaigns</a>
+                <a href="/leaderboard" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'leaderboard' ? 'active' : '' %>">🏆 Leaderboard</a>
+                <a href="/dashboard/saved" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'saved' ? 'active' : '' %>">💝 Saved</a>
+                <a href="/dashboard/my-campaigns" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'my-campaigns' ? 'active' : '' %>">My Campaigns</a>
+                <a href="/builder/create" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'create' ? 'active' : '' %>">Create Campaign</a>
+                <a href="/dashboard" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+                <button class="nav-item" id="themeToggle" style="background: transparent; border: none; cursor: pointer; font-size: 1.25rem; padding: 0.5rem;">🌙</button>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+                    <button type="submit" class="nav-item logout-button">Logout</button>
+                </form>
+            <% } else { %>
+                <a href="/campaigns" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'explore' ? 'active' : '' %>">Explore Campaigns</a>
+                <a href="/leaderboard" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'leaderboard' ? 'active' : '' %>">🏆 Leaderboard</a>
+                <a href="/login" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'login' ? 'active' : '' %>">Login</a>
+                <a href="/register" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'register' ? 'active' : '' %>">Register</a>
+                <button class="nav-item" id="themeToggle" style="background: transparent; border: none; cursor: pointer; font-size: 1.25rem; padding: 0.5rem;">🌙</button>
+            <% } %>
+        </div>
+    </div>
+</nav>

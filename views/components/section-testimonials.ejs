@@ -1,0 +1,112 @@
+<% if (typeof content !== 'undefined') { %>
+<div class="testimonials-section">
+    <% if (content.title) { %>
+    <h2 class="testimonials-title"><%= content.title %></h2>
+    <% } %>
+    <% if (content.description) { %>
+    <p class="testimonials-description"><%= content.description %></p>
+    <% } %>
+    <div class="testimonials-container">
+        <% if (content.testimonials && content.testimonials.length > 0) { %>
+            <% content.testimonials.forEach(function(testimonial, index) { %>
+            <div class="testimonial-card" data-index="<%= index %>">
+                <div class="testimonial-content">
+                    <% if (testimonial.quote) { %>
+                    <blockquote class="testimonial-quote">
+                        <p><%= testimonial.quote %></p>
+                    </blockquote>
+                    <% } %>
+                    <div class="testimonial-author">
+                        <% if (testimonial.avatar) { %>
+                        <img src="<%= testimonial.avatar %>" alt="<%= testimonial.name %>" class="author-avatar">
+                        <% } else { %>
+                        <div class="author-initials"><%= testimonial.name.charAt(0).toUpperCase() %></div>
+                        <% } %>
+                        <div class="author-info">
+                            <% if (testimonial.name) { %>
+                            <h4 class="author-name"><%= testimonial.name %></h4>
+                            <% } %>
+                            <% if (testimonial.role) { %>
+                            <p class="author-role"><%= testimonial.role %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        <% } %>
+    </div>
+    <% if (content.testimonials && content.testimonials.length > 1) { %>
+    <div class="testimonial-navigation">
+        <button class="nav-button prev-button" aria-label="Previous testimonial">←</button>
+        <div class="testimonial-indicators">
+            <% content.testimonials.forEach(function(_, index) { %>
+            <button class="indicator" data-index="<%= index %>" <% if (index === 0) { %>aria-current="true"<% } %>></button>
+            <% }); %>
+        </div>
+        <button class="nav-button next-button" aria-label="Next testimonial">→</button>
+    </div>
+    <% } %>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scope each slider to its own section container
+    document.querySelectorAll('.testimonials-section').forEach(section => {
+        const testimonials = section.querySelectorAll('.testimonial-card');
+        const indicators = section.querySelectorAll('.indicator');
+        const prevButton = section.querySelector('.prev-button');
+        const nextButton = section.querySelector('.next-button');
+        if (testimonials.length === 0) return;
+        let currentIndex = 0;
+        const totalTestimonials = testimonials.length;
+        function showTestimonial(index) {
+            // Hide all testimonials
+            testimonials.forEach(testimonial => {
+                testimonial.style.display = 'none';
+            });
+            // Show current testimonial
+            if (testimonials[index]) {
+                testimonials[index].style.display = 'block';
+            }
+            // Update indicators
+            indicators.forEach((indicator, i) => {
+                if (i === index) {
+                    indicator.setAttribute('aria-current', 'true');
+                } else {
+                    indicator.removeAttribute('aria-current');
+                }
+            });
+            currentIndex = index;
+        }
+        function nextTestimonial() {
+            const nextIndex = (currentIndex + 1) % totalTestimonials;
+            showTestimonial(nextIndex);
+        }
+        function prevTestimonial() {
+            const prevIndex = (currentIndex - 1 + totalTestimonials) % totalTestimonials;
+            showTestimonial(prevIndex);
+        }
+        // Event listeners
+        if (nextButton) {
+            nextButton.addEventListener('click', nextTestimonial);
+        }
+        if (prevButton) {
+            prevButton.addEventListener('click', prevTestimonial);
+        }
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                showTestimonial(index);
+            });
+        });
+        // Auto-rotate testimonials
+        if (totalTestimonials > 1) {
+            const intervalId = setInterval(nextTestimonial, 5000);
+            // Store for potential cleanup
+            section.dataset.intervalId = intervalId;
+        }
+        // Initialize
+        showTestimonial(0);
+    });
+});
+</script>
+<% } %>

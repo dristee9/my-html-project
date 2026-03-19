@@ -1,0 +1,27 @@
+<% if (typeof content !== 'undefined') { %>
+<div class="features-section">
+    <% if (content.title) { %>
+    <h2 class="features-title"><%= content.title %></h2>
+    <% } %>
+    <% if (content.description) { %>
+    <p class="features-description"><%= content.description %></p>
+    <% } %>
+    <div class="features-grid">
+        <% if (content.features && content.features.length > 0) { %>
+            <% content.features.forEach(function(feature) { %>
+            <div class="feature-card">
+                <% if (feature.icon) { %>
+                <div class="feature-icon">
+                    <%= feature.icon %>
+                </div>
+                <% } %>
+                <h3 class="feature-title"><%= feature.title %></h3>
+                <% if (feature.description) { %>
+                <p class="feature-description"><%= feature.description %></p>
+                <% } %>
+            </div>
+            <% }); %>
+        <% } %>
+    </div>
+</div>
+<% } %>

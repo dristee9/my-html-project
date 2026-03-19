@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',function(){let a=document.querySelectorAll('.js-form');for(const A of a)A.addEventListener('submit',function(e){let b=A.querySelector('button[type="submit"]');(b&&!b.disabled)&&(b.dataset.originalText=b.textContent.trim(),b.classList.add('btn--loading'),b.disabled=!0,b.textContent='Please wait...')})});

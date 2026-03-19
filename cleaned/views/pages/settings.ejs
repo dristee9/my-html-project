@@ -1,0 +1,264 @@
+<% layout('layouts/main') -%>
+<% title = 'Account Settings - FundMyIdea BD' -%>
+<div class="dashboard-header">
+    <h1 class="heading-1">Account Settings</h1>
+    <p class="dashboard-subtitle">Manage your account preferences and security</p>
+</div>
+<div class="dashboard-grid">
+    <%- include('../partials/dashboard-sidebar', { currentPage: 'settings' }) %>
+    <div class="settings-container">
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="success-banner" style="background: var(--success-light, #dcfce7); color: var(--secondary-green); padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem;">
+                <%= success %>
+            </div>
+        <% } %>
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-banner" style="background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem;">
+                <%= error %>
+            </div>
+        <% } %>
+        <div class="settings-tabs">
+            <button class="tab-button active" data-tab="password">Change Password</button>
+            <button class="tab-button" data-tab="notifications">Notifications</button>
+            <button class="tab-button" data-tab="danger">Danger Zone</button>
+        </div>
+        <div id="password-tab" class="tab-content active">
+            <div class="card-shadow">
+                <h2 class="text-xl font-semibold mb-4">Change Password</h2>
+                <form method="POST" action="/dashboard/settings/password" class="space-y-4">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input 
+                            type="password" 
+                            name="currentPassword" 
+                            class="form-input" 
+                            placeholder="Enter current password"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input 
+                            type="password" 
+                            name="newPassword" 
+                            class="form-input" 
+                            placeholder="Enter new password"
+                            minlength="6"
+                            required
+                        >
+                        <small class="form-help-text">Must be at least 6 characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm New Password</label>
+                        <input 
+                            type="password" 
+                            name="confirmPassword" 
+                            class="form-input" 
+                            placeholder="Confirm new password"
+                            minlength="6"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full">Update Password</button>
+                </form>
+            </div>
+        </div>
+        <div id="notifications-tab" class="tab-content">
+            <div class="card-shadow">
+                <h2 class="text-xl font-semibold mb-4">Notification Preferences</h2>
+                <p class="text-gray-600 mb-6">Manage how you receive notifications about your campaigns and donations.</p>
+                <div class="notification-options">
+                    <div class="notification-option">
+                        <div class="notification-info">
+                            <h4 class="font-semibold">Email Notifications</h4>
+                            <p class="text-sm text-gray-600">Receive emails about campaign updates, donations, and important announcements</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <small class="text-xs text-gray-500 mt-1">Coming soon - Essential notifications cannot be disabled</small>
+                    </div>
+                    <div class="notification-option">
+                        <div class="notification-info">
+                            <h4 class="font-semibold">Donation Alerts</h4>
+                            <p class="text-sm text-gray-600">Get notified when someone donates to your campaigns</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <small class="text-xs text-gray-500 mt-1">Coming soon - Transaction alerts are always enabled</small>
+                    </div>
+                    <div class="notification-option">
+                        <div class="notification-info">
+                            <h4 class="font-semibold">Campaign Updates</h4>
+                            <p class="text-sm text-gray-600">Receive updates about campaigns you've donated to</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <small class="text-xs text-gray-500 mt-1">Coming soon</small>
+                    </div>
+                    <div class="notification-option">
+                        <div class="notification-info">
+                            <h4 class="font-semibold">Newsletter</h4>
+                            <p class="text-sm text-gray-600">Monthly newsletter with platform updates and featured campaigns</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <small class="text-xs text-gray-500 mt-1">Coming soon</small>
+                    </div>
+                </div>
+                <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                    <p class="text-sm text-blue-800">
+                        <strong>Note:</strong> Essential transactional emails (password reset, email verification) cannot be disabled.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div id="danger-tab" class="tab-content">
+            <div class="card-shadow danger-zone">
+                <h2 class="text-xl font-semibold text-red-600 mb-4">Danger Zone</h2>
+                <p class="text-gray-700 mb-6">
+                    Once you delete your account, there is no going back. Please be certain.
+                </p>
+                <div class="danger-warning">
+                    <h4 class="font-semibold text-red-700 mb-2">⚠️ What will happen:</h4>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li>All your campaigns will be permanently deleted</li>
+                        <li>Your donation history will be removed</li>
+                        <li>Your profile will be completely erased</li>
+                        <li>This action cannot be undone</li>
+                    </ul>
+                </div>
+                <button class="delete-account-btn" onclick="showDeleteModal()">
+                    Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="deleteModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Delete Account?</h3>
+            <button class="modal-close" onclick="hideDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="text-gray-700 mb-4">
+                This action is permanent and cannot be undone. All your data will be deleted.
+            </p>
+            <form id="deleteAccountForm" onsubmit="handleDelete(event)">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div class="form-group">
+                    <label class="form-label">Enter your password to confirm:</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="deletePassword" 
+                        class="form-input" 
+                        placeholder="Your password"
+                        required
+                    >
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="hideDeleteModal()">Cancel</button>
+                    <button type="submit" class="btn-delete">Delete Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            // Remove active class from all buttons and contents
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            // Add active class to clicked button and corresponding content
+            this.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        });
+    });
+    // Modal functions
+    function showDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+    function hideDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.getElementById('deleteAccountForm').reset();
+    }
+    // Handle delete account
+    async function handleDelete(event) {
+        event.preventDefault();
+        const form = event.target;
+        const password = document.getElementById('deletePassword').value;
+        const csrfToken = form.querySelector('[name="_csrf"]').value;
+        const deleteBtn = form.querySelector('.btn-delete');
+        try {
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = 'Deleting...';
+            const response = await fetch('/dashboard/settings/account', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ 
+                    password: password,
+                    _csrf: csrfToken
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = result.redirect || '/';
+            } else {
+                alert(result.error || 'Failed to delete account');
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = 'Delete Account';
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Failed to delete account. Please try again.');
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = 'Delete Account';
+        }
+    }
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('deleteModal');
+        if (event.target === modal) {
+            hideDeleteModal();
+        }
+    }
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                // Add active class to clicked button and corresponding content
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                const tabContent = document.getElementById(tabId + '-tab');
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                }
+            });
+        });
+        // Activate first tab by default
+        if (tabButtons.length > 0) {
+            tabButtons[0].click();
+        }
+    });
+</script>
