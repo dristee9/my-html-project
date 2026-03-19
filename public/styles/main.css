@@ -1577,6 +1577,64 @@ body {
     font-weight: 500;
 }
 
+/* Dashboard Sidebar Navigation */
+.dashboard-sidebar {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: 2rem;
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--gray-700);
+    text-decoration: none;
+    border-radius: var(--border-radius-lg);
+    transition: all var(--transition-fast);
+    font-weight: 500;
+}
+
+.sidebar-link:hover {
+    background-color: var(--gray-100);
+    color: var(--primary-blue);
+}
+
+.sidebar-link--active {
+    background-color: var(--primary-blue);
+    color: var(--white);
+}
+
+.sidebar-action-area {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+@media (max-width: 768px) {
+    .dashboard-sidebar {
+        padding: 1.5rem;
+    }
+    
+    .sidebar-link {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+    }
+}
+
 @media (max-width: 768px) {
     .breadcrumbs {
         margin-bottom: 1rem;

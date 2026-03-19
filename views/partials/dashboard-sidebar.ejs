@@ -1,0 +1,23 @@
+<div class="dashboard-sidebar">
+    <h3 class="sidebar-title">Account Settings</h3>
+    <nav class="sidebar-nav">
+        <a href="/dashboard/profile" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'profile' ? 'sidebar-link--active' : '' %>">
+            Profile Information
+        </a>
+        <a href="/dashboard/my-campaigns" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'my-campaigns' ? 'sidebar-link--active' : '' %>">
+            My Campaigns
+        </a>
+        <a href="/dashboard/my-donations" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'my-donations' ? 'sidebar-link--active' : '' %>">
+            My Donations
+        </a>
+        <a href="/dashboard/settings" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'sidebar-link--active' : '' %>">
+            Settings
+        </a>
+    </nav>
+    
+    <% if (typeof showCreateButton !== 'undefined' && showCreateButton) { %>
+    <div class="sidebar-action-area">
+        <a href="/builder/create" class="btn btn--primary btn--full">Create New Campaign</a>
+    </div>
+    <% } %>
+</div>

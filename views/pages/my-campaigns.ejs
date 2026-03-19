@@ -15,18 +15,7 @@
 
 <div class="layout-grid">
     <!-- Sidebar Navigation -->
-    <div class="sidebar-card">
-        <h3 class="sidebar-title">Account Settings</h3>
-        <nav>
-            <a href="/dashboard/profile" class="sidebar-nav-link">Profile Information</a>
-            <a href="/dashboard/my-campaigns" class="sidebar-nav-link active">My Campaigns</a>
-            <a href="/dashboard/my-donations" class="sidebar-nav-link">My Donations</a>
-        </nav>
-        
-        <div class="sidebar-action-area">
-            <a href="/builder/create" class="btn btn--primary btn--full">Create New Campaign</a>
-        </div>
-    </div>
+    <%- include('../partials/dashboard-sidebar', { currentPage: 'my-campaigns', showCreateButton: true }) %>
 
     <!-- Campaigns List -->
     <div>

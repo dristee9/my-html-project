@@ -8,15 +8,7 @@
 
 <div class="dashboard-grid">
     <!-- Sidebar Navigation -->
-    <div class="stat-sidebar">
-        <h3 class="text-xl font-semibold text-gray-800 mb-6">Account Settings</h3>
-        <nav>
-            <a href="/dashboard/profile" class="sidebar-nav-link">Profile Information</a>
-            <a href="/dashboard/my-campaigns" class="sidebar-nav-link">My Campaigns</a>
-            <a href="/dashboard/my-donations" class="sidebar-nav-link">My Donations</a>
-            <a href="/dashboard/settings" class="sidebar-nav-link active">Settings</a>
-        </nav>
-    </div>
+    <%- include('../partials/dashboard-sidebar', { currentPage: 'settings' }) %>
 
     <!-- Settings Content -->
     <div class="settings-container">
