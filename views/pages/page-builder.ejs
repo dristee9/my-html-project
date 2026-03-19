@@ -24,6 +24,9 @@
             <button class="btn btn-outline" id="saveDraftBtn">
                 <i class="icon">💾</i> Save Draft
             </button>
+            <button class="btn btn-outline" id="versionHistoryBtn" onclick="toggleVersionHistory()">
+                <i class="icon">📜</i> Version History
+            </button>
             <button class="btn btn-primary" id="publishBtn">
                 <i class="icon">🚀</i> <%= typeof campaign !== 'undefined' && campaign ? 'Update' : 'Publish' %> Campaign
             </button>
@@ -211,6 +214,21 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Version History Sidebar (Hidden by default) -->
+        <div class="builder-panel builder-panel-right" id="versionHistoryPanel" style="display: none;">
+            <div class="panel-header">
+                <h3>📜 Version History</h3>
+                <button class="btn btn-sm btn-outline" onclick="toggleVersionHistory()">×</button>
+            </div>
+            <div class="panel-content">
+                <div class="properties-content" id="versionHistoryContent">
+                    <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        <p>Loading version history...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -235,6 +253,23 @@
     <% if (typeof campaign !== 'undefined' && campaign) { %>
         window.existingCampaign = <%- JSON.stringify(campaign) %>;
     <% } %>
+    
+    // Toggle version history panel
+    function toggleVersionHistory() {
+        const panel = document.getElementById('versionHistoryPanel');
+        const propertiesPanel = document.getElementById('propertiesPanel').closest('.builder-panel');
+        
+        if (panel.style.display === 'none') {
+            propertiesPanel.style.display = 'none';
+            panel.style.display = 'block';
+            if (window.pageBuilder && window.pageBuilder.showVersionHistory) {
+                window.pageBuilder.showVersionHistory();
+            }
+        } else {
+            panel.style.display = 'none';
+            propertiesPanel.style.display = 'block';
+        }
+    }
     
     // Initialize page builder
     document.addEventListener('DOMContentLoaded', function() {

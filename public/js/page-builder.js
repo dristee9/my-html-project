@@ -1449,6 +1449,93 @@ class PageBuilder {
         this.updateSectionPreview(this.selectedSection);
         this.saveToHistory();
     }
+    
+    // Version History Management
+    async showVersionHistory() {
+        const contentDiv = document.getElementById('versionHistoryContent');
+        if (!contentDiv) return;
+        
+        try {
+            const response = await fetch(`/builder/${this.campaignId}/versions`);
+            if (!response.ok) throw new Error('Failed to load versions');
+            
+            const result = await response.json();
+            const versions = result.versions || [];
+            
+            if (versions.length === 0) {
+                contentDiv.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        <p>No version history yet</p>
+                        <p style="font-size: 0.875rem;">Save your campaign to create versions</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Calculate diff summary
+            const currentSectionsCount = this.sections.length;
+            
+            contentDiv.innerHTML = `
+                <div style="padding: 1rem;">
+                    ${versions.slice().reverse().map((version, index) => {
+                        const prevVersion = versions[versions.length - index - 2];
+                        const sectionsDiff = prevVersion ? version.sections.length - prevVersion.sections.length : version.sections.length;
+                        const diffText = sectionsDiff > 0 ? `+${sectionsDiff} sections` : sectionsDiff < 0 ? `${sectionsDiff} sections` : 'No changes';
+                        const isCurrent = JSON.stringify(version.sections) === JSON.stringify(this.sections);
+                        
+                        return `
+                            <div style="border: 1px solid var(--gray-200); border-radius: var(--border-radius-md); padding: 1rem; margin-bottom: 0.75rem; background: ${isCurrent ? '#f0fdf4' : 'white'};">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--gray-800);">v${version.version}</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">${new Date(version.timestamp).toLocaleString()}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 0.75rem; color: var(--secondary-green); margin-bottom: 0.25rem;">${diffText}</div>
+                                        <div style="font-size: 0.625rem; background: ${version.status === 'published' ? 'var(--primary-blue)' : 'var(--gray-500)'}; color: white; padding: 0.125rem 0.5rem; border-radius: 9999px; display: inline-block;">${version.status}</div>
+                                    </div>
+                                </div>
+                                ${!isCurrent ? `<button onclick="pageBuilder.restoreVersion(${versions.length - index - 1})" style="width: 100%; padding: 0.5rem; background: var(--primary-blue-light); color: var(--primary-blue); border: none; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);" onmouseover="this.style.background='var(--primary-blue)'; this.style.color='white'" onmouseout="this.style.background='var(--primary-blue-light)'; this.style.color='var(--primary-blue)'">Restore This Version</button>` : '<div style="text-align: center; color: var(--secondary-green); font-size: 0.75rem; font-weight: 600;">✓ Current Version</div>'}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading version history:', error);
+            contentDiv.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                    <p>Failed to load version history</p>
+                </div>
+            `;
+        }
+    }
+    
+    async restoreVersion(versionIndex) {
+        if (!confirm('Restore this version? This will replace your current work.')) return;
+        
+        try {
+            const response = await fetch(`/builder/${this.campaignId}/versions`);
+            if (!response.ok) throw new Error('Failed to load versions');
+            
+            const result = await response.json();
+            const versions = result.versions || [];
+            const version = versions[versionIndex];
+            
+            if (!version) return;
+            
+            this.sections = JSON.parse(JSON.stringify(version.sections));
+            this.refreshCanvas();
+            this.saveToHistory();
+            this.showMessage(`Restored version ${version.version}`, 'success');
+            
+            // Close version history panel
+            toggleVersionHistory();
+        } catch (error) {
+            console.error('Error restoring version:', error);
+            this.showMessage('Failed to restore version', 'error');
+        }
+    }
 }
 
 // Initialize when DOM is loaded

@@ -92,8 +92,47 @@
     <h2 class="heading-2">My Active Campaigns</h2>
     <div class="campaign-grid">
         <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
-            <% campaigns.forEach(campaign => { %>
-            <div class="campaign-card">
+            <% 
+                // Sort campaigns by urgency (time to deadline)
+                const sortedCampaigns = campaigns.slice().sort((a, b) => {
+                    const aUrgent = a.status === 'active' ? new Date(a.deadline) - new Date() : Infinity;
+                    const bUrgent = b.status === 'active' ? new Date(b.deadline) - new Date() : Infinity;
+                    return aUrgent - bUrgent;
+                });
+            %>
+            <% sortedCampaigns.forEach(campaign => { %>
+            <% 
+                // Calculate urgency level for color coding
+                let urgencyLevel = 'low';
+                let urgencyColor = 'var(--secondary-green)';
+                let urgencyLabel = '';
+                
+                if (campaign.status === 'active') {
+                    const daysLeft = Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+                    if (daysLeft <= 1) {
+                        urgencyLevel = 'critical';
+                        urgencyColor = '#dc2626'; // Red
+                        urgencyLabel = '🚨 Final Day!';
+                    } else if (daysLeft <= 3) {
+                        urgencyLevel = 'high';
+                        urgencyColor = '#f59e0b'; // Orange
+                        urgencyLabel = '⚡ ' + daysLeft + ' Days Left';
+                    } else if (daysLeft <= 7) {
+                        urgencyLevel = 'medium';
+                        urgencyColor = '#eab308'; // Yellow
+                        urgencyLabel = '⏰ ' + daysLeft + ' Days';
+                    } else {
+                        urgencyLevel = 'low';
+                        urgencyColor = 'var(--secondary-green)'; // Green
+                        urgencyLabel = campaign.daysLeftText;
+                    }
+                } else {
+                    urgencyLevel = 'completed';
+                    urgencyColor = 'var(--gray-500)';
+                    urgencyLabel = campaign.status === 'completed' ? '✅ Completed' : '⏰ Ended';
+                }
+            %>
+            <div class="campaign-card" style="border-left: 4px solid <%= urgencyColor %>;">
                 <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
                 <div class="campaign-details">
                     <div class="campaign-header">
@@ -101,14 +140,14 @@
                             let dashStatusClass = 'badge-' + campaign.status;
                             let dashStatusText = campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1);
                             if (campaign.status === 'active') {
-                                dashStatusText += ' • ' + campaign.daysLeftText;
+                                dashStatusText = urgencyLabel; // Use urgency-based label
                             } else if (campaign.status === 'expired' || campaign.status === 'cancelled') {
                                 dashStatusClass = 'badge-expired';
                             } else if (campaign.status === 'draft') {
                                 dashStatusClass = 'badge-draft';
                             }
                         %>
-                        <span class="status-badge <%= dashStatusClass %>"><%= dashStatusText %></span>
+                        <span class="status-badge <%= dashStatusClass %>" style="background: <%= campaign.status === 'active' ? urgencyColor : '' %>;"><%= dashStatusText %></span>
                         <span class="status-badge badge-category"><%= campaign.category %></span>
                     </div>
                     <h3 class="campaign-name"><%= campaign.title %></h3>

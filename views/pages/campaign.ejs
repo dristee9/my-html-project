@@ -121,6 +121,69 @@
                     <%- include('../partials/campaign-stats', { campaign: campaign }) %>
                 </div>
                 
+                <!-- Countdown Timer -->
+                <% if (campaign.status === 'active' && campaign.daysRemaining > 0) { %>
+                    <div id="countdown-timer" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: var(--border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; text-align: center; box-shadow: var(--shadow-md);">
+                        <h4 style="color: #1e40af; font-size: 1.125rem; margin-bottom: 1rem; font-weight: 600;">⏰ Time Remaining</h4>
+                        <div id="countdown-display" style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                            <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 80px; box-shadow: var(--shadow-sm);">
+                                <div id="days-left" style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);"><%= campaign.daysRemaining %></div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); text-transform: uppercase;">Days</div>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 80px; box-shadow: var(--shadow-sm);">
+                                <div id="hours-left" style="font-size: 2rem; font-weight: 700; color: var(--secondary-green);">0</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); text-transform: uppercase;">Hours</div>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 80px; box-shadow: var(--shadow-sm);">
+                                <div id="minutes-left" style="font-size: 2rem; font-weight: 700; color: #8b5cf6;">0</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); text-transform: uppercase;">Minutes</div>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 80px; box-shadow: var(--shadow-sm);">
+                                <div id="seconds-left" style="font-size: 2rem; font-weight: 700; color: #ec4899;">0</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); text-transform: uppercase;">Seconds</div>
+                            </div>
+                        </div>
+                        <% if (campaign.daysRemaining <= 3) { %>
+                            <p style="color: #dc2626; font-size: 0.875rem; margin-top: 1rem; font-weight: 600;">⚡ Hurry! Only a few days left!</p>
+                        <% } %>
+                    </div>
+                    
+                    <script>
+                        // Countdown timer
+                        (function() {
+                            const deadline = new Date('<%= campaign.deadline.toISOString() %>').getTime();
+                            
+                            function updateCountdown() {
+                                const now = new Date().getTime();
+                                const distance = deadline - now;
+                                
+                                if (distance < 0) {
+                                    document.getElementById('countdown-display').innerHTML = '<div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">Campaign Ended</div>';
+                                    return;
+                                }
+                                
+                                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                                
+                                const daysEl = document.getElementById('days-left');
+                                const hoursEl = document.getElementById('hours-left');
+                                const minutesEl = document.getElementById('minutes-left');
+                                const secondsEl = document.getElementById('seconds-left');
+                                
+                                if (daysEl) daysEl.textContent = days;
+                                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+                                if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+                                if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+                            }
+                            
+                            updateCountdown();
+                            setInterval(updateCountdown, 1000);
+                        })();
+                    </script>
+                <% } %>
+                
                 <!-- Enhanced Backer Statistics -->
                 <% if (campaign.backers.length > 0) { %>
                     <% 
@@ -184,7 +247,11 @@
                                 <strong>Category:</strong> <%= campaign.category %>
                             </div>
                             <div>
-                                <strong>Created:</strong> <%= campaign.createdAt.toLocaleDateString() %>
+                                <% 
+                                    const launchedDays = Math.floor((new Date() - new Date(campaign.createdAt)) / (1000 * 60 * 60 * 24));
+                                %>
+                                <strong>Launched:</strong> <%= campaign.createdAt.toLocaleDateString() %> 
+                                <span style="color: var(--gray-600); font-size: 0.875rem;">(<%= launchedDays %> <%= launchedDays === 1 ? 'day' : 'days' %> ago)</span>
                             </div>
                             <div>
                                 <strong>Deadline:</strong> <%= campaign.deadline.toLocaleDateString() %>
@@ -195,6 +262,15 @@
                                     <%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %>
                                 </span>
                             </div>
+                            <% if (campaign.updatedAt && campaign.updatedAt > campaign.createdAt) { %>
+                                <div>
+                                    <% 
+                                        const updatedHours = Math.floor((new Date() - new Date(campaign.updatedAt)) / (1000 * 60 * 60));
+                                        const timeAgo = updatedHours < 1 ? 'less than an hour' : updatedHours + ' ' + (updatedHours === 1 ? 'hour' : 'hours');
+                                    %>
+                                    <strong>Last Updated:</strong> <span style="color: var(--gray-600); font-size: 0.875rem;"><%= timeAgo %> ago</span>
+                                </div>
+                            <% } %>
                         </div>
                     
                         <!-- Full Backer Wall Section -->
