@@ -1,5 +1,7 @@
 const Campaign = require('../models/Campaign');
 const User = require('../models/User');
+const bkashService = require('../services/bkash');
+const emailService = require('../services/emailService');
 
 // Get all active campaigns for explore page
 exports.getAllCampaigns = async (req, res) => {
@@ -11,7 +13,8 @@ exports.getAllCampaigns = async (req, res) => {
         res.render('pages/explore', {
             title: 'Explore Campaigns - FundMyIdea BD',
             campaigns: campaigns,
-            user: req.user
+            user: req.user,
+            currentPage: 'explore'
         });
     } catch (error) {
         console.error('Error fetching campaigns:', error);
@@ -130,7 +133,8 @@ exports.getUserCampaigns = async (req, res) => {
             title: 'Dashboard - FundMyIdea BD',
             user: req.user,
             campaigns: campaigns,
-            userStats: userStats
+            userStats: userStats,
+            currentPage: 'dashboard'
         });
     } catch (error) {
         console.error('Error fetching user campaigns:', error);
@@ -173,7 +177,8 @@ exports.getDonationPage = async (req, res) => {
             title: `Donate to ${campaign.title} - FundMyIdea BD`,
             campaign: campaignData,
             hasDonated: hasDonated,
-            user: req.user
+            user: req.user,
+            pageStyles: ['donate']
         });
     } catch (error) {
         console.error('Error loading donation page:', error);
@@ -218,7 +223,8 @@ exports.processDonation = async (req, res) => {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
                 campaign: campaignData,
                 user: req.user,
-                error: 'This campaign is no longer accepting donations'
+                error: 'This campaign is no longer accepting donations',
+                pageStyles: ['donate']
             });
         }
         
@@ -235,7 +241,8 @@ exports.processDonation = async (req, res) => {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
                 campaign: campaignData,
                 user: req.user,
-                error: 'Minimum donation amount is 100 BDT'
+                error: 'Minimum donation amount is 100 BDT',
+                pageStyles: ['donate']
             });
         }
         
@@ -246,7 +253,8 @@ exports.processDonation = async (req, res) => {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
                 campaign: campaignData,
                 user: req.user,
-                error: 'Please enter a valid 11-digit bKash number'
+                error: 'Please enter a valid 11-digit bKash number',
+                pageStyles: ['donate']
             });
         }
         
@@ -257,7 +265,8 @@ exports.processDonation = async (req, res) => {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
                 campaign: campaignData,
                 user: req.user,
-                error: 'This campaign is no longer accepting donations'
+                error: 'This campaign is no longer accepting donations',
+                pageStyles: ['donate']
             });
         }
         
@@ -281,6 +290,17 @@ exports.processDonation = async (req, res) => {
         await campaign.save();
         console.log('Campaign saved successfully');
         
+        // Send donation confirmation email (non-blocking)
+        const donor = req.user;
+        emailService.sendDonationConfirmation(
+            donor, 
+            campaign, 
+            donationAmount,
+            null // No bKash transaction ID for manual donations
+        ).catch(err => {
+            console.error('Failed to send donation confirmation email:', err);
+        });
+        
         console.log(`Donation of ${donationAmount} BDT processed for campaign ${campaign.title}`);
         
         // Redirect to campaign page with success flag (POST-Redirect-GET pattern)
@@ -290,7 +310,8 @@ exports.processDonation = async (req, res) => {
         res.status(500).render('pages/donate', {
             title: 'Donate - FundMyIdea BD',
             user: req.user,
-            error: 'Failed to process donation. Please try again.'
+            error: 'Failed to process donation. Please try again.',
+            pageStyles: ['donate']
         });
     }
 };
@@ -365,6 +386,7 @@ exports.searchCampaigns = async (req, res) => {
             title: q ? `Search Results - FundMyIdea BD` : 'Explore Campaigns - FundMyIdea BD',
             campaigns: campaigns,
             user: req.user,
+            currentPage: 'explore',
             searchQuery: q || '',
             searchCategory: category || 'all',
             sortBy: sort || 'newest',
@@ -382,5 +404,129 @@ exports.searchCampaigns = async (req, res) => {
             error: 'Failed to search campaigns',
             user: req.user
         });
+    }
+};
+
+// Initiate bKash payment
+exports.initiateBkashPayment = async (req, res) => {
+    try {
+        const { amount } = req.body;
+        const campaignId = req.params.id;
+        
+        // Validate amount
+        const donationAmount = parseInt(amount);
+        if (donationAmount < 100) {
+            return res.status(400).json({
+                success: false,
+                error: 'Minimum donation amount is 100 BDT'
+            });
+        }
+        
+        // Verify campaign exists and is active
+        const campaign = await Campaign.findById(campaignId);
+        if (!campaign || campaign.status !== 'active') {
+            return res.status(400).json({
+                success: false,
+                error: 'Campaign not found or inactive'
+            });
+        }
+        
+        // Generate unique invoice number
+        const invoiceNumber = `DONATION-${campaignId}-${Date.now()}-${req.user._id}`;
+        const callbackURL = `${process.env.APP_URL || 'http://localhost:3000'}/campaigns/${campaignId}/bkash-callback`;
+        
+        // Create bKash payment
+        const paymentData = await bkashService.createPayment(donationAmount, invoiceNumber, callbackURL);
+        
+        // Store payment ID in session for verification later
+        req.session.bkashPayment = {
+            paymentID: paymentData.paymentID,
+            campaignId: campaignId,
+            amount: donationAmount,
+            invoiceNumber: invoiceNumber
+        };
+        
+        res.json({
+            success: true,
+            bkashURL: paymentData.bkashURL
+        });
+    } catch (error) {
+        console.error('Error initiating bKash payment:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to initiate bKash payment. Please try again.'
+        });
+    }
+};
+
+// Handle bKash payment callback
+exports.handleBkashCallback = async (req, res) => {
+    try {
+        const { paymentID, status } = req.query;
+        const campaignId = req.params.id;
+        
+        // Verify payment status
+        if (status !== 'success' || !paymentID) {
+            return res.redirect(`/campaigns/${campaignId}?payment=failed`);
+        }
+        
+        // Execute payment to confirm and get transaction details
+        const paymentResult = await bkashService.executePayment(paymentID);
+        
+        if (paymentResult.transactionStatus === 'Completed') {
+            // Get campaign and update with donation
+            const campaign = await Campaign.findById(campaignId)
+                .populate('creator', 'username university profileImage');
+            
+            if (!campaign || campaign.status !== 'active') {
+                return res.redirect(`/campaigns/${campaignId}?payment=failed&error=campaign_inactive`);
+            }
+            
+            // Add backer entry with bKash payment details
+            campaign.backers.push({
+                user: req.user._id,
+                amount: parseFloat(paymentResult.amount),
+                message: req.session.bkashPayment?.message || '',
+                paymentMethod: 'bkash',
+                bkashPaymentID: paymentID,
+                bkashTrxID: paymentResult.trxID,
+                bkashStatus: paymentResult.transactionStatus
+            });
+            
+            // Update campaign funding
+            campaign.currentFunding += parseFloat(paymentResult.amount);
+            
+            // Check if funding goal reached
+            if (campaign.currentFunding >= campaign.fundingGoal) {
+                campaign.status = 'completed';
+            }
+            
+            await campaign.save();
+            
+            // Clear session data
+            delete req.session.bkashPayment;
+            
+            // Send donation confirmation email (non-blocking)
+            const donor = req.user;
+            emailService.sendDonationConfirmation(
+                donor, 
+                campaign, 
+                parseFloat(paymentResult.amount),
+                paymentResult.trxID
+            ).catch(err => {
+                console.error('Failed to send donation confirmation email:', err);
+            });
+            
+            console.log(`bKash donation of ${paymentResult.amount} BDT processed successfully. TrxID: ${paymentResult.trxID}`);
+            
+            // Redirect to campaign page with success message
+            res.redirect(`/campaigns/${campaignId}?donated=true&bkash=success`);
+        } else {
+            throw new Error('Payment not completed');
+        }
+    } catch (error) {
+        console.error('Error processing bKash callback:', error);
+        const campaignId = req.params.id;
+        res.redirect(`/campaigns/${campaignId}?payment=failed&error=verification_failed`);
     }
 };

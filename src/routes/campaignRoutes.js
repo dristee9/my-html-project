@@ -57,13 +57,13 @@ router.get('/search', campaignController.searchCampaigns);
 router.get('/:id/donate', authenticateToken, campaignController.getDonationPage);
 router.post('/:id/donate', authenticateToken, donationLimiter, campaignController.processDonation);
 
-// Create campaign route (GET)
+// bKash payment routes
+router.post('/:id/bkash/initiate', authenticateToken, campaignController.initiateBkashPayment);
+router.get('/:id/bkash-callback', authenticateToken, campaignController.handleBkashCallback);
+
+// Create campaign route (GET) - Redirect to page builder
 router.get('/create', authenticateToken, (req, res) => {
-    res.render('pages/create', {
-        title: 'Create Campaign - FundMyIdea BD',
-        user: req.user,
-        error: null
-    });
+    res.redirect('/builder/create');
 });
 
 // Create campaign route (POST)
@@ -101,7 +101,8 @@ router.get('/:id/edit', authenticateToken, async (req, res) => {
         res.render('pages/edit-campaign', {
             title: `Edit ${campaign.title} - FundMyIdea BD`,
             user: req.user,
-            campaign: campaign
+            campaign: campaign,
+            currentPage: 'edit'
         });
     } catch (error) {
         console.error('Error loading edit campaign:', error);

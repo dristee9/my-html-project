@@ -31,13 +31,9 @@ const campaignSchema = new mongoose.Schema({
     },
     deadline: {
         type: Date,
-        required: [true, 'Deadline is required'],
-        validate: {
-            validator: function(date) {
-                return date > Date.now();
-            },
-            message: 'Deadline must be in the future'
-        }
+        required: [true, 'Deadline is required']
+        // Note: Future date validation removed to allow fetching expired campaigns
+        // Validation is now only applied during creation/update via controllers
     },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
@@ -102,8 +98,16 @@ const campaignSchema = new mongoose.Schema({
         },
         amount: Number,
         message: String,
-        bkashNumberLast4: String, // Store only last 4 digits for privacy
-        transactionId: String, // For future bKash API integration
+        bkashNumberLast4: String, // Store only last 4 digits for privacy (legacy)
+        paymentMethod: {
+            type: String,
+            enum: ['manual', 'bkash'],
+            default: 'manual'
+        },
+        bkashPaymentID: String, // bKash payment ID for API integration
+        bkashTrxID: String, // bKash transaction ID
+        bkashStatus: String, // bKash payment status
+        transactionId: String, // For future bKash API integration (legacy field)
         donatedAt: {
             type: Date,
             default: Date.now

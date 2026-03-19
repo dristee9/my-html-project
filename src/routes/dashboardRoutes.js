@@ -48,4 +48,9 @@ router.post('/profile', upload.single('profileImage'), dashboardController.updat
 router.get('/my-campaigns', dashboardController.getMyCampaigns);
 router.get('/my-donations', dashboardController.getMyDonations);
 
+// Settings routes
+router.get('/settings', dashboardController.getSettings);
+router.post('/settings/password', dashboardController.changePassword);
+router.delete('/settings/account', dashboardController.deleteAccount);
+
 module.exports = router;

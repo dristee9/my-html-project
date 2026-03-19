@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const emailService = require('../services/emailService');
 
 // Validation rules
 const registerValidation = [
@@ -77,22 +78,20 @@ exports.register = [
 
             await user.save();
 
-            // Generate JWT token
-            const token = jwt.sign(
-                { userId: user._id }, 
-                process.env.JWT_SECRET,
-                { expiresIn: '7d' }
-            );
-
-            // Set cookie
-            res.cookie('token', token, {
-                httpOnly: true,
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
+            // Generate email verification token
+            const verificationToken = await user.generateEmailVerificationToken();
+            await user.save();
+            
+            // Send verification email (non-blocking)
+            emailService.sendEmailVerification(user, verificationToken).catch(err => {
+                console.error('Failed to send verification email:', err);
             });
 
-            res.redirect('/dashboard');
+            // Render "check your email" page instead of logging in
+            return res.render('pages/verify-email-pending', {
+                title: 'Verify Your Email - FundMyIdea BD',
+                email: user.email
+            });
         } catch (error) {
             console.error('Registration error:', error);
             res.status(500).render('pages/register', {
@@ -117,7 +116,8 @@ exports.login = [
                 return res.status(400).render('pages/login', {
                     error: errors.array()[0].msg,
                     formData: {
-                        email: req.body.email
+                        email: req.body.email,
+                        next: req.body.next
                     }
                 });
             }
@@ -130,7 +130,8 @@ exports.login = [
                 return res.status(400).render('pages/login', {
                     error: 'Invalid email or password',
                     formData: {
-                        email: req.body.email
+                        email: req.body.email,
+                        next: req.body.next
                     }
                 });
             }
@@ -141,7 +142,8 @@ exports.login = [
                 return res.status(400).render('pages/login', {
                     error: 'Invalid email or password',
                     formData: {
-                        email: req.body.email
+                        email: req.body.email,
+                        next: req.body.next
                     }
                 });
             }
@@ -160,7 +162,9 @@ exports.login = [
                 secure: process.env.NODE_ENV === 'production'
             });
 
-            res.redirect('/dashboard');
+            // Redirect to intended destination or dashboard
+            const redirectTo = req.body.next && req.body.next.startsWith('/') ? req.body.next : '/dashboard';
+            res.redirect(redirectTo);
         } catch (error) {
             console.error('Login error:', error);
             res.status(500).render('pages/login', {
@@ -184,7 +188,17 @@ exports.getLogin = (req, res) => {
     if (req.user) {
         return res.redirect('/dashboard');
     }
-    res.render('pages/login', { error: null, formData: {} });
+    
+    // Get the 'next' parameter from query string if it exists
+    const nextUrl = req.query.next || '';
+    
+    res.render('pages/login', { 
+        error: null, 
+        formData: {
+            next: nextUrl
+        },
+        currentPage: 'login'
+    });
 };
 
 // Render register page
@@ -192,7 +206,11 @@ exports.getRegister = (req, res) => {
     if (req.user) {
         return res.redirect('/dashboard');
     }
-    res.render('pages/register', { error: null, formData: {} });
+    res.render('pages/register', { 
+        error: null, 
+        formData: {},
+        currentPage: 'register'
+    });
 };
 
 // Refresh JWT token endpoint for AJAX requests

@@ -11,16 +11,17 @@
         
         <div class="nav-links" id="navLinks">
             <% if (typeof user !== 'undefined' && user) { %>
-                <a href="/campaigns" class="nav-item">Explore Campaigns</a>
-                <a href="/builder/create" class="nav-item">Create Campaign</a>
-                <a href="/dashboard" class="nav-item">Dashboard</a>
+                <a href="/campaigns" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'explore' ? 'active' : '' %>">Explore Campaigns</a>
+                <a href="/builder/create" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'create' ? 'active' : '' %>">Create Campaign</a>
+                <a href="/dashboard" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">Dashboard</a>
                 <form method="POST" action="/logout" style="display: inline;">
+                    <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
                     <button type="submit" class="nav-item logout-button">Logout</button>
                 </form>
             <% } else { %>
-                <a href="/campaigns" class="nav-item">Explore Campaigns</a>
-                <a href="/login" class="nav-item">Login</a>
-                <a href="/register" class="nav-item">Register</a>
+                <a href="/campaigns" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'explore' ? 'active' : '' %>">Explore Campaigns</a>
+                <a href="/login" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'login' ? 'active' : '' %>">Login</a>
+                <a href="/register" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'register' ? 'active' : '' %>">Register</a>
             <% } %>
         </div>
     </div>

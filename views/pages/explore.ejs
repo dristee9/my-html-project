@@ -3,11 +3,11 @@
 
 <section class="page-section">
     <% if (typeof searchQuery !== 'undefined' && searchQuery && searchQuery.trim() !== '') { %>
-        <h1 class="section-title">Search Results for: "<%= searchQuery %>"</h1>
+        <h1 class="heading-1">Search Results for: "<%= searchQuery %>"</h1>
     <% } else if (typeof searchCategory !== 'undefined' && searchCategory && searchCategory !== 'all') { %>
-        <h1 class="section-title">Browse Category: <%= searchCategory %></h1>
+        <h1 class="heading-1">Browse Category: <%= searchCategory %></h1>
     <% } else { %>
-        <h1 class="section-title">Explore Student Campaigns</h1>
+        <h1 class="heading-1">Explore Student Campaigns</h1>
     <% } %>
     
     <!-- Search and Filter Bar -->
@@ -29,7 +29,7 @@
                     <option value="most-funded" <%= typeof sortBy !== 'undefined' && sortBy === 'most-funded' ? 'selected' : '' %>>Most Funded</option>
                     <option value="ending-soon" <%= typeof sortBy !== 'undefined' && sortBy === 'ending-soon' ? 'selected' : '' %>>Ending Soon</option>
                 </select>
-                <button type="submit" class="primary-button" style="padding: 0.75rem 2rem;">Search</button>
+                <button type="submit" class="btn btn--primary" style="padding: 0.75rem 2rem;">Search</button>
             </div>
         </form>
         
@@ -77,10 +77,10 @@
         <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
             <% campaigns.forEach(campaign => { %>
             <div class="campaign-card">
-                <img src="<%= campaign.imageUrl || 'https://via.placeholder.com/400x200/f3f4f6/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20)) %>" alt="<%= campaign.title %>" class="campaign-image">
+                <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                 <div class="campaign-details">
                     <div class="campaign-header">
-                        <span class="status-badge badge-active">Active • <%= campaign.daysLeftText %></span>
+                        <span class="status-badge badge-<%= campaign.status === 'active' ? 'active' : (campaign.status === 'completed' ? 'completed' : 'expired') %>"><%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %><%= campaign.status === 'active' ? ' • ' + campaign.daysLeftText : '' %></span>
                         <span class="status-badge badge-category"><%= campaign.category %></span>
                     </div>
                     <h3 class="campaign-name"><%= campaign.title %></h3>
@@ -95,21 +95,56 @@
                         </div>
                     </div>
                     <div class="campaign-footer">
-                        <span class="time-remaining"><%= campaign.daysLeftText %></span>
                         <a href="/campaigns/<%= campaign._id %>" class="view-button">View Details</a>
                     </div>
                 </div>
             </div>
             <% }) %>
         <% } else { %>
-            <div class="empty-state-box">
-                <h3 class="empty-state-title">No campaigns found</h3>
-                <p class="empty-state-text">Be the first to create a campaign and inspire others!</p>
-                <% if (typeof user !== 'undefined' && user) { %>
-                    <a href="/builder/create" class="primary-button">Create Your First Campaign</a>
+            <div class="empty-state-box" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); max-width: 600px; margin: 3rem auto;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+                <h3 class="empty-state-title" style="font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem;">No campaigns found</h3>
+                
+                <% if (typeof searchQuery !== 'undefined' && searchQuery && searchQuery.trim() !== '') { %>
+                    <p class="empty-state-text" style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                        No results matched "<strong><%= searchQuery %></strong>". Try different keywords or browse all campaigns.
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="/campaigns/search?q=&category=all&sort=newest" class="btn btn--primary">Browse All Campaigns</a>
+                        <a href="/builder/create" class="btn btn--secondary">Create Your Own</a>
+                    </div>
+                <% } else if (typeof searchCategory !== 'undefined' && searchCategory && searchCategory !== 'all') { %>
+                    <p class="empty-state-text" style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                        There are no campaigns in the <strong><%= searchCategory %></strong> category yet.
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="/campaigns/search?category=all&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" class="btn btn--primary">View All Categories</a>
+                        <a href="/builder/create?category=<%= encodeURIComponent(searchCategory) %>" class="btn btn--secondary">Create in This Category</a>
+                    </div>
                 <% } else { %>
-                    <a href="/register" class="primary-button">Get Started</a>
+                    <p class="empty-state-text" style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                        Be the first to create a campaign and inspire others!
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <% if (typeof user !== 'undefined' && user) { %>
+                            <a href="/builder/create" class="btn btn--primary">Create Your First Campaign</a>
+                        <% } else { %>
+                            <a href="/register" class="btn btn--primary">Get Started</a>
+                            <a href="/campaigns/search?q=&category=all&sort=newest" class="btn btn--secondary">Browse All Campaigns</a>
+                        <% } %>
+                    </div>
                 <% } %>
+                
+                <!-- Popular Categories Suggestions -->
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gray-200);">
+                    <h4 style="font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 1rem;">📊 Browse Popular Categories:</h4>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="/campaigns/search?category=Technology&sort=newest" class="category-tag" style="background: var(--gray-100); color: var(--gray-700); padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem;">Technology</a>
+                        <a href="/campaigns/search?category=Education&sort=newest" class="category-tag" style="background: var(--gray-100); color: var(--gray-700); padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem;">Education</a>
+                        <a href="/campaigns/search?category=Social Impact&sort=newest" class="category-tag" style="background: var(--gray-100); color: var(--gray-700); padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem;">Social Impact</a>
+                        <a href="/campaigns/search?category=Arts & Culture&sort=newest" class="category-tag" style="background: var(--gray-100); color: var(--gray-700); padding: 0.5rem 1rem; border-radius: var(--border-radius-full); text-decoration: none; font-size: 0.875rem;">Arts & Culture</a>
+                    </div>
+                </div>
             </div>
         <% } %>
     </div>

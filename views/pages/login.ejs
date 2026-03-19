@@ -1,9 +1,10 @@
 <% layout('layouts/main') -%>
 <% title = 'Login - FundMyIdea BD' -%>
 
-<form class="auth-form" method="POST" action="/login">
+<form class="form-card auth-form js-form" method="POST" action="/login">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <h2 class="form-title">Login to FundMyIdea BD</h2>
+    <input type="hidden" name="next" value="<%= typeof formData !== 'undefined' && formData.next ? formData.next : '' %>">
+    <h2 class="heading-2 auth-form-title">Login to FundMyIdea BD</h2>
     
     <% if (typeof error !== 'undefined' && error) { %>
         <div class="error-banner mb-4">
@@ -32,7 +33,7 @@
             required>
     </div>
     
-    <button type="submit" class="submit-button">Login to Account</button>
+    <button type="submit" class="btn btn--primary btn--full">Login to Account</button>
     
     <div class="form-footer">
         Don't have an account? <a href="/register" class="form-link">Register here</a>

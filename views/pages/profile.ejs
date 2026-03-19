@@ -1,25 +1,33 @@
 <% layout('layouts/main') -%>
 <% title = 'My Profile - FundMyIdea BD' -%>
 
+<%- include('../partials/breadcrumbs', {
+    breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Profile' }
+    ]
+}) %>
+
 <div class="dashboard-header">
-    <h1 class="dashboard-title">My Profile</h1>
+    <h1 class="heading-1">My Profile</h1>
     <p class="dashboard-subtitle">Manage your account information</p>
 </div>
 
+<!-- Success Banner -->
+<% if (typeof saved !== 'undefined' && saved) { %>
+<div class="success-banner mb-6 p-4 bg-green-50 border border-green-200 rounded-lg" style="background: #f0fdf4; border-color: #bbf7d0; border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1.5rem;">
+    <h3 class="font-semibold text-green-800" style="color: #166534; font-weight: 600; margin-bottom: 0.25rem;">✓ Profile Updated Successfully!</h3>
+    <p class="text-green-700 text-sm" style="color: #15803d; font-size: 0.875rem;">Your profile information has been saved.</p>
+</div>
+<% } %>
+
 <div class="dashboard-grid">
     <!-- Sidebar Navigation -->
-    <div class="stat-sidebar">
-        <h3 class="text-xl font-semibold text-gray-800 mb-6">Account Settings</h3>
-        <nav>
-            <a href="/dashboard/profile" class="sidebar-nav-link active">Profile Information</a>
-            <a href="/dashboard/my-campaigns" class="sidebar-nav-link">My Campaigns</a>
-            <a href="/dashboard/my-donations" class="sidebar-nav-link">My Donations</a>
-        </nav>
-    </div>
+    <%- include('../partials/dashboard-sidebar', { currentPage: 'profile' }) %>
 
     <!-- Profile Form -->
     <div class="card-shadow">
-        <form method="POST" action="/dashboard/profile">
+        <form method="POST" action="/dashboard/profile" class="js-form">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="form-group">
                 <label class="form-label">Username</label>
@@ -53,7 +61,7 @@
                 <small class="form-help-text">Upload a profile picture (JPG, PNG, max 2MB)</small>
             </div>
             
-            <button type="submit" class="submit-button">Update Profile</button>
+            <button type="submit" class="btn btn--primary btn--full">Update Profile</button>
         </form>
     </div>
 </div>

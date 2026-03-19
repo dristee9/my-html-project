@@ -1,21 +1,21 @@
 <% layout('layouts/main') -%>
 <% title = 'My Donations - FundMyIdea BD' -%>
 
+<%- include('../partials/breadcrumbs', {
+    breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'My Donations' }
+    ]
+}) %>
+
 <div class="dashboard-header">
-    <h1 class="dashboard-title">My Donations</h1>
+    <h1 class="heading-1">My Donations</h1>
     <p class="dashboard-subtitle">Track your contributions to student campaigns</p>
 </div>
 
 <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 2rem; max-width: 1200px; margin: 0 auto;">
     <!-- Sidebar Navigation -->
-    <div style="background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
-        <h3 style="margin-bottom: 1.5rem; color: var(--gray-800);">Account Settings</h3>
-        <nav>
-            <a href="/dashboard/profile" style="display: block; padding: 0.75rem 1rem; color: var(--gray-700); text-decoration: none; border-radius: var(--border-radius-lg); margin-bottom: 0.5rem;">Profile Information</a>
-            <a href="/dashboard/my-campaigns" style="display: block; padding: 0.75rem 1rem; color: var(--gray-700); text-decoration: none; border-radius: var(--border-radius-lg); margin-bottom: 0.5rem;">My Campaigns</a>
-            <a href="/dashboard/my-donations" style="display: block; padding: 0.75rem 1rem; background: var(--primary-blue); color: white; text-decoration: none; border-radius: var(--border-radius-lg);">My Donations</a>
-        </nav>
-    </div>
+    <%- include('../partials/dashboard-sidebar', { currentPage: 'my-donations' }) %>
 
     <!-- Donations List -->
     <div>
@@ -37,7 +37,7 @@
                             <% donations.forEach(donation => { %>
                             <tr style="border-bottom: 1px solid var(--gray-200);">
                                 <td style="padding: 1rem;">
-                                    <div style="font-weight: 600;"><%= donation.campaignTitle %></div>
+                                    <a href="/campaigns/<%= donation.campaignId %>" style="font-weight: 600; color: var(--primary-blue); text-decoration: none;"><%= donation.campaignTitle %></a>
                                     <div style="color: var(--gray-500); font-size: 0.875rem;">by <%= donation.creatorName %></div>
                                 </td>
                                 <td style="padding: 1rem; font-weight: 600; color: var(--secondary-green);"><%= donation.amount %> BDT</td>
@@ -54,7 +54,7 @@
                 <div style="text-align: center; padding: 3rem;">
                     <h3 style="color: var(--gray-600); margin-bottom: 1rem;">No donations yet</h3>
                     <p style="color: var(--gray-500); margin-bottom: 2rem;">You haven't made any donations to campaigns yet.</p>
-                    <a href="/campaigns" class="primary-button">Explore Campaigns</a>
+                    <a href="/campaigns" class="btn btn--primary">Explore Campaigns</a>
                 </div>
             <% } %>
         </div>

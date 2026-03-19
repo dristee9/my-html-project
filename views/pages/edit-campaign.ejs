@@ -1,9 +1,17 @@
 <% layout('layouts/main') -%>
 <% title = 'Edit Campaign - FundMyIdea BD' -%>
 
-<form class="auth-form campaign-form" method="POST" action="/campaigns/<%= campaign ? campaign._id : 'id' %>/edit" enctype="multipart/form-data">
+<%- include('../partials/breadcrumbs', {
+    breadcrumbs: [
+        { label: 'Campaigns', href: '/campaigns' },
+        { label: campaign ? campaign.title : 'Edit Campaign', href: campaign ? '/campaigns/' + campaign._id : '#' },
+        { label: 'Edit' }
+    ]
+}) %>
+
+<form class="form-card campaign-form" method="POST" action="/campaigns/<%= campaign ? campaign._id : 'id' %>/edit" enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <h2 class="form-title">Edit Your Campaign</h2>
+    <h2 class="heading-2">Edit Your Campaign</h2>
     
     <% if (typeof error !== 'undefined' && error) { %>
         <div class="error-banner mb-4">
@@ -61,7 +69,7 @@
     </div>
     
     <div class="flex gap-4 mt-6">
-        <button type="submit" class="submit-button btn-success">Update Campaign</button>
-        <a href="/campaigns/<%= campaign ? campaign._id : 'id' %>" class="secondary-button">Cancel</a>
+        <button type="submit" class="btn btn--success btn--full btn--lg">Update Campaign</button>
+        <a href="/campaigns/<%= campaign ? campaign._id : 'id' %>" class="btn btn--secondary">Cancel</a>
     </div>
 </form>

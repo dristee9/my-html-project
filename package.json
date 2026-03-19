@@ -18,6 +18,7 @@
   "author": "FundMyIdea BD Team",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",

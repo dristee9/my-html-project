@@ -4,7 +4,7 @@
 <!-- Hero Section -->
 <section class="landing-hero">
     <div class="hero-content">
-        <h1 class="hero-title">Empower Student Innovation</h1>
+        <h1 class="heading-1">Empower Student Innovation</h1>
         <p class="hero-subtitle">FundMyIdea BD connects passionate students with supporters to bring groundbreaking ideas to life. Join our community of innovators and changemakers today.</p>
         
         <!-- Search Bar -->
@@ -16,16 +16,16 @@
                 class="form-control" 
                 style="flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--gray-300); border-radius: var(--border-radius-lg); font-size: 1rem;"
             >
-            <button type="submit" class="primary-button" style="padding: 0.75rem 2rem;">Search</button>
+            <button type="submit" class="btn btn--primary" style="padding: 0.75rem 2rem;">Search</button>
         </form>
         
         <div class="hero-actions">
             <% if (typeof user !== 'undefined' && user) { %>
-                <a href="/builder/create" class="primary-button">Start Your Campaign</a>
-                <a href="/campaigns" class="secondary-button">Browse Projects</a>
+                <a href="/campaigns" class="btn btn--primary">Explore Campaigns</a>
+                <a href="/builder/create" class="btn btn--secondary">Start a Campaign</a>
             <% } else { %>
-                <a href="/register" class="primary-button">Get Started</a>
-                <a href="/campaigns" class="secondary-button">Explore Campaigns</a>
+                <a href="/campaigns" class="btn btn--primary">Explore Campaigns</a>
+                <a href="/register" class="btn btn--secondary">Get Started</a>
             <% } %>
         </div>
 
@@ -50,16 +50,16 @@
 <% if (typeof recommendedCampaigns !== 'undefined' && recommendedCampaigns.length > 0) { %>
 <section class="page-section">
     <div class="section-header">
-        <h2 class="section-title">Recommended For You</h2>
+        <h2 class="heading-2">Recommended For You</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
     <div class="campaign-grid">
         <% recommendedCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
-                    <img src="<%= campaign.imageUrl || '/images/default-campaign.jpg' %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
-                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
                         <div class="campaign-meta">
                             <span class="campaign-category"><%= campaign.category %></span>
@@ -68,7 +68,7 @@
                         <div class="campaign-stats">
                             <div class="funding-progress">
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
                                 </div>
                                 <div class="funding-amount">
                                     <span><%= campaign.currentFunding %> BDT</span>
@@ -88,16 +88,16 @@
 <!-- Trending Campaigns -->
 <section class="page-section">
     <div class="section-header">
-        <h2 class="section-title">🔥 Trending Campaigns</h2>
+        <h2 class="heading-2">🔥 Trending Campaigns</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
     <div class="campaign-grid">
         <% trendingCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
-                    <img src="<%= campaign.imageUrl || '/images/default-campaign.jpg' %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
-                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
                         <div class="campaign-meta">
                             <span class="campaign-category"><%= campaign.category %></span>
@@ -106,7 +106,7 @@
                         <div class="campaign-stats">
                             <div class="funding-progress">
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
                                 </div>
                                 <div class="funding-amount">
                                     <span><%= campaign.currentFunding %> BDT</span>
@@ -125,16 +125,16 @@
 <!-- Newest Campaigns -->
 <section class="page-section">
     <div class="section-header">
-        <h2 class="section-title">✨ Newest Campaigns</h2>
+        <h2 class="heading-2">✨ Newest Campaigns</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
     <div class="campaign-grid">
         <% newestCampaigns.forEach(campaign => { %>
             <div class="campaign-card">
                 <a href="/campaigns/<%= campaign._id %>">
-                    <img src="<%= campaign.imageUrl || '/images/default-campaign.jpg' %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
-                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
                         <div class="campaign-meta">
                             <span class="campaign-category"><%= campaign.category %></span>
@@ -143,7 +143,7 @@
                         <div class="campaign-stats">
                             <div class="funding-progress">
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: <%= campaign.fundingPercentage %>%"></div>
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
                                 </div>
                                 <div class="funding-amount">
                                     <span><%= campaign.currentFunding %> BDT</span>

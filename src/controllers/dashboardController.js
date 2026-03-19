@@ -7,12 +7,12 @@ exports.getDashboard = async (req, res) => {
         const campaigns = await Campaign.find({ creator: req.user._id })
             .sort({ createdAt: -1 });
         
-        // Calculate user statistics
+        // Calculate user statistics - only for ACTIVE campaigns
         const activeCampaigns = campaigns.filter(c => c.status === 'active');
         const userStats = {
             campaignsCount: activeCampaigns.length,
-            totalRaised: campaigns.reduce((sum, camp) => sum + camp.currentFunding, 0),
-            donationsCount: campaigns.reduce((sum, camp) => sum + camp.backers.length, 0)
+            totalRaised: activeCampaigns.reduce((sum, camp) => sum + camp.currentFunding, 0),
+            donationsCount: activeCampaigns.reduce((sum, camp) => sum + camp.backers.length, 0)
         };
         
         // Find campaigns expiring in next 3 days
@@ -70,7 +70,8 @@ exports.getDashboard = async (req, res) => {
             campaigns: campaigns,
             userStats: userStats,
             expiringSoon: expiringSoon,
-            recentActivities: recentActivities
+            recentActivities: recentActivities,
+            currentPage: 'dashboard'
         });
     } catch (error) {
         console.error('Error fetching user dashboard:', error);
@@ -84,9 +85,13 @@ exports.getDashboard = async (req, res) => {
 
 // Get user profile
 exports.getProfile = (req, res) => {
+    const saved = req.query.saved === 'true';
+    
     res.render('pages/profile', {
         title: 'My Profile - FundMyIdea BD',
-        user: req.user
+        user: req.user,
+        saved: saved,
+        currentPage: 'profile'
     });
 };
 
@@ -122,7 +127,8 @@ exports.updateProfile = async (req, res) => {
         // Refresh user data
         req.user = user;
         
-        res.redirect('/dashboard/profile');
+        // Redirect with success flag
+        res.redirect('/dashboard/profile?saved=true');
     } catch (error) {
         console.error('Error updating profile:', error);
         res.render('pages/profile', {
@@ -142,7 +148,8 @@ exports.getMyCampaigns = async (req, res) => {
         res.render('pages/my-campaigns', {
             title: 'My Campaigns - FundMyIdea BD',
             user: req.user,
-            campaigns: campaigns
+            campaigns: campaigns,
+            currentPage: 'my-campaigns'
         });
     } catch (error) {
         console.error('Error fetching user campaigns:', error);
@@ -180,7 +187,8 @@ exports.getMyDonations = async (req, res) => {
         res.render('pages/my-donations', {
             title: 'My Donations - FundMyIdea BD',
             user: req.user,
-            donations: donations
+            donations: donations,
+            currentPage: 'my-donations'
         });
     } catch (error) {
         console.error('Error fetching user donations:', error);
@@ -188,6 +196,121 @@ exports.getMyDonations = async (req, res) => {
             title: 'Error - FundMyIdea BD',
             error: 'Failed to load donations',
             user: req.user
+        });
+    }
+};
+
+// Get settings page
+exports.getSettings = (req, res) => {
+    res.render('pages/settings', {
+        title: 'Account Settings - FundMyIdea BD',
+        user: req.user,
+        success: null,
+        error: null,
+        currentPage: 'settings'
+    });
+};
+
+// Change password
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        
+        // Validation
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.render('pages/settings', {
+                title: 'Account Settings - FundMyIdea BD',
+                user: req.user,
+                error: 'All fields are required'
+            });
+        }
+        
+        if (newPassword.length < 6) {
+            return res.render('pages/settings', {
+                title: 'Account Settings - FundMyIdea BD',
+                user: req.user,
+                error: 'New password must be at least 6 characters'
+            });
+        }
+        
+        if (newPassword !== confirmPassword) {
+            return res.render('pages/settings', {
+                title: 'Account Settings - FundMyIdea BD',
+                user: req.user,
+                error: 'New passwords do not match'
+            });
+        }
+        
+        // Fetch user with password
+        const user = await User.findById(req.user._id);
+        
+        // Verify current password
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            return res.render('pages/settings', {
+                title: 'Account Settings - FundMyIdea BD',
+                user: req.user,
+                error: 'Current password is incorrect'
+            });
+        }
+        
+        // Update password (pre-save hook will hash it)
+        user.password = newPassword;
+        await user.save();
+        
+        res.render('pages/settings', {
+            title: 'Account Settings - FundMyIdea BD',
+            user: req.user,
+            success: 'Password changed successfully!',
+            error: null
+        });
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.render('pages/settings', {
+            title: 'Account Settings - FundMyIdea BD',
+            user: req.user,
+            error: 'Failed to change password. Please try again.'
+        });
+    }
+};
+
+// Delete account
+exports.deleteAccount = async (req, res) => {
+    try {
+        const { password } = req.body;
+        
+        if (!password) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Password is required' 
+            });
+        }
+        
+        // Verify password
+        const user = await User.findById(req.user._id);
+        const isMatch = await user.comparePassword(password);
+        
+        if (!isMatch) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Incorrect password' 
+            });
+        }
+        
+        // Delete all user's campaigns
+        await Campaign.deleteMany({ creator: req.user._id });
+        
+        // Delete user account
+        await User.findByIdAndDelete(req.user._id);
+        
+        // Clear cookie and redirect
+        res.clearCookie('token');
+        res.json({ success: true, redirect: '/' });
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to delete account' 
         });
     }
 };
