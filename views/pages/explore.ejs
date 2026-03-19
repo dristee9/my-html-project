@@ -3,11 +3,11 @@
 
 <section class="page-section">
     <% if (typeof searchQuery !== 'undefined' && searchQuery && searchQuery.trim() !== '') { %>
-        <h1 class="section-title">Search Results for: "<%= searchQuery %>"</h1>
+        <h1 class="heading-1">Search Results for: "<%= searchQuery %>"</h1>
     <% } else if (typeof searchCategory !== 'undefined' && searchCategory && searchCategory !== 'all') { %>
-        <h1 class="section-title">Browse Category: <%= searchCategory %></h1>
+        <h1 class="heading-1">Browse Category: <%= searchCategory %></h1>
     <% } else { %>
-        <h1 class="section-title">Explore Student Campaigns</h1>
+        <h1 class="heading-1">Explore Student Campaigns</h1>
     <% } %>
     
     <!-- Search and Filter Bar -->

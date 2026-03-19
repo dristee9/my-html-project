@@ -2,7 +2,7 @@
 <% title = 'Dashboard - FundMyIdea BD' -%>
 
 <div class="dashboard-header">
-    <h1 class="dashboard-title">Welcome back, <%= user.username %>!</h1>
+    <h1 class="heading-1">Welcome back, <%= user.username %>!</h1>
     <p class="dashboard-subtitle">Manage your campaigns and track your progress</p>
 </div>
 
@@ -24,7 +24,7 @@
 
 <!-- Quick Actions Section -->
 <section class="quick-actions-section mb-8">
-    <h2 class="section-title text-lg font-semibold mb-4">Quick Actions</h2>
+    <h2 class="heading-2 text-lg font-semibold mb-4">Quick Actions</h2>
     <div class="flex gap-4 flex-wrap">
         <a href="/builder/create" class="primary-button inline-flex items-center gap-2">
             <span class="text-xl">➕</span>
@@ -44,7 +44,7 @@
 <!-- Expiring Soon Alert -->
 <% if (typeof expiringSoon !== 'undefined' && expiringSoon.length > 0) { %>
 <section class="expiring-alerts-section mb-8">
-    <h2 class="section-title text-lg font-semibold mb-4 text-error">⚠️ Campaigns Expiring Soon</h2>
+    <h2 class="heading-2 text-lg font-semibold mb-4 text-error">⚠️ Campaigns Expiring Soon</h2>
     <div class="grid grid-cols-1 md-grid-cols-2 gap-4">
         <% expiringSoon.forEach(campaign => { 
             const daysLeft = Math.ceil((campaign.deadline - new Date()) / (1000 * 60 * 60 * 24));
@@ -73,7 +73,7 @@
 
 <!-- My Campaigns Section -->
 <section class="page-section">
-    <h2 class="section-title">My Active Campaigns</h2>
+    <h2 class="heading-2">My Active Campaigns</h2>
     <div class="campaign-grid">
         <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
             <% campaigns.forEach(campaign => { %>
@@ -116,7 +116,7 @@
 
 <!-- Recent Donations -->
 <section class="page-section">
-    <h2 class="section-title">Recent Donations Received</h2>
+    <h2 class="heading-2">Recent Donations Received</h2>
     <div class="table-container">
         <table class="data-table">
             <thead>
@@ -140,7 +140,7 @@
 
 <!-- Recent Activity Feed -->
 <section class="page-section">
-    <h2 class="section-title">Recent Activity</h2>
+    <h2 class="heading-2">Recent Activity</h2>
     <% if (typeof recentActivities !== 'undefined' && recentActivities.length > 0) { %>
     <div class="activity-feed bg-white rounded-xl shadow-lg p-6">
         <div class="space-y-4">

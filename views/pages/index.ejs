@@ -4,7 +4,7 @@
 <!-- Hero Section -->
 <section class="landing-hero">
     <div class="hero-content">
-        <h1 class="hero-title">Empower Student Innovation</h1>
+        <h1 class="heading-1">Empower Student Innovation</h1>
         <p class="hero-subtitle">FundMyIdea BD connects passionate students with supporters to bring groundbreaking ideas to life. Join our community of innovators and changemakers today.</p>
         
         <!-- Search Bar -->
@@ -50,7 +50,7 @@
 <% if (typeof recommendedCampaigns !== 'undefined' && recommendedCampaigns.length > 0) { %>
 <section class="page-section">
     <div class="section-header">
-        <h2 class="section-title">Recommended For You</h2>
+        <h2 class="heading-2">Recommended For You</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
     <div class="campaign-grid">
@@ -59,7 +59,7 @@
                 <a href="/campaigns/<%= campaign._id %>">
                     <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
-                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
                         <div class="campaign-meta">
                             <span class="campaign-category"><%= campaign.category %></span>
@@ -88,7 +88,7 @@
 <!-- Trending Campaigns -->
 <section class="page-section">
     <div class="section-header">
-        <h2 class="section-title">🔥 Trending Campaigns</h2>
+        <h2 class="heading-2">🔥 Trending Campaigns</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
     <div class="campaign-grid">
@@ -97,7 +97,7 @@
                 <a href="/campaigns/<%= campaign._id %>">
                     <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
-                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
                         <div class="campaign-meta">
                             <span class="campaign-category"><%= campaign.category %></span>
@@ -125,7 +125,7 @@
 <!-- Newest Campaigns -->
 <section class="page-section">
     <div class="section-header">
-        <h2 class="section-title">✨ Newest Campaigns</h2>
+        <h2 class="heading-2">✨ Newest Campaigns</h2>
         <a href="/campaigns" class="view-all-link">View All →</a>
     </div>
     <div class="campaign-grid">
@@ -134,7 +134,7 @@
                 <a href="/campaigns/<%= campaign._id %>">
                     <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>", alt="<%= campaign.title %>" class="campaign-image">
                     <div class="campaign-content">
-                        <h3 class="campaign-title"><%= campaign.title %></h3>
+                        <h3 class="heading-3"><%= campaign.title %></h3>
                         <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
                         <div class="campaign-meta">
                             <span class="campaign-category"><%= campaign.category %></span>

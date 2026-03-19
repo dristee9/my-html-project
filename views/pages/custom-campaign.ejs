@@ -158,7 +158,7 @@
                     <span class="status-badge badge-category"><%= campaign.category %></span>
                 </div>
                 
-                <h1 class="campaign-title"><%= campaign.title %></h1>
+                <h1 class="heading-1"><%= campaign.title %></h1>
                 <p class="campaign-author-detail">by <%= campaign.creator.username %>, <%= campaign.creator.university %> Student</p>
                 
                 <div class="funding-summary">
@@ -176,7 +176,7 @@
             </div>
             
             <div class="campaign-description">
-                <h2 class="section-subtitle">About this Campaign</h2>
+                <h2 class="heading-3">About this Campaign</h2>
                 <div class="description-content">
                     <p><%= campaign.description %></p>
                 </div>
@@ -184,7 +184,7 @@
             
             <% if (typeof user !== 'undefined' && user && campaign.creator._id.toString() !== user._id.toString()) { %>
             <div class="donation-section">
-                <h2 class="section-subtitle">Support this Project</h2>
+                <h2 class="heading-3">Support this Project</h2>
                 <form class="donation-form" method="POST" action="/campaigns/<%= campaign._id %>/donate">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <% if (typeof error !== 'undefined' && error) { %>
