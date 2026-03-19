@@ -432,3 +432,132 @@
         }
     })();
 </script>
+
+<!-- Tabbed Content Section -->
+<div class="tabbed-content-section" style="margin-top: 3rem;">
+    <!-- Tab Navigation -->
+    <div style="display: flex; gap: 1rem; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem;">
+        <button class="tab-button active" data-tab="about" style="padding: 1rem 2rem; background: transparent; border: none; border-bottom: 3px solid var(--primary-blue); color: var(--primary-blue); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">
+            📖 About
+        </button>
+        <button class="tab-button" data-tab="updates" style="padding: 1rem 2rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--gray-600); font-weight: 600; cursor: pointer; transition: all var(--transition-fast); position: relative;">
+            📢 Updates
+            <% if (campaign.updates && campaign.updates.length > 0) { %>
+                <span style="position: absolute; top: 0.5rem; right: 0.5rem; background: var(--secondary-green); color: white; font-size: 0.625rem; padding: 0.125rem 0.5rem; border-radius: 9999px; font-weight: 700;"><%= campaign.updates.length %></span>
+            <% } %>
+        </button>
+        <button class="tab-button" data-tab="supporters" style="padding: 1rem 2rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--gray-600); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">
+            💝 Supporters
+        </button>
+    </div>
+
+    <!-- Tab Content: About -->
+    <div id="about-tab" class="tab-content active" style="display: block;">
+        <div style="background: white; border-radius: var(--border-radius-xl); padding: 2rem; box-shadow: var(--shadow-md);">
+            <h2 class="heading-3">📖 About this Campaign</h2>
+            <p><%= campaign.description %></p>
+        </div>
+    </div>
+
+    <!-- Tab Content: Updates -->
+    <div id="updates-tab" class="tab-content" style="display: none;">
+        <div style="background: white; border-radius: var(--border-radius-xl); padding: 2rem; box-shadow: var(--shadow-md);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 class="heading-3">📢 Campaign Updates</h2>
+                <% if (typeof user !== 'undefined' && user && campaign.creator?._id?.toString() === user._id.toString()) { %>
+                    <button onclick="showUpdateModal()" class="btn btn--primary btn--sm">+ Post Update</button>
+                <% } %>
+            </div>
+            
+            <% if (campaign.updates && campaign.updates.length > 0) { %>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <% campaign.updates.slice().sort((a, b) => new Date(b.postedAt) - new Date(a.postedAt)).forEach(update => { %>
+                        <div style="border: 1px solid var(--gray-200); border-radius: var(--border-radius-lg); padding: 1.5rem; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="font-size: 1.25rem; font-weight: 700; color: #92400e;"><%= update.title %></h3>
+                                <span style="font-size: 0.75rem; color: var(--gray-600);"><%= new Date(update.postedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+                            </div>
+                            <div style="white-space: pre-wrap; line-height: 1.8; color: var(--gray-800);">
+                                <%= update.content %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div style="text-align: center; padding: 3rem 2rem; color: var(--gray-600);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                    <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">No updates yet</h3>
+                    <p>The campaign creator hasn't posted any updates yet.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Tab Content: Supporters -->
+    <div id="supporters-tab" class="tab-content" style="display: none;">
+        <% if (campaign.backers.length > 0) { %>
+            <div style="text-align: center; padding: 3rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">💝</div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">Our Amazing Supporters</h3>
+                <p style="color: var(--gray-600);">Thank you to all our backers for your support!</p>
+            </div>
+        <% } else { %>
+            <div style="text-align: center; padding: 3rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">💝</div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">No supporters yet</h3>
+                <p style="color: var(--gray-600);">Be the first to support this campaign!</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            
+            // Remove active class from all buttons and tabs
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.style.borderBottomColor = 'transparent';
+                btn.style.color = 'var(--gray-600)';
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Add active class to clicked button and corresponding tab
+            this.style.borderBottomColor = 'var(--primary-blue)';
+            this.style.color = 'var(--primary-blue)';
+            document.getElementById(tabName + '-tab').style.display = 'block';
+        });
+    });
+    
+    // Show update modal
+    function showUpdateModal() {
+        const modal = document.createElement('dialog');
+        modal.innerHTML = `
+            <div style="padding: 2rem; max-width: 600px; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl);">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📢 Post Campaign Update</h3>
+                <form method="POST" action="/campaigns/<%= campaign._id %>/updates">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Title</label>
+                        <input type="text" name="title" required maxlength="200" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--border-radius-md); font-size: 1rem;" placeholder="Enter update title">
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Content</label>
+                        <textarea name="content" required maxlength="5000" rows="6" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--border-radius-md); font-size: 1rem; resize: vertical;" placeholder="Share your progress with backers..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button type="button" onclick="this.closest('dialog').close()" class="btn btn--secondary">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Post Update</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        modal.style.background = 'white';
+        modal.style.border = 'none';
+        document.body.appendChild(modal);
+        modal.showModal();
+    }
+</script>
