@@ -29,7 +29,7 @@
                     <option value="most-funded" <%= typeof sortBy !== 'undefined' && sortBy === 'most-funded' ? 'selected' : '' %>>Most Funded</option>
                     <option value="ending-soon" <%= typeof sortBy !== 'undefined' && sortBy === 'ending-soon' ? 'selected' : '' %>>Ending Soon</option>
                 </select>
-                <button type="submit" class="primary-button" style="padding: 0.75rem 2rem;">Search</button>
+                <button type="submit" class="btn btn--primary" style="padding: 0.75rem 2rem;">Search</button>
             </div>
         </form>
         
@@ -111,16 +111,16 @@
                         No results matched "<strong><%= searchQuery %></strong>". Try different keywords or browse all campaigns.
                     </p>
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                        <a href="/campaigns/search?q=&category=all&sort=newest" class="primary-button" style="background: var(--primary-blue);">Browse All Campaigns</a>
-                        <a href="/builder/create" class="primary-button" style="background: var(--gray-700);">Create Your Own</a>
+                        <a href="/campaigns/search?q=&category=all&sort=newest" class="btn btn--primary">Browse All Campaigns</a>
+                        <a href="/builder/create" class="btn btn--secondary">Create Your Own</a>
                     </div>
                 <% } else if (typeof searchCategory !== 'undefined' && searchCategory && searchCategory !== 'all') { %>
                     <p class="empty-state-text" style="color: var(--gray-600); margin-bottom: 1.5rem;">
                         There are no campaigns in the <strong><%= searchCategory %></strong> category yet.
                     </p>
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                        <a href="/campaigns/search?category=all&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" class="primary-button" style="background: var(--primary-blue);">View All Categories</a>
-                        <a href="/builder/create?category=<%= encodeURIComponent(searchCategory) %>" class="primary-button" style="background: var(--gray-700);">Create in This Category</a>
+                        <a href="/campaigns/search?category=all&sort=<%= typeof sortBy !== 'undefined' ? sortBy : 'newest' %>" class="btn btn--primary">View All Categories</a>
+                        <a href="/builder/create?category=<%= encodeURIComponent(searchCategory) %>" class="btn btn--secondary">Create in This Category</a>
                     </div>
                 <% } else { %>
                     <p class="empty-state-text" style="color: var(--gray-600); margin-bottom: 1.5rem;">
@@ -128,10 +128,10 @@
                     </p>
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                         <% if (typeof user !== 'undefined' && user) { %>
-                            <a href="/builder/create" class="primary-button">Create Your First Campaign</a>
+                            <a href="/builder/create" class="btn btn--primary">Create Your First Campaign</a>
                         <% } else { %>
-                            <a href="/register" class="primary-button">Get Started</a>
-                            <a href="/campaigns/search?q=&category=all&sort=newest" class="primary-button" style="background: var(--gray-700);">Browse All Campaigns</a>
+                            <a href="/register" class="btn btn--primary">Get Started</a>
+                            <a href="/campaigns/search?q=&category=all&sort=newest" class="btn btn--secondary">Browse All Campaigns</a>
                         <% } %>
                     </div>
                 <% } %>

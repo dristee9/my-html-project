@@ -17,7 +17,7 @@
                 <!-- Donate Button Section -->
                 <% if (typeof user !== 'undefined' && user && campaign.creator._id.toString() !== user._id.toString() && campaign.status === 'active') { %>
                 <div class="donate-button-section">
-                    <a href="/campaigns/<%= campaign._id %>/donate" class="donate-now-button">
+                    <a href="/campaigns/<%= campaign._id %>/donate" class="btn btn--success btn--lg">
                         <span class="button-icon">💰</span>
                         <span class="button-text">Donate Funds</span>
                         <span class="button-subtext">Support this campaign</span>
@@ -136,7 +136,7 @@
                             <input type="text" name="bkashNumber" class="form-control" placeholder="Enter your bKash number" required>
                         </div>
                         
-                        <button type="submit" class="submit-button donation-button">Donate Now via bKash</button>
+                        <button type="submit" class="btn btn--success btn--full">Donate Now via bKash</button>
                     </form>
                 <% } %>
             </div>
@@ -144,8 +144,8 @@
             <div class="card-shadow mt-6">
                 <h2 class="heading-3">Creator Tools</h2>
                 <div class="flex gap-4 flex-wrap">
-                    <a href="/campaigns/<%= campaign._id %>/edit" class="primary-button">Edit Campaign</a>
-                    <button onclick="showDeleteModal()" class="secondary-button bg-accent-red text-white">Delete Campaign</button>
+                    <a href="/campaigns/<%= campaign._id %>/edit" class="btn btn--primary">Edit Campaign</a>
+                    <button onclick="showDeleteModal()" class="btn btn--danger">Delete Campaign</button>
                 </div>
                 
                 <div class="mt-6">
@@ -176,7 +176,7 @@
                     <h3 class="text-xl font-bold text-error mb-4">Delete Campaign</h3>
                     <p class="mb-6">Are you sure you want to delete this campaign? This action cannot be undone.</p>
                     <div class="flex gap-4 justify-end">
-                        <button onclick="hideDeleteModal()" class="secondary-button">Cancel</button>
+                        <button onclick="hideDeleteModal()" class="btn btn--secondary">Cancel</button>
                         <form method="POST" action="/campaigns/<%= campaign._id %>/delete" style="display: inline;">
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <button type="submit" class="btn-danger">Delete Campaign</button>
@@ -190,7 +190,7 @@
         <div class="page-404">
             <h1 class="page-404-title">Campaign Not Found</h1>
             <p class="page-404-text">The campaign you're looking for doesn't exist or has been removed.</p>
-            <a href="/campaigns" class="primary-button">Browse Other Campaigns</a>
+            <a href="/campaigns" class="btn btn--primary">Browse Other Campaigns</a>
         </div>
     <% } %>
 </div>

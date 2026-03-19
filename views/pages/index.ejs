@@ -16,16 +16,16 @@
                 class="form-control" 
                 style="flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--gray-300); border-radius: var(--border-radius-lg); font-size: 1rem;"
             >
-            <button type="submit" class="primary-button" style="padding: 0.75rem 2rem;">Search</button>
+            <button type="submit" class="btn btn--primary" style="padding: 0.75rem 2rem;">Search</button>
         </form>
         
         <div class="hero-actions">
             <% if (typeof user !== 'undefined' && user) { %>
-                <a href="/builder/create" class="primary-button">Start Your Campaign</a>
-                <a href="/campaigns" class="secondary-button">Browse Projects</a>
+                <a href="/builder/create" class="btn btn--primary">Start Your Campaign</a>
+                <a href="/campaigns" class="btn btn--secondary">Browse Projects</a>
             <% } else { %>
-                <a href="/register" class="primary-button">Get Started</a>
-                <a href="/campaigns" class="secondary-button">Explore Campaigns</a>
+                <a href="/register" class="btn btn--primary">Get Started</a>
+                <a href="/campaigns" class="btn btn--secondary">Explore Campaigns</a>
             <% } %>
         </div>
 
