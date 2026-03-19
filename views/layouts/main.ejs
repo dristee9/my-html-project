@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= typeof title !== 'undefined' ? title : 'FundMyIdea BD' %></title>
+    <% if (typeof extraStyles !== 'undefined') { %>
+        <% extraStyles.forEach(function(style) { %>
+    <link rel="stylesheet" href="/styles/<%= style %>.css">
+        <% }); %>
+    <% } %>
     <link rel="stylesheet" href="/styles/main.css">
 </head>
 <body class="app-container">
