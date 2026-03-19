@@ -179,6 +179,126 @@ exports.getTemplates = async () => {
                     { name: 'Jane Smith', role: 'Mentor', quote: 'Incredible work being done here.', avatar: '' }
                 ]
             }
+        },
+        {
+            id: 'text-basic',
+            name: 'Basic Text Section',
+            type: 'text',
+            thumbnail: '/images/templates/text-basic.png',
+            content: {
+                heading: 'Text Section Heading',
+                body: 'This is a basic text section. You can use this section to add descriptive content about your campaign, mission, or any information you want to share with your audience. Explain your goals, your story, and why people should support your cause.'
+            }
+        },
+        {
+            id: 'image-basic',
+            name: 'Image with Caption',
+            type: 'image',
+            thumbnail: '/images/templates/image-basic.png',
+            content: {
+                src: 'https://via.placeholder.com/800x400',
+                alt: 'Campaign image',
+                caption: 'Add a meaningful caption to describe your image'
+            }
+        },
+        {
+            id: 'gallery-grid',
+            name: 'Photo Gallery Grid',
+            type: 'gallery',
+            thumbnail: '/images/templates/gallery-grid.png',
+            content: {
+                title: 'Photo Gallery',
+                images: [
+                    'https://via.placeholder.com/400x300',
+                    'https://via.placeholder.com/400x300',
+                    'https://via.placeholder.com/400x300',
+                    'https://via.placeholder.com/400x300',
+                    'https://via.placeholder.com/400x300',
+                    'https://via.placeholder.com/400x300'
+                ]
+            }
+        },
+        {
+            id: 'video-youtube',
+            name: 'Video Embed',
+            type: 'video',
+            thumbnail: '/images/templates/video-youtube.png',
+            content: {
+                url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                caption: 'Embed videos from YouTube, Vimeo, or other platforms'
+            }
+        },
+        {
+            id: 'cta-basic',
+            name: 'Call to Action',
+            type: 'cta',
+            thumbnail: '/images/templates/cta-basic.png',
+            content: {
+                heading: 'Take Action Now',
+                description: 'Encourage visitors to take the next step and support your cause with a compelling call to action.',
+                buttonText: 'Get Involved',
+                buttonLink: '#donate'
+            }
+        },
+        {
+            id: 'faq-basic',
+            name: 'FAQ Section',
+            type: 'faq',
+            thumbnail: '/images/templates/faq-basic.png',
+            content: {
+                title: 'Frequently Asked Questions',
+                faqs: [
+                    { question: 'What is this campaign about?', answer: 'This campaign aims to make a positive impact by addressing an important issue in our community.' },
+                    { question: 'How can I contribute?', answer: 'You can contribute by donating, sharing our campaign, or volunteering your time and skills.' },
+                    { question: 'When will the funds be used?', answer: 'Funds will be used immediately upon reaching our goal to start implementation of the project.' }
+                ]
+            }
+        },
+        {
+            id: 'form-contact',
+            name: 'Contact Form',
+            type: 'form',
+            thumbnail: '/images/templates/form-contact.png',
+            content: {
+                title: 'Get In Touch',
+                fields: [
+                    { type: 'text', label: 'Name', required: true },
+                    { type: 'email', label: 'Email', required: true },
+                    { type: 'textarea', label: 'Message', required: true }
+                ],
+                buttonText: 'Send Message'
+            }
+        },
+        {
+            id: 'form-donation',
+            name: 'Donation Form',
+            type: 'form',
+            thumbnail: '/images/templates/form-donation.png',
+            content: {
+                title: 'Support This Campaign',
+                fields: [
+                    { type: 'number', label: 'Donation Amount (BDT)', required: true, min: 100 },
+                    { type: 'text', label: 'bKash Number', required: true },
+                    { type: 'textarea', label: 'Your Message (Optional)', required: false }
+                ],
+                buttonText: 'Donate Now'
+            }
+        },
+        {
+            id: 'divider-simple',
+            name: 'Section Divider',
+            type: 'divider',
+            thumbnail: '/images/templates/divider-simple.png',
+            content: {}
+        },
+        {
+            id: 'custom-html',
+            name: 'Custom HTML',
+            type: 'custom',
+            thumbnail: '/images/templates/custom-html.png',
+            content: {
+                html: '<div class="custom-content"><h3>Custom Content</h3><p>Add your own custom HTML code here</p></div>'
+            }
         }
     ];
 };

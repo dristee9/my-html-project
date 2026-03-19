@@ -222,15 +222,18 @@
 
 <script src="/js/page-builder.js"></script>
 
-
 <!-- External Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
 <!-- Page Builder JavaScript -->
-<script src="/js/page-builder.js"></script>
 <script>
     // Set campaign ID for JavaScript access
     window.campaignId = '<%= typeof campaign !== "undefined" && campaign ? campaign._id : "" %>';
+    
+    // Inject existing campaign data for editing
+    <% if (typeof campaign !== 'undefined' && campaign) { %>
+        window.existingCampaign = <%- JSON.stringify(campaign) %>;
+    <% } %>
     
     // Initialize page builder
     document.addEventListener('DOMContentLoaded', function() {

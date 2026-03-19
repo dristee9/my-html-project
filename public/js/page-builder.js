@@ -301,6 +301,10 @@ class PageBuilder {
         
         // Add event listeners for property changes
         this.setupPropertyListeners(section);
+        
+        // Show the properties panel
+        panel.classList.add('open');
+        document.getElementById('builderSidebar')?.classList.add('panel-visible');
     }
 
     generatePropertiesForm(section) {
@@ -671,8 +675,10 @@ class PageBuilder {
     }
 
     setupPropertyListeners(section) {
+        const panel = document.getElementById('propertiesPanel');
+        
         // Color pickers
-        document.querySelectorAll('.color-picker').forEach(input => {
+        panel.querySelectorAll('.color-picker').forEach(input => {
             input.addEventListener('change', (e) => {
                 const property = e.target.dataset.property;
                 section.settings[property] = e.target.value;
@@ -689,7 +695,7 @@ class PageBuilder {
         });
         
         // Setting inputs (padding, margin, etc.)
-        document.querySelectorAll('[data-setting]').forEach(input => {
+        panel.querySelectorAll('[data-setting]').forEach(input => {
             input.addEventListener('input', (e) => {
                 const settingPath = e.target.dataset.setting;
                 const value = e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value;
@@ -708,7 +714,7 @@ class PageBuilder {
         });
         
         // Content inputs
-        document.querySelectorAll('[data-content]').forEach(input => {
+        panel.querySelectorAll('[data-content]').forEach(input => {
             input.addEventListener('input', (e) => {
                 const property = e.target.dataset.content;
                 const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -765,20 +771,26 @@ class PageBuilder {
         if (!confirm('Are you sure you want to delete this section?')) return;
         
         this.sections = this.sections.filter(s => s.id !== sectionId);
-        document.querySelector(`[data-section-id="${sectionId}"]`).remove();
+        const element = document.querySelector(`[data-section-id="${sectionId}"]`);
+        if (element) {
+            element.remove();
+        }
+        
+        if (this.sections.length === 0) {
+            this.showDropZonePlaceholder(true);
+        }
+        
         this.reorderSections();
         this.saveToHistory();
-        this.showDropZonePlaceholder(this.sections.length === 0);
     }
 
     reorderSections() {
-        const sectionElements = document.querySelectorAll('.builder-section');
-        sectionElements.forEach((element, index) => {
-            const sectionId = element.dataset.sectionId;
-            const section = this.sections.find(s => s.id === sectionId);
-            if (section) section.order = index;
-        });
-        this.sections.sort((a, b) => a.order - b.order);
+        const container = document.getElementById('sectionsContainer');
+        const items = container.querySelectorAll('.builder-section');
+        const orderedIds = Array.from(items).map(el => el.dataset.sectionId);
+        
+        this.sections.sort((a, b) => orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id));
+        this.sections.forEach((s, i) => s.order = i);
         this.saveToHistory();
     }
 
@@ -1087,8 +1099,15 @@ class PageBuilder {
             return;
         }
         
-        // Open preview in same window to maintain authentication
-        window.location.href = `/builder/${this.campaignId}/preview`;
+        // Auto-save before previewing to capture latest changes
+        try {
+            await this.saveCampaign('draft');
+            // Open preview in same window to maintain authentication
+            window.location.href = `/builder/${this.campaignId}/preview`;
+        } catch (error) {
+            console.error('Error auto-saving before preview:', error);
+            this.showMessage('Failed to save before preview', 'error');
+        }
     }
 
     updatePreviewButtonState() {
@@ -1120,8 +1139,8 @@ class PageBuilder {
 
     loadExistingData() {
         // Load existing campaign data if editing
-        if (typeof campaign !== 'undefined' && campaign && campaign.pageBuilder && campaign.pageBuilder.enabled) {
-            this.sections = campaign.pageBuilder.sections || [];
+        if (window.existingCampaign && window.existingCampaign.pageBuilder && window.existingCampaign.pageBuilder.enabled) {
+            this.sections = window.existingCampaign.pageBuilder.sections || [];
             this.sections.forEach(section => this.renderSection(section));
             this.showDropZonePlaceholder(false);
             this.saveToHistory();
