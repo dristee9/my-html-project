@@ -34,7 +34,7 @@ exports.getDashboard = async (req, res) => {
                     campaignTitle: campaign.title,
                     donorName: backer.user?.username || 'Anonymous',
                     amount: backer.amount,
-                    date: backer.donatedAt,
+                    date: backer.donatedAt || new Date(0), // Handle undefined dates
                     icon: '💰'
                 });
             });

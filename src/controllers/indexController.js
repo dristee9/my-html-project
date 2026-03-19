@@ -88,19 +88,29 @@ exports.getHomePage = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching homepage data:', error);
-        // Render page with default values if data fetch fails
-        res.render('pages/index', {
-            stats: {
-                totalCampaigns: 0,
-                totalRaised: 0,
-                activeCampaigns: 0,
-                universities: 0
-            },
-            trendingCampaigns: [],
-            newestCampaigns: [],
-            recommendedCampaigns: [],
-            user: req.user,
-            currentPage: 'home'
-        });
+        try {
+            // Render page with default values if data fetch fails
+            res.render('pages/index', {
+                stats: {
+                    totalCampaigns: 0,
+                    totalRaised: 0,
+                    activeCampaigns: 0,
+                    universities: 0
+                },
+                trendingCampaigns: [],
+                newestCampaigns: [],
+                recommendedCampaigns: [],
+                user: req.user,
+                currentPage: 'home'
+            });
+        } catch (renderError) {
+            console.error('Error rendering homepage after fallback:', renderError);
+            // If render itself fails, use Express error handler
+            return res.status(500).render('pages/error', {
+                title: 'Error - FundMyIdea BD',
+                error: 'Failed to load homepage',
+                user: req.user
+            });
+        }
     }
 };

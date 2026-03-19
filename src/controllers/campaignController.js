@@ -47,6 +47,7 @@ exports.getCampaignById = async (req, res) => {
         const campaignData = campaign.toObject();
         campaignData.daysLeftText = campaign.daysLeftText;
         campaignData.fundingPercentage = campaign.fundingPercentage;
+        campaignData.daysRemaining = campaign.daysRemaining;
         
         // Check if user has donated to this campaign
         const hasDonated = req.user && campaign.backers.some(backer => 
@@ -247,6 +248,7 @@ exports.getDonationPage = async (req, res) => {
         const campaignData = campaign.toObject();
         campaignData.daysLeftText = campaign.daysLeftText;
         campaignData.fundingPercentage = campaign.fundingPercentage;
+        campaignData.daysRemaining = campaign.daysRemaining;
         
         // Check if user has donated to this campaign
         const hasDonated = req.user && campaign.backers.some(backer => 
@@ -300,6 +302,7 @@ exports.processDonation = async (req, res) => {
         const campaignData = campaign.toObject();
         campaignData.daysLeftText = campaign.daysLeftText;
         campaignData.fundingPercentage = campaign.fundingPercentage;
+        campaignData.daysRemaining = campaign.daysRemaining;
         
         // Check if campaign is still active after expiration check
         if (campaign.status !== 'active') {
@@ -315,7 +318,7 @@ exports.processDonation = async (req, res) => {
         
         // Validate amount
         const donationAmount = parseInt(amount);
-        if (donationAmount < 100) {
+        if (isNaN(donationAmount) || donationAmount < 100) {
             console.log('Donation amount too low:', donationAmount);
             return res.status(400).render('pages/donate', {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
@@ -334,18 +337,6 @@ exports.processDonation = async (req, res) => {
                 campaign: campaignData,
                 user: req.user,
                 error: 'Please enter a valid 11-digit bKash number',
-                pageStyles: ['donate']
-            });
-        }
-        
-        // Check if campaign is still active
-        if (campaign.status !== 'active' || campaign.deadline < new Date()) {
-            console.log('Campaign not active or expired');
-            return res.status(400).render('pages/donate', {
-                title: `Donate to ${campaign.title} - FundMyIdea BD`,
-                campaign: campaignData,
-                user: req.user,
-                error: 'This campaign is no longer accepting donations',
                 pageStyles: ['donate']
             });
         }
@@ -436,7 +427,7 @@ exports.searchCampaigns = async (req, res) => {
                 
                 // If text search returns results, filter by category and use it
                 if (textSearch.length > 0) {
-                    query = { _id: { $in: textSearch.map(c => c._id) } };
+                    query = { _id: { $in: textSearch.map(c => c._id) }, status: 'active' };
                 } else {
                     // Fallback to safe regex search with escaped query
                     query.$or = [
@@ -576,6 +567,15 @@ exports.handleBkashCallback = async (req, res) => {
             
             if (!campaign || campaign.status !== 'active') {
                 return res.redirect(`/campaigns/${campaignId}?payment=failed&error=campaign_inactive`);
+            }
+            
+            // Check if this payment was already processed (prevent double-donation)
+            const alreadyProcessed = campaign.backers.some(backer => 
+                backer.bkashPaymentID === paymentID
+            );
+            if (alreadyProcessed) {
+                console.log('Duplicate bKash callback detected for paymentID:', paymentID);
+                return res.redirect(`/campaigns/${campaignId}?donated=true&bkash=duplicate`);
             }
             
             // Add backer entry with bKash payment details
