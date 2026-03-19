@@ -767,3 +767,81 @@ exports.getCampaignAnalytics = async (req, res) => {
         });
     }
 };
+
+// Post campaign update
+exports.postCampaignUpdate = async (req, res) => {
+    try {
+        const { title, content } = req.body;
+        
+        // Validate required fields
+        if (!title || !content) {
+            return res.status(400).json({ error: 'Title and content are required' });
+        }
+        
+        const campaign = await Campaign.findById(req.params.id)
+            .populate('backers.user', 'email username');
+        
+        if (!campaign) {
+            return res.status(404).json({ error: 'Campaign not found' });
+        }
+        
+        // Check if user owns this campaign
+        if (String(campaign.creator._id) !== String(req.user._id)) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+        
+        // Add update to campaign
+        campaign.updates.push({ title, content });
+        await campaign.save();
+        
+        // Email all unique backers about the update
+        const uniqueEmails = [...new Set(
+            campaign.backers
+                .map(b => b.user?.email)
+                .filter(Boolean)
+        )];
+        
+        if (uniqueEmails.length > 0) {
+            const emailPromises = uniqueEmails.map(email => {
+                return emailService.sendCampaignUpdate(email, campaign, title, content)
+                    .catch(err => console.error(`Failed to send update email to ${email}:`, err));
+            });
+            
+            // Don't wait for emails to send (fire-and-forget)
+            Promise.all(emailPromises).catch(console.error);
+        }
+        
+        console.log(`Update posted to campaign ${campaign.title}`);
+        res.redirect(`/campaigns/${campaign._id}?updated=true`);
+    } catch (error) {
+        console.error('Error posting campaign update:', error);
+        res.status(500).json({ error: 'Failed to post update' });
+    }
+};
+
+// Get campaign updates
+exports.getCampaignUpdates = async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id);
+        
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Sort updates by most recent first
+        const sortedUpdates = campaign.updates.slice().sort((a, b) => 
+            new Date(b.postedAt) - new Date(a.postedAt)
+        );
+        
+        res.json({
+            success: true,
+            updates: sortedUpdates
+        });
+    } catch (error) {
+        console.error('Error fetching updates:', error);
+        res.status(500).json({ error: 'Failed to fetch updates' });
+    }
+};

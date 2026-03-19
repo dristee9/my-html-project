@@ -59,4 +59,8 @@ router.post('/:id/delete', authenticateToken, campaignController.deleteCampaign)
 // Analytics route (must be after other routes to avoid conflicts)
 router.get('/:id/analytics', authenticateToken, campaignController.getCampaignAnalytics);
 
+// Campaign updates routes
+router.post('/:id/updates', authenticateToken, campaignController.postCampaignUpdate);
+router.get('/:id/updates', campaignController.getCampaignUpdates);
+
 module.exports = router;

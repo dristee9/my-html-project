@@ -121,6 +121,27 @@ const campaignSchema = new mongoose.Schema({
     viewsByDay: [{
         date: Date,
         count: Number
+    }],
+    // Campaign updates/posts
+    updates: [{
+        title: {
+            type: String,
+            required: true,
+            maxlength: 200
+        },
+        content: {
+            type: String,
+            required: true,
+            maxlength: 5000
+        },
+        postedAt: {
+            type: Date,
+            default: Date.now
+        },
+        notificationSent: {
+            type: Boolean,
+            default: false
+        }
     }]
 }, {
     timestamps: true, // Automatically adds createdAt and updatedAt

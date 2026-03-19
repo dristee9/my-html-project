@@ -181,6 +181,48 @@ const templates = {
             </div>
         </body>
         </html>
+    `,
+
+    campaignUpdate: (campaign, title, content) => `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+                .update-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+                .button { display: inline-block; background: #f59e0b; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>📢 New Update from Campaign!</h1>
+                </div>
+                <div class="content">
+                    <p>Hello,</p>
+                    <p>Great news! <strong>${campaign.creator.username}</strong> has posted a new update to the campaign you're supporting:</p>
+                    
+                    <div class="update-box">
+                        <h2 style="color: #f59e0b; margin-bottom: 10px;">${title}</h2>
+                        <p style="white-space: pre-wrap; line-height: 1.8;">${content}</p>
+                    </div>
+                    
+                    <p>Your continued support makes a difference! Check out the full campaign page to see all updates and progress.</p>
+                    
+                    <a href="${process.env.APP_URL || 'http://localhost:3000'}/campaigns/${campaign._id}" class="button">View Campaign Page</a>
+                    
+                    <p style="margin-top: 30px;">Thank you for being part of this journey!<br>The FundMyIdea BD Team</p>
+                </div>
+                <div class="footer">
+                    <p>&copy; ${new Date().getFullYear()} FundMyIdea BD. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
     `
 };
 
@@ -276,9 +318,33 @@ async function sendEmailVerification(user, verificationToken) {
     }
 }
 
+/**
+ * Send campaign update notification to backers
+ */
+async function sendCampaignUpdate(backerEmail, campaign, title, content) {
+    try {
+        const transporter = createTransporter();
+        
+        const mailOptions = {
+            from: `"FundMyIdea BD" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+            to: backerEmail,
+            subject: `📢 New Update: ${campaign.title}`,
+            html: templates.campaignUpdate(campaign, title, content)
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Campaign update email sent to ${backerEmail}`);
+        return { success: true };
+    } catch (error) {
+        console.error('Error sending campaign update email:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 module.exports = {
     sendWelcomeEmail,
     sendDonationConfirmation,
     sendPasswordResetEmail,
-    sendEmailVerification
+    sendEmailVerification,
+    sendCampaignUpdate
 };
