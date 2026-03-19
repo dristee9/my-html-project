@@ -112,6 +112,15 @@ const campaignSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
+    }],
+    // Analytics tracking
+    views: {
+        type: Number,
+        default: 0
+    },
+    viewsByDay: [{
+        date: Date,
+        count: Number
     }]
 }, {
     timestamps: true, // Automatically adds createdAt and updatedAt

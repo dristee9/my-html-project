@@ -54,6 +54,19 @@ exports.getCampaignById = async (req, res) => {
             backer.user && backer.user._id.toString() === req.user._id.toString()
         );
         
+        // Track page view (fire-and-forget, don't await)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        Campaign.updateOne({ _id: campaign._id, 'viewsByDay.date': today },
+            { $inc: { views: 1, 'viewsByDay.$.count': 1 } }
+        ).then(result => {
+            if (result.modifiedCount === 0) {
+                Campaign.updateOne({ _id: campaign._id }, 
+                    { $inc: { views: 1 }, $push: { viewsByDay: { date: today, count: 1 } } }
+                ).exec();
+            }
+        }).catch(err => console.error('Failed to track view:', err));
+        
         // Check for donation success message from redirect
         const donationSuccess = req.query.donated === 'true' ? 
             `Thank you for your generous donation! Your support means everything to ${campaign.creator.username}.` : 
@@ -666,5 +679,91 @@ exports.handleBkashCallback = async (req, res) => {
         console.error('Error processing bKash callback:', error);
         const campaignId = req.params.id;
         res.redirect(`/campaigns/${campaignId}?payment=failed&error=verification_failed`);
+    }
+};
+
+// Get campaign analytics
+exports.getCampaignAnalytics = async (req, res) => {
+    try {
+        const campaign = await Campaign.findById(req.params.id)
+            .populate('creator', 'username university profileImage')
+            .populate('backers.user', 'username university');
+        
+        if (!campaign) {
+            return res.status(404).render('pages/404', {
+                title: 'Campaign Not Found - FundMyIdea BD',
+                user: req.user
+            });
+        }
+        
+        // Check if user owns this campaign
+        if (String(campaign.creator._id) !== String(req.user._id)) {
+            return res.status(403).render('pages/error', {
+                title: 'Access Denied - FundMyIdea BD',
+                error: 'You can only view analytics for your own campaigns',
+                user: req.user
+            });
+        }
+        
+        // Compute analytics for last 30 days
+        const last30Days = [...Array(30)].map((_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (29 - i));
+            d.setHours(0, 0, 0, 0);
+            return d;
+        });
+        
+        const donationsByDay = last30Days.map(day => {
+            const next = new Date(day);
+            next.setDate(next.getDate() + 1);
+            const dayDonations = campaign.backers.filter(b => 
+                new Date(b.donatedAt) >= day && new Date(b.donatedAt) < next
+            );
+            return {
+                date: day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                amount: dayDonations.reduce((sum, b) => sum + b.amount, 0),
+                count: dayDonations.length
+            };
+        });
+        
+        // University breakdown
+        const universityBreakdown = campaign.backers.reduce((acc, b) => {
+            const uni = b.user?.university || 'Unknown';
+            acc[uni] = (acc[uni] || 0) + b.amount;
+            return acc;
+        }, {});
+        
+        // Convert to array for chart
+        const universityData = Object.entries(universityBreakdown).map(([name, amount]) => ({
+            name,
+            amount
+        }));
+        
+        // Calculate conversion rate
+        const conversionRate = campaign.views > 0 
+            ? ((campaign.backers.length / campaign.views) * 100).toFixed(2) 
+            : 0;
+        
+        // Calculate average donation
+        const avgDonation = campaign.backers.length > 0 
+            ? Math.round(campaign.currentFunding / campaign.backers.length) 
+            : 0;
+        
+        res.render('pages/campaign-analytics', {
+            title: `Analytics - ${campaign.title} - FundMyIdea BD`,
+            campaign,
+            donationsByDay,
+            universityData,
+            conversionRate,
+            avgDonation,
+            user: req.user
+        });
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to load analytics',
+            user: req.user
+        });
     }
 };

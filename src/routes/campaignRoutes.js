@@ -56,4 +56,7 @@ router.post('/:id/edit', authenticateToken, upload.single('image'), campaignCont
 // Delete campaign route - moved to controller
 router.post('/:id/delete', authenticateToken, campaignController.deleteCampaign);
 
+// Analytics route (must be after other routes to avoid conflicts)
+router.get('/:id/analytics', authenticateToken, campaignController.getCampaignAnalytics);
+
 module.exports = router;
