@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= typeof title !== 'undefined' ? title : 'FundMyIdea BD' %></title>
-    <% if (typeof extraStyles !== 'undefined') { %>
-        <% extraStyles.forEach(function(style) { %>
+    <% if (typeof extraStyles !== 'undefined' || typeof pageStyles !== 'undefined') { %>
+        <% const styles = typeof pageStyles !== 'undefined' ? pageStyles : (typeof extraStyles !== 'undefined' ? extraStyles : []); %>
+        <% styles.forEach(function(style) { %>
     <link rel="stylesheet" href="/styles/<%= style %>.css">
         <% }); %>
     <% } %>

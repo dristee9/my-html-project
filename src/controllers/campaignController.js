@@ -175,7 +175,8 @@ exports.getDonationPage = async (req, res) => {
             title: `Donate to ${campaign.title} - FundMyIdea BD`,
             campaign: campaignData,
             hasDonated: hasDonated,
-            user: req.user
+            user: req.user,
+            pageStyles: ['donate']
         });
     } catch (error) {
         console.error('Error loading donation page:', error);
@@ -220,7 +221,8 @@ exports.processDonation = async (req, res) => {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
                 campaign: campaignData,
                 user: req.user,
-                error: 'This campaign is no longer accepting donations'
+                error: 'This campaign is no longer accepting donations',
+                pageStyles: ['donate']
             });
         }
         
@@ -237,7 +239,8 @@ exports.processDonation = async (req, res) => {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
                 campaign: campaignData,
                 user: req.user,
-                error: 'Minimum donation amount is 100 BDT'
+                error: 'Minimum donation amount is 100 BDT',
+                pageStyles: ['donate']
             });
         }
         
@@ -248,7 +251,8 @@ exports.processDonation = async (req, res) => {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
                 campaign: campaignData,
                 user: req.user,
-                error: 'Please enter a valid 11-digit bKash number'
+                error: 'Please enter a valid 11-digit bKash number',
+                pageStyles: ['donate']
             });
         }
         
@@ -259,7 +263,8 @@ exports.processDonation = async (req, res) => {
                 title: `Donate to ${campaign.title} - FundMyIdea BD`,
                 campaign: campaignData,
                 user: req.user,
-                error: 'This campaign is no longer accepting donations'
+                error: 'This campaign is no longer accepting donations',
+                pageStyles: ['donate']
             });
         }
         
@@ -303,7 +308,8 @@ exports.processDonation = async (req, res) => {
         res.status(500).render('pages/donate', {
             title: 'Donate - FundMyIdea BD',
             user: req.user,
-            error: 'Failed to process donation. Please try again.'
+            error: 'Failed to process donation. Please try again.',
+            pageStyles: ['donate']
         });
     }
 };
