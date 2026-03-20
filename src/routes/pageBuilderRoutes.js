@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken: protect, optionalAuth } = require('../middleware/auth');
+const { campaignUpload } = require('../middleware/upload');
 const {
     getPageBuilder,
     editPageBuilder,
@@ -9,7 +10,8 @@ const {
     getVersionHistory,
     saveVersion,
     clearVersionHistory,
-    renderSectionPreview
+    renderSectionPreview,
+    uploadImage
 } = require('../controllers/pageBuilderController');
 
 // Page Builder Routes
@@ -20,6 +22,9 @@ router.get('/:id/preview', optionalAuth, previewCampaign);
 
 // Section Preview API (for real-time server-side rendering in builder)
 router.post('/preview-section', protect, renderSectionPreview);
+
+// Image Upload Route
+router.post('/upload-image', protect, campaignUpload.single('image'), uploadImage);
 
 // Version History Routes
 router.get('/:id/versions', protect, getVersionHistory);

@@ -89,7 +89,9 @@ app.use((req, res, next) => {
     if (req.path.startsWith('/builder/api/')) {
         // For builder API routes that legitimately need AJAX access,
         // CSRF token should be passed in JSON body or headers
+        const originalCsrfToken = req.csrfToken;
         req.csrfToken = () => '';
+        req._originalCsrfToken = originalCsrfToken; // Store original for reference
         return next();
     }
     
@@ -173,7 +175,14 @@ app.use((req, res, next) => {
     res.locals.user = req.user;
     // Safely get CSRF token, fallback to empty string if not available
     try {
-        res.locals.csrfToken = req.csrfToken ? req.csrfToken() : '';
+        // Check if we have an original CSRF token function (for page builder routes)
+        if (req._originalCsrfToken) {
+            res.locals.csrfToken = req._originalCsrfToken();
+        } else if (req.csrfToken) {
+            res.locals.csrfToken = req.csrfToken();
+        } else {
+            res.locals.csrfToken = '';
+        }
     } catch (err) {
         console.error('Error getting CSRF token:', err.message);
         res.locals.csrfToken = '';

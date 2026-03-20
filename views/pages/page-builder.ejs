@@ -5,7 +5,7 @@
 <%- include('../partials/breadcrumbs', {
     breadcrumbs: [
         { label: 'Dashboard', href: '/dashboard' },
-        { label: campaign ? 'Edit Campaign' : 'Create Campaign' }
+        { label: typeof campaign !== 'undefined' && campaign ? 'Edit Campaign' : 'Create Campaign' }
     ]
 }) %>
 
@@ -65,7 +65,7 @@
                                 </div>
                             </div>
                             
-                            <div class="template-card" data-template="hero-image" data-type="hero" draggable="true">
+                            <div class="template-card" data-template="hero-basic" data-type="hero" draggable="true">
                                 <div class="template-thumbnail">
                                     <div class="template-preview">🌄</div>
                                 </div>
@@ -91,13 +91,79 @@
                                 </div>
                             </div>
                             
-                            <div class="template-card" data-template="testimonials-slider" data-type="testimonials" draggable="true">
+                            <div class="template-card" data-template="testimonial-slider" data-type="testimonials" draggable="true">
                                 <div class="template-thumbnail">
                                     <div class="template-preview">💬</div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Testimonial Slider</h4>
                                     <p class="template-desc">Rotating customer testimonials</p>
+                                </div>
+                            </div>
+                            
+                            <div class="template-card" data-template="text-basic" data-type="text" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">📝</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Text Block</h4>
+                                    <p class="template-desc">Headings and paragraphs</p>
+                                </div>
+                            </div>
+                            
+                            <div class="template-card" data-template="cta-basic" data-type="cta" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">🎯</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Call to Action</h4>
+                                    <p class="template-desc">Bold CTA with button</p>
+                                </div>
+                            </div>
+                            
+                            <div class="template-card" data-template="faq-basic" data-type="faq" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">❓</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>FAQ</h4>
+                                    <p class="template-desc">Questions and answers</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Interactive Templates -->
+                    <div class="template-category">
+                        <h4>Media</h4>
+                        <div class="template-items">
+                            <div class="template-card" data-template="image-basic" data-type="image" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">🖼️</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Image</h4>
+                                    <p class="template-desc">Single image with caption</p>
+                                </div>
+                            </div>
+                            
+                            <div class="template-card" data-template="gallery-grid" data-type="gallery" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">🎨</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Photo Gallery</h4>
+                                    <p class="template-desc">Grid of images</p>
+                                </div>
+                            </div>
+                            
+                            <div class="template-card" data-template="video-youtube" data-type="video" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">🎥</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Video</h4>
+                                    <p class="template-desc">YouTube or Vimeo embed</p>
                                 </div>
                             </div>
                         </div>
@@ -107,7 +173,7 @@
                     <div class="template-category">
                         <h4>Interactive</h4>
                         <div class="template-items">
-                            <div class="template-card" data-template="contact-form" data-type="form" draggable="true">
+                            <div class="template-card" data-template="form-contact" data-type="form" draggable="true">
                                 <div class="template-thumbnail">
                                     <div class="template-preview">📋</div>
                                 </div>
@@ -117,13 +183,23 @@
                                 </div>
                             </div>
                             
-                            <div class="template-card" data-template="donation-form" data-type="form" draggable="true">
+                            <div class="template-card" data-template="form-donation" data-type="form" draggable="true">
                                 <div class="template-thumbnail">
                                     <div class="template-preview">💰</div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Donation Form</h4>
                                     <p class="template-desc">Built-in donation collection</p>
+                                </div>
+                            </div>
+                            
+                            <div class="template-card" data-template="divider-simple" data-type="divider" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">➖</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Divider</h4>
+                                    <p class="template-desc">Horizontal line separator</p>
                                 </div>
                             </div>
                         </div>
@@ -238,10 +314,11 @@
     <input type="hidden" id="campaignStatus" name="status" value="draft">
 </form>
 
-<script src="/js/page-builder.js"></script>
-
 <!-- External Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<!-- Page Builder JavaScript -->
+<script src="/js/page-builder.js"></script>
 
 <!-- Page Builder JavaScript -->
 <script>

@@ -112,23 +112,8 @@
     gap: 1rem;
 }
 
-.template-card {
-    border: 1px solid var(--gray-200);
-    border-radius: var(--border-radius-md);
-    overflow: hidden;
-    cursor: grab;
-    transition: all 0.2s;
-    background: white;
-}
-
-.template-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-color: var(--primary-blue-light);
-}
-
 .template-thumbnail {
-    height: 120px;
+    height: 80px;
     background: var(--gray-100);
     display: flex;
     align-items: center;
@@ -250,8 +235,9 @@
 }
 
 .btn-primary:hover {
-    background: var(--primary-blue-light);
-    border-color: var(--primary-blue-light);
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
 }
 
 .btn-secondary {
@@ -722,4 +708,11 @@
     .version-comparison {
         grid-template-columns: 1fr;
     }
+}
+
+/* Shake Animation for Preview Button */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
 }

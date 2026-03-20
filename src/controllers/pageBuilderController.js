@@ -82,7 +82,7 @@ exports.savePageBuilder = async (req, res) => {
             pageBuilderObj = pageBuilderData;
         }
 
-        // Sanitize section content to prevent XSS
+        // Sanitize section content to prevent XSS (CSS only, text is handled client-side)
         if (pageBuilderObj && pageBuilderObj.sections) {
             pageBuilderObj.sections.forEach(section => {
                 // Sanitize custom CSS - remove dangerous patterns
@@ -93,51 +93,8 @@ exports.savePageBuilder = async (req, res) => {
                         .replace(/@import/gi, '');  // Remove @import
                 }
                 
-                // Sanitize text content in sections
-                if (section.content) {
-                    Object.keys(section.content).forEach(key => {
-                        if (typeof section.content[key] === 'string') {
-                            // Basic HTML escaping for user-provided strings
-                            section.content[key] = section.content[key]
-                                .replace(/&/g, '&amp;')
-                                .replace(/</g, '&lt;')
-                                .replace(/>/g, '&gt;')
-                                .replace(/"/g, '&quot;')
-                                .replace(/'/g, '&#x27;');
-                        }
-                    });
-                }
-                
-                // Sanitize nested arrays (like features, testimonials)
-                if (Array.isArray(section.content.features)) {
-                    section.content.features.forEach(feature => {
-                        Object.keys(feature).forEach(key => {
-                            if (typeof feature[key] === 'string') {
-                                feature[key] = feature[key]
-                                    .replace(/&/g, '&amp;')
-                                    .replace(/</g, '&lt;')
-                                    .replace(/>/g, '&gt;')
-                                    .replace(/"/g, '&quot;')
-                                    .replace(/'/g, '&#x27;');
-                            }
-                        });
-                    });
-                }
-                
-                if (Array.isArray(section.content.testimonials)) {
-                    section.content.testimonials.forEach(testimonial => {
-                        Object.keys(testimonial).forEach(key => {
-                            if (typeof testimonial[key] === 'string') {
-                                testimonial[key] = testimonial[key]
-                                    .replace(/&/g, '&amp;')
-                                    .replace(/</g, '&lt;')
-                                    .replace(/>/g, '&gt;')
-                                    .replace(/"/g, '&quot;')
-                                    .replace(/'/g, '&#x27;');
-                            }
-                        });
-                    });
-                }
+                // NOTE: Text content sanitization is now handled client-side during rendering
+                // This prevents double-encoding issues when editing saved campaigns
             });
         }
 
@@ -483,6 +440,7 @@ exports.saveVersion = async (req, res) => {
         const versionDoc = new CampaignVersion({
             campaign: campaign._id,
             version,
+            status,          // Store the campaign status (draft/active)
             data: { sections, ...campaignData },
             createdBy: req.user._id
         });
@@ -507,5 +465,26 @@ exports.clearVersionHistory = async (req, res) => {
     } catch (error) {
         console.error('Error clearing version history:', error);
         res.status(500).json({ error: 'Failed to clear version history' });
+    }
+};
+
+// Upload image for page builder
+exports.uploadImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+        
+        // Construct the URL path to the uploaded image
+        const imageUrl = `/uploads/${req.file.filename}`;
+        
+        res.json({ 
+            success: true, 
+            imageUrl,
+            filename: req.file.originalname
+        });
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ error: 'Failed to upload image' });
     }
 };

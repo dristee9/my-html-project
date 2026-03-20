@@ -4,6 +4,7 @@ class PageBuilder {
         this.selectedSection = null;
         this.history = [];
         this.historyIndex = -1;
+        this.serverVersionCount = 0; // Dedicated counter for saved versions
         
         // Get campaign ID from data attribute on root element (not global variable)
         const builderContainer = document.getElementById('pageBuilderContainer');
@@ -22,6 +23,30 @@ class PageBuilder {
         const d = document.createElement('div');
         d.textContent = str;
         return d.innerHTML;
+    }
+
+    /**
+     * Convert YouTube/Vimeo URLs to embed format
+     * @param {string} url - Video URL
+     * @returns {string} - Embeddable URL
+     */
+    convertVideoUrl(url) {
+        if (!url) return '';
+        
+        // YouTube embed conversion
+        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+        if (youtubeMatch) {
+            return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+        }
+        
+        // Vimeo embed conversion
+        const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+        if (vimeoMatch) {
+            return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+        }
+        
+        // If already an embed URL or direct video file, return as-is
+        return url;
     }
 
     init() {
@@ -69,6 +94,9 @@ class PageBuilder {
         
         // Properties panel
         document.getElementById('closeProperties')?.addEventListener('click', () => this.closeProperties());
+        
+        // Keyboard shortcuts for copy/paste
+        document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
         
         // Initialize preview button state
         this.updatePreviewButtonState();
@@ -161,7 +189,9 @@ class PageBuilder {
                 </div>
                 <div class="section-actions">
                     <button class="btn-icon" onclick="pageBuilder.editSection('${section.id}')" aria-label="Edit section">✏️</button>
-                    <button class="btn-icon" onclick="pageBuilder.duplicateSection('${section.id}')" aria-label="Duplicate section">📋</button>
+                    <button class="btn-icon" onclick="pageBuilder.copySection('${section.id}')" aria-label="Copy section">📋</button>
+                    <button class="btn-icon" onclick="pageBuilder.pasteSection('${section.id}')" aria-label="Paste section after">📄</button>
+                    <button class="btn-icon" onclick="pageBuilder.duplicateSection('${section.id}')" aria-label="Duplicate section">🔄</button>
                     <button class="btn-icon" onclick="pageBuilder.deleteSection('${section.id}')" aria-label="Delete section">🗑️</button>
                 </div>
             </div>
@@ -274,7 +304,7 @@ class PageBuilder {
                     <div class="video-preview">
                         <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 0.5rem;">
                             <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-                                src="${this.sanitize(section.content.url)}" 
+                                src="${this.convertVideoUrl(this.sanitize(section.content.url))}" 
                                 title="Video preview"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
                             </iframe>
@@ -344,9 +374,20 @@ class PageBuilder {
         // Add event listeners for property changes
         this.setupPropertyListeners(section);
         
-        // Show the properties panel
-        panel.classList.add('open');
-        document.getElementById('builderSidebar')?.classList.add('panel-visible');
+        // Show the properties panel - mark as active
+        document.querySelector('.builder-panel-right')?.classList.add('panel-active');
+    }
+    
+    closeProperties() {
+        const panel = document.getElementById('propertiesPanel');
+        panel.innerHTML = `
+            <div class="no-selection">
+                <i class="icon">⚙️</i>
+                <p>Select a section to edit its properties</p>
+            </div>
+        `;
+        this.selectedSection = null;
+        document.querySelector('.builder-panel-right')?.classList.remove('panel-active');
     }
 
     generatePropertiesForm(section) {
@@ -591,11 +632,19 @@ class PageBuilder {
                     <div class="property-group">
                         <h4>Image Content</h4>
                         <div class="form-group">
-                            <label>Image URL</label>
-                            <input type="text" class="form-control" data-content="src" value="${section.content.src}">
+                            <label>Upload Image</label>
+                            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;">
+                                <input type="file" id="imageUploadInput" accept="image/*" style="flex: 1; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem;">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="pageBuilder.uploadImage()" style="white-space: nowrap;">Upload</button>
+                            </div>
+                            <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">Max size: 5MB. Allowed: JPG, PNG, GIF, WebP</p>
                         </div>
                         <div class="form-group">
-                            <label>Alt Text</label>
+                            <label>Or Use Image URL</label>
+                            <input type="text" class="form-control" data-content="src" value="${section.content.src}" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label>Alt Text (for accessibility)</label>
                             <input type="text" class="form-control" data-content="alt" value="${section.content.alt}">
                         </div>
                         <div class="form-group">
@@ -673,7 +722,15 @@ class PageBuilder {
                             <input type="text" class="form-control" data-content="title" value="${section.content.title || ''}">
                         </div>
                         <div class="form-group">
-                            <label>Images</label>
+                            <label>Upload Images</label>
+                            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;">
+                                <input type="file" id="galleryUploadInput" accept="image/*" multiple style="flex: 1; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem;">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="pageBuilder.uploadGalleryImages()" style="white-space: nowrap;">Upload All</button>
+                            </div>
+                            <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">Select multiple images. Max size: 5MB each</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Or Add Image URLs Manually</label>
                             <div id="galleryList">
                                 ${section.content.images.map((image, index) => `
                                     <div class="gallery-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px; display: flex; gap: 10px; align-items: start;">
@@ -690,7 +747,7 @@ class PageBuilder {
                                     </div>
                                 `).join('')}
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline" onclick="pageBuilder.addGalleryImage()" style="width: 100%; margin-top: 8px;">+ Add Image</button>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="pageBuilder.addGalleryImage()" style="width: 100%; margin-top: 8px;">+ Add Image URL</button>
                         </div>
                     </div>
                 `;
@@ -701,12 +758,35 @@ class PageBuilder {
                     <div class="property-group">
                         <h4>Video Content</h4>
                         <div class="form-group">
-                            <label>Video URL (YouTube/Vimeo)</label>
-                            <input type="text" class="form-control" data-content="url" value="${section.content.url}">
+                            <label>YouTube or Vimeo URL</label>
+                            <input type="text" class="form-control" data-content="url" value="${section.content.url}" placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/...">
+                            <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">Paste your video URL and it will be auto-converted to embed format</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Or Direct Embed Code</label>
+                            <textarea class="form-control" data-content="embedCode" rows="3" placeholder="<iframe src=\"...\"></iframe>">${section.content.embedCode || ''}</textarea>
+                            <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">Use this for custom embed codes or other video platforms</p>
                         </div>
                         <div class="form-group">
                             <label>Caption (optional)</label>
                             <input type="text" class="form-control" data-content="caption" value="${section.content.caption || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Video Settings</label>
+                            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                                    <input type="checkbox" data-content="autoplay" ${section.content.autoplay ? 'checked' : ''}>
+                                    Autoplay
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                                    <input type="checkbox" data-content="controls" ${section.content.controls !== false ? 'checked' : ''}>
+                                    Show Controls
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                                    <input type="checkbox" data-content="loop" ${section.content.loop ? 'checked' : ''}>
+                                    Loop
+                                </label>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -757,7 +837,8 @@ class PageBuilder {
         
         // Content inputs
         panel.querySelectorAll('[data-content]').forEach(input => {
-            input.addEventListener('input', (e) => {
+            const eventType = input.type === 'checkbox' ? 'change' : 'input';
+            input.addEventListener(eventType, (e) => {
                 const property = e.target.dataset.content;
                 const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
                 
@@ -807,6 +888,61 @@ class PageBuilder {
         this.sections.push(newSection);
         this.renderSection(newSection);
         this.saveToHistory();
+        this.showMessage('Section duplicated!', 'success');
+    }
+    
+    copySection(sectionId) {
+        const section = this.sections.find(s => s.id === sectionId);
+        if (!section) return;
+        
+        // Store in clipboard (memory)
+        this.clipboard = {
+            type: 'section',
+            data: JSON.parse(JSON.stringify(section))
+        };
+        
+        this.showMessage('Section copied! Click "Paste" on another section to paste after it.', 'info');
+    }
+    
+    pasteSection(targetSectionId) {
+        if (!this.clipboard || this.clipboard.type !== 'section') {
+            this.showMessage('Nothing to paste! Copy a section first.', 'warning');
+            return;
+        }
+        
+        const targetIndex = this.sections.findIndex(s => s.id === targetSectionId);
+        if (targetIndex === -1) return;
+        
+        const newSection = JSON.parse(JSON.stringify(this.clipboard.data));
+        newSection.id = this.generateId();
+        newSection.order = targetIndex + 1;
+        
+        // Insert after target section
+        this.sections.splice(targetIndex + 1, 0, newSection);
+        
+        // Re-render all sections
+        this.refreshCanvas();
+        this.showMessage('Section pasted successfully!', 'success');
+    }
+    
+    handleKeyboardShortcuts(e) {
+        // Ctrl+C / Cmd+C for copy
+        if ((e.ctrlKey || e.metaKey) && e.key === 'c' && this.selectedSection) {
+            e.preventDefault();
+            this.copySection(this.selectedSection.id);
+        }
+        
+        // Ctrl+V / Cmd+V for paste
+        if ((e.ctrlKey || e.metaKey) && e.key === 'v' && this.selectedSection) {
+            e.preventDefault();
+            this.pasteSection(this.selectedSection.id);
+        }
+        
+        // Delete key for deletion
+        if (e.key === 'Delete' && this.selectedSection) {
+            e.preventDefault();
+            this.deleteSection(this.selectedSection.id);
+        }
     }
 
     deleteSection(sectionId) {
@@ -857,6 +993,10 @@ class PageBuilder {
         
         this.history.push(JSON.parse(JSON.stringify(this.sections)));
         this.historyIndex = this.history.length - 1;
+        
+        // Auto-save to localStorage for recovery on page refresh
+        const storageKey = `builder_draft_${this.campaignId || 'new'}`;
+        localStorage.setItem(storageKey, JSON.stringify(this.sections));
         
         this.updateHistoryButtons();
     }
@@ -931,8 +1071,15 @@ class PageBuilder {
                 // Update preview button state now that we have a campaignId
                 this.updatePreviewButtonState();
                 
+                // Increment server version count on successful save
+                this.serverVersionCount++;
+                
                 // Add to version history
                 this.addToVersionHistory(status);
+                
+                // Clear localStorage draft after successful server save
+                const storageKey = `builder_draft_${this.campaignId}`;
+                localStorage.removeItem(storageKey);
                 
                 if (status === 'active') {
                     window.location.href = `/campaigns/${result.campaignId}`;
@@ -948,7 +1095,7 @@ class PageBuilder {
 
     async addToVersionHistory(status) {
         const versionData = {
-            version: this.history.length,
+            version: this.serverVersionCount,
             timestamp: new Date().toISOString(),
             status: status,
             sections: JSON.parse(JSON.stringify(this.sections)),
@@ -979,10 +1126,10 @@ class PageBuilder {
     }
     
     updateVersionHistoryUI(versions) {
-        const historyPanel = document.getElementById('versionHistoryPanel');
-        if (!historyPanel) return;
+        const contentDiv = document.getElementById('versionHistoryContent');
+        if (!contentDiv) return;
         
-        historyPanel.innerHTML = `
+        contentDiv.innerHTML = `
             <div class="version-history-header">
                 <h4>Version History</h4>
                 <button class="btn btn-sm btn-outline" onclick="pageBuilder.clearVersionHistory()">Clear</button>
@@ -1018,20 +1165,6 @@ class PageBuilder {
             console.error('Error loading version history:', error);
         }
         return [];
-    }
-    
-    async restoreVersion(versionIndex) {
-        const versions = await this.loadVersionHistory();
-        const version = versions[versionIndex];
-        
-        if (!version) return;
-        
-        if (confirm(`Restore version ${version.version}? This will replace your current work.`)) {
-            this.sections = JSON.parse(JSON.stringify(version.sections));
-            this.refreshCanvas();
-            this.saveToHistory();
-            this.showMessage(`Restored version ${version.version}`, 'success');
-        }
     }
     
     async compareVersion(versionIndex) {
@@ -1187,7 +1320,17 @@ class PageBuilder {
             this.showDropZonePlaceholder(false);
             this.saveToHistory();
         } else {
-            this.showDropZonePlaceholder(true);
+            // For new campaigns, try to restore from localStorage
+            const storageKey = `builder_draft_${this.campaignId || 'new'}`;
+            const draft = localStorage.getItem(storageKey);
+            if (draft) {
+                this.sections = JSON.parse(draft);
+                this.sections.forEach(s => this.renderSection(s));
+                this.showDropZonePlaceholder(false);
+                this.showMessage('Draft restored from local save', 'info');
+            } else {
+                this.showDropZonePlaceholder(true);
+            }
         }
     }
 
@@ -1197,25 +1340,36 @@ class PageBuilder {
         document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
         
+        // Map category names to actual template types
+        const categoryMap = {
+            'content': ['features', 'testimonials', 'text', 'faq', 'cta'],
+            'media': ['image', 'gallery', 'video'],
+            'interactive': ['form']
+        };
+        
+        const validTypes = categoryMap[category];
         const templates = document.querySelectorAll('.template-card');
         templates.forEach(template => {
-            if (category === 'all' || template.dataset.type === category) {
-                template.style.display = 'block';
-            } else {
-                template.style.display = 'none';
-            }
+            const type = template.dataset.type;
+            const show = category === 'all' || type === category || (validTypes && validTypes.includes(type));
+            template.style.display = show ? 'block' : 'none';
         });
     }
 
     getTemplateById(id) {
-        const template = this.templates.find(t => t.id === id);
-        if (!template) return null;
+        // Check server-provided templates first
+        const serverTemplate = (window.sectionTemplates || []).find(t => t.id === id);
+        if (serverTemplate) {
+            return serverTemplate; // already has id, type, content
+        }
         
-        // Return template with content based on type
+        // Fallback to DOM-discovered templates with defaults
+        const domTemplate = this.templates.find(t => t.id === id);
+        if (!domTemplate) return null;
         return {
-            id: template.id,
-            type: template.type,
-            content: this.getDefaultTemplateContent(template.type)
+            id: domTemplate.id,
+            type: domTemplate.type,
+            content: this.getDefaultTemplateContent(domTemplate.type)
         };
     }
 
@@ -1450,6 +1604,123 @@ class PageBuilder {
         this.saveToHistory();
     }
     
+    async uploadImage() {
+        const input = document.getElementById('imageUploadInput');
+        const file = input.files[0];
+        
+        if (!file) {
+            this.showMessage('Please select an image to upload', 'warning');
+            return;
+        }
+        
+        // Check file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            this.showMessage('Image must be less than 5MB', 'error');
+            return;
+        }
+        
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+            this.showMessage('Please select a valid image file', 'error');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        try {
+            this.showMessage('Uploading image...', 'info');
+            
+            const response = await fetch('/builder/upload-image', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success && result.imageUrl) {
+                // Update the section content with uploaded image URL
+                if (this.selectedSection) {
+                    this.selectedSection.content.src = result.imageUrl;
+                    this.selectedSection.content.alt = this.selectedSection.content.alt || file.name.split('.')[0];
+                    this.openPropertiesPanel(this.selectedSection);
+                    this.updateSectionPreview(this.selectedSection);
+                    this.saveToHistory();
+                    this.showMessage('Image uploaded successfully!', 'success');
+                }
+            } else {
+                this.showMessage(result.error || 'Upload failed', 'error');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            this.showMessage('Upload failed. Please try again.', 'error');
+        }
+        
+        // Clear input
+        input.value = '';
+    }
+    
+    async uploadGalleryImages() {
+        const input = document.getElementById('galleryUploadInput');
+        const files = Array.from(input.files);
+        
+        if (files.length === 0) {
+            this.showMessage('Please select images to upload', 'warning');
+            return;
+        }
+        
+        // Validate all files
+        for (let file of files) {
+            if (file.size > 5 * 1024 * 1024) {
+                this.showMessage(`Image "${file.name}" exceeds 5MB limit`, 'error');
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                this.showMessage(`File "${file.name}" is not an image`, 'error');
+                return;
+            }
+        }
+        
+        try {
+            this.showMessage(`Uploading ${files.length} image(s)...`, 'info');
+            
+            const uploadPromises = files.map(async (file) => {
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                const response = await fetch('/builder/upload-image', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                if (result.success && result.imageUrl) {
+                    return result.imageUrl;
+                }
+                throw new Error('Upload failed');
+            });
+            
+            const imageUrls = await Promise.all(uploadPromises);
+            
+            // Add uploaded URLs to gallery
+            if (this.selectedSection) {
+                this.selectedSection.content.images.push(...imageUrls);
+                this.openPropertiesPanel(this.selectedSection);
+                this.updateSectionPreview(this.selectedSection);
+                this.saveToHistory();
+                this.showMessage(`Successfully uploaded ${imageUrls.length} image(s)!`, 'success');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            this.showMessage('Some uploads failed. Please try again.', 'error');
+        }
+        
+        // Clear input
+        input.value = '';
+    }
+    
     // Version History Management
     async showVersionHistory() {
         const contentDiv = document.getElementById('versionHistoryContent');
@@ -1538,7 +1809,4 @@ class PageBuilder {
     }
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.pageBuilder = new PageBuilder();
-});
+// PageBuilder class exported - initialization handled by page-builder.ejs
