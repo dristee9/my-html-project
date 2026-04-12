@@ -58,6 +58,10 @@ exports.editPageBuilder = async (req, res) => {
 // Save page builder content
 exports.savePageBuilder = async (req, res) => {
     try {
+        console.log('💾 Save request received for campaign:', req.params.id || 'NEW');
+        console.log('👤 User:', req.user ? req.user.username : 'No user');
+        console.log('📥 Request body:', JSON.stringify(req.body, null, 2));
+        
         const { 
             title, 
             description, 
@@ -471,12 +475,18 @@ exports.clearVersionHistory = async (req, res) => {
 // Upload image for page builder
 exports.uploadImage = async (req, res) => {
     try {
+        console.log('📤 Upload request received');
+        console.log('📁 Request file:', req.file);
+        console.log('👤 User:', req.user ? req.user.username : 'No user');
+        
         if (!req.file) {
+            console.error('❌ No file uploaded');
             return res.status(400).json({ error: 'No file uploaded' });
         }
         
         // Construct the URL path to the uploaded image
         const imageUrl = `/uploads/${req.file.filename}`;
+        console.log(`✅ Image uploaded successfully: ${imageUrl}`);
         
         res.json({ 
             success: true, 
@@ -484,7 +494,7 @@ exports.uploadImage = async (req, res) => {
             filename: req.file.originalname
         });
     } catch (error) {
-        console.error('Upload error:', error);
+        console.error('❌ Upload error:', error);
         res.status(500).json({ error: 'Failed to upload image' });
     }
 };

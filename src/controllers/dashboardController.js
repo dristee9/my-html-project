@@ -119,7 +119,9 @@ exports.updateProfile = async (req, res) => {
         
         // Handle profile image upload if file exists
         if (req.file) {
-            user.profileImage = '/uploads/profiles/' + req.file.filename;
+            const profileImageUrl = `/uploads/profiles/${req.file.filename}`;
+            console.log(`👤 Profile image uploaded: ${profileImageUrl}`);
+            user.profileImage = profileImageUrl;
         }
         
         // Save to trigger pre-save hooks and validation

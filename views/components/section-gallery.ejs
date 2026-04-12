@@ -1,0 +1,25 @@
+<div class="gallery-section" style="background: <%= settings.backgroundColor || '#ffffff' %>; color: <%= settings.textColor || '#000000' %>; padding: <%= settings.padding.top %>px <%= settings.padding.right %>px <%= settings.padding.bottom %>px <%= settings.padding.left %>px; margin: <%= settings.margin.top %>px 0 <%= settings.margin.bottom %>px 0; border-radius: <%= settings.borderRadius %>px; box-shadow: <%= settings.boxShadow || 'none' %>;">
+    <div class="container">
+        <% if (content.title) { %>
+            <h2 style="text-align: center; margin-bottom: 1.5rem;"><%= content.title %></h2>
+        <% } %>
+        
+        <% if (content.images && content.images.length > 0) { %>
+            <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <% content.images.forEach(imageUrl => { %>
+                    <div class="gallery-item">
+                        <img 
+                            src="<%= imageUrl %>" 
+                            alt="Gallery image"
+                            style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; display: block;"
+                        >
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div style="text-align: center; padding: 2rem; background: #f3f4f6; border-radius: 8px;">
+                <p style="color: #9ca3af;">No images yet - add images in the editor</p>
+            </div>
+        <% } %>
+    </div>
+</div>

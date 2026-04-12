@@ -10,8 +10,12 @@ const fs = require('fs');
  */
 const createStorage = (destination) => {
     // Ensure destination directory exists
-    if (!fs.existsSync(destination)) {
-        fs.mkdirSync(destination, { recursive: true });
+    const fullDest = path.join(process.cwd(), destination);
+    if (!fs.existsSync(fullDest)) {
+        fs.mkdirSync(fullDest, { recursive: true });
+        console.log(`📁 Upload directory created at: ${fullDest}`);
+    } else {
+        console.log(`✅ Upload directory exists: ${fullDest}`);
     }
     
     return multer.diskStorage({
@@ -23,7 +27,9 @@ const createStorage = (destination) => {
             // Use only the extension from original name, generate random filename
             const ext = path.extname(file.originalname).toLowerCase();
             const randomName = crypto.randomBytes(16).toString('hex');
-            cb(null, `${Date.now()}-${randomName}${ext}`);
+            const filename = `${Date.now()}-${randomName}${ext}`;
+            console.log(`📤 Uploading file: ${file.originalname} -> ${filename}`);
+            cb(null, filename);
         }
     });
 };
@@ -46,7 +52,7 @@ const imageFilter = (req, file, cb) => {
  * - Images only
  */
 exports.campaignUpload = multer({
-    storage: createStorage('public/uploads/'),
+    storage: createStorage('public/uploads'),
     limits: {
         fileSize: 5 * 1024 * 1024 // 5MB limit
     },
@@ -60,7 +66,7 @@ exports.campaignUpload = multer({
  * - Images only
  */
 exports.profileUpload = multer({
-    storage: createStorage('public/uploads/profiles/'),
+    storage: createStorage('public/uploads/profiles'),
     limits: {
         fileSize: 5 * 1024 * 1024 // 5MB limit
     },

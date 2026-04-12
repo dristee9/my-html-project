@@ -1,0 +1,27 @@
+<div class="faq-section" style="background: <%= settings.backgroundColor || '#ffffff' %>; color: <%= settings.textColor || '#000000' %>; padding: <%= settings.padding.top %>px <%= settings.padding.right %>px <%= settings.padding.bottom %>px <%= settings.padding.left %>px; margin: <%= settings.margin.top %>px 0 <%= settings.margin.bottom %>px 0; border-radius: <%= settings.borderRadius %>px; box-shadow: <%= settings.boxShadow || 'none' %>;">
+    <div class="container">
+        <% if (content.title) { %>
+            <h2 style="text-align: center; margin-bottom: 1.5rem;"><%= content.title %></h2>
+        <% } %>
+        
+        <div class="faq-list">
+            <% if (content.faqs && content.faqs.length > 0) { %>
+                <% content.faqs.forEach((faq, index) => { %>
+                    <details class="faq-item" style="margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                        <summary style="padding: 1rem; background: #f9fafb; cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                            <%= faq.question %>
+                            <span style="font-size: 1.25rem;">+</span>
+                        </summary>
+                        <div style="padding: 1rem; background: white;">
+                            <p style="color: #4b5563;"><%= faq.answer %></p>
+                        </div>
+                    </details>
+                <% }); %>
+            <% } else { %>
+                <div style="text-align: center; padding: 2rem; background: #f3f4f6; border-radius: 8px;">
+                    <p style="color: #9ca3af;">No FAQs yet - add questions and answers in the editor</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

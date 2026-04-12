@@ -1,4 +1,3 @@
-const axios = require('axios');
 require('dotenv').config();
 
 // Validate bKash credentials at startup - fail fast if missing
@@ -52,30 +51,40 @@ async function grantToken() {
             return accessTokenCache.token;
         }
 
-        const response = await axios.post(config.tokenUrl, {
-            app_key: BKASH_CONFIG.appKey,
-            app_secret: BKASH_CONFIG.appSecret
-        }, {
+        const response = await fetch(config.tokenUrl, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'username': BKASH_CONFIG.username,
                 'password': BKASH_CONFIG.password
-            }
+            },
+            body: JSON.stringify({
+                app_key: BKASH_CONFIG.appKey,
+                app_secret: BKASH_CONFIG.appSecret
+            })
         });
 
-        if (response.data && response.data.id_token) {
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error getting bKash token:', errorData);
+            throw new Error('Failed to authenticate with bKash');
+        }
+
+        const data = await response.json();
+
+        if (data && data.id_token) {
             // Cache the token (expires in 1 hour, we'll refresh at 50 minutes)
-            accessTokenCache.token = response.data.id_token;
+            accessTokenCache.token = data.id_token;
             accessTokenCache.expiresAt = new Date(Date.now() + 50 * 60 * 1000);
             
             console.log('bKash token granted successfully');
-            return response.data.id_token;
+            return data.id_token;
         } else {
             throw new Error('Invalid token response from bKash');
         }
     } catch (error) {
-        console.error('Error getting bKash token:', error.response?.data || error.message);
+        console.error('Error getting bKash token:', error.message);
         throw new Error('Failed to authenticate with bKash');
     }
 }
@@ -91,9 +100,15 @@ async function createPayment(amount, invoiceNumber, callbackURL) {
     try {
         const token = await grantToken();
         
-        const response = await axios.post(
-            `${config.baseUrl}/tokenized/checkout/create`,
-            {
+        const response = await fetch(`${config.baseUrl}/tokenized/checkout/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': token,
+                'X-App-Key': BKASH_CONFIG.appKey
+            },
+            body: JSON.stringify({
                 mode: '0011',
                 payerReference: ' ',
                 callbackURL: callbackURL,
@@ -101,25 +116,25 @@ async function createPayment(amount, invoiceNumber, callbackURL) {
                 currency: 'BDT',
                 intent: 'sale',
                 merchantInvoiceNumber: invoiceNumber
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': token,
-                    'X-App-Key': BKASH_CONFIG.appKey
-                }
-            }
-        );
+            })
+        });
 
-        if (response.data && response.data.bkashURL) {
-            console.log('bKash payment created:', response.data.paymentID);
-            return response.data;
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error creating bKash payment:', errorData);
+            throw new Error('Failed to create bKash payment');
+        }
+
+        const data = await response.json();
+
+        if (data && data.bkashURL) {
+            console.log('bKash payment created:', data.paymentID);
+            return data;
         } else {
             throw new Error('Invalid payment creation response from bKash');
         }
     } catch (error) {
-        console.error('Error creating bKash payment:', error.response?.data || error.message);
+        console.error('Error creating bKash payment:', error.message);
         throw new Error('Failed to create bKash payment');
     }
 }
@@ -134,27 +149,33 @@ async function executePayment(paymentID) {
         const token = await grantToken();
         
         // bKash API expects paymentID in request body, not URL path
-        const response = await axios.post(
-            `${config.baseUrl}/tokenized/checkout/execute`,
-            { paymentID: paymentID },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': token,
-                    'X-App-Key': BKASH_CONFIG.appKey
-                }
-            }
-        );
+        const response = await fetch(`${config.baseUrl}/tokenized/checkout/execute`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': token,
+                'X-App-Key': BKASH_CONFIG.appKey
+            },
+            body: JSON.stringify({ paymentID: paymentID })
+        });
 
-        if (response.data && response.data.transactionStatus === 'Completed') {
-            console.log('bKash payment executed successfully:', response.data.trxID);
-            return response.data;
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error executing bKash payment:', errorData);
+            throw new Error('Failed to execute bKash payment');
+        }
+
+        const data = await response.json();
+
+        if (data && data.transactionStatus === 'Completed') {
+            console.log('bKash payment executed successfully:', data.trxID);
+            return data;
         } else {
             throw new Error('Payment execution failed or not completed');
         }
     } catch (error) {
-        console.error('Error executing bKash payment:', error.response?.data || error.message);
+        console.error('Error executing bKash payment:', error.message);
         throw new Error('Failed to execute bKash payment');
     }
 }
@@ -168,26 +189,32 @@ async function queryPayment(paymentID) {
     try {
         const token = await grantToken();
         
-        const response = await axios.post(
-            `${config.baseUrl}/tokenized/checkout/details/${paymentID}`,
-            {},
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': token,
-                    'X-App-Key': BKASH_CONFIG.appKey
-                }
-            }
-        );
+        const response = await fetch(`${config.baseUrl}/tokenized/checkout/details/${paymentID}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': token,
+                'X-App-Key': BKASH_CONFIG.appKey
+            },
+            body: JSON.stringify({})
+        });
 
-        if (response.data) {
-            return response.data;
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error querying bKash payment:', errorData);
+            throw new Error('Failed to query bKash payment');
+        }
+
+        const data = await response.json();
+
+        if (data) {
+            return data;
         } else {
             throw new Error('Invalid payment details response from bKash');
         }
     } catch (error) {
-        console.error('Error querying bKash payment:', error.response?.data || error.message);
+        console.error('Error querying bKash payment:', error.message);
         throw new Error('Failed to query bKash payment');
     }
 }

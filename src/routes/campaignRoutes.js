@@ -13,6 +13,10 @@ const upload = campaignUpload;
 // Apply optionalAuth middleware
 router.use(optionalAuth);
 
+// Basic campaign creation routes (must be before /:id routes)
+router.get('/basic-create', authenticateToken, campaignController.getBasicCampaignForm);
+router.post('/create', authenticateToken, upload.single('image'), campaignController.createBasicCampaign);
+
 // Rate limiter for donation routes
 const donationLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
@@ -35,11 +39,6 @@ router.post('/:id/donate', authenticateToken, donationLimiter, validateDonation,
 // bKash payment routes
 router.post('/:id/bkash/initiate', authenticateToken, campaignController.initiateBkashPayment);
 router.get('/:id/bkash-callback', authenticateToken, campaignController.handleBkashCallback);
-
-// Create campaign route (GET) - Redirect to page builder
-router.get('/create', authenticateToken, (req, res) => {
-    res.redirect('/builder/create');
-});
 
 // Single campaign route
 router.get('/:id', campaignController.getCampaignById);

@@ -18,7 +18,6 @@
   "author": "FundMyIdea BD Team",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",
@@ -26,7 +25,7 @@
     "ejs": "^3.1.9",
     "ejs-mate": "^4.0.0",
     "express": "^4.18.2",
-    "express-rate-limit": "^8.3.1",
+    "express-rate-limit": "^8.3.2",
     "express-session": "^1.19.0",
     "express-validator": "^7.0.1",
     "helmet": "^8.1.0",
@@ -34,6 +33,7 @@
     "mongoose": "^7.5.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.4",
+    "sanitize-html": "^2.17.2",
     "sortablejs": "^1.15.7",
     "ws": "^8.19.0"
   },

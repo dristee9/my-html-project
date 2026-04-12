@@ -1,0 +1,23 @@
+<div class="cta-section" style="background: <%= settings.backgroundColor || '#3b82f6' %>; color: <%= settings.textColor || '#ffffff' %>; padding: <%= settings.padding.top %>px <%= settings.padding.right %>px <%= settings.padding.bottom %>px <%= settings.padding.left %>px; margin: <%= settings.margin.top %>px 0 <%= settings.margin.bottom %>px 0; border-radius: <%= settings.borderRadius %>px; box-shadow: <%= settings.boxShadow || 'none' %>;">
+    <div class="container" style="text-align: center;">
+        <% if (content.title) { %>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;"><%= content.title %></h2>
+        <% } %>
+        
+        <% if (content.subtitle) { %>
+            <p style="font-size: 1.125rem; margin-bottom: 1.5rem; opacity: 0.9;"><%= content.subtitle %></p>
+        <% } %>
+        
+        <% if (content.ctaText && content.ctaLink) { %>
+            <a 
+                href="<%= content.ctaLink %>" 
+                class="btn btn-primary"
+                style="display: inline-block; padding: 0.75rem 1.5rem; background: <%= settings.textColor || '#ffffff' %>; color: <%= settings.backgroundColor || '#3b82f6' %>; text-decoration: none; border-radius: 6px; font-weight: 600; transition: all 0.2s;"
+                onmouseover="this.style.opacity='0.9'"
+                onmouseout="this.style.opacity='1'"
+            >
+                <%= content.ctaText %>
+            </a>
+        <% } %>
+    </div>
+</div>

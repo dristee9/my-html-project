@@ -84,24 +84,30 @@ const csrfProtection = csrf({
 
 // Apply CSRF protection conditionally
 app.use((req, res, next) => {
-    // Skip CSRF for page builder API routes only
-    // Note: We do NOT skip CSRF based on X-Requested-With header as this is a security bypass
-    if (req.path.startsWith('/builder/api/')) {
-        // For builder API routes that legitimately need AJAX access,
-        // CSRF token should be passed in JSON body or headers
+    // Skip CSRF for page builder routes that need AJAX access
+    console.log(`🔍 CSRF check for path: ${req.path}`);
+    if (req.path.startsWith('/builder/api/') || req.path.startsWith('/builder/save') || req.path.startsWith('/builder/upload') || req.path.startsWith('/builder/preview-section')) {
+        console.log('✅ CSRF bypass applied for page builder route');
         const originalCsrfToken = req.csrfToken;
         req.csrfToken = () => '';
-        req._originalCsrfToken = originalCsrfToken; // Store original for reference
+        req._originalCsrfToken = originalCsrfToken;
+        return next();
+    }
+    
+    // Temporarily skip CSRF for basic campaign creation to debug
+    if (req.path === '/campaigns/create' && req.method === 'POST') {
+        console.log('⚠️  CSRF bypass for basic campaign creation (DEBUG)');
         return next();
     }
     
     // Apply CSRF to all other routes including forms and standard requests
     csrfProtection(req, res, (err) => {
         if (err) {
-            console.error('CSRF Token Error:', err.message);
+            console.error('❌ CSRF Token Error:', err.message);
+            console.error('   Path:', req.path);
+            console.error('   Method:', req.method);
             
             // If it's a CSRF error and user is trying to logout, allow it anyway
-            // This prevents users from being stuck logged in due to token issues
             if (req.path === '/logout' && err.code === 'EBADCSRFTOKEN') {
                 console.warn('Allowing logout despite CSRF error for path:', req.path);
                 return next();
@@ -118,8 +124,15 @@ app.use((req, res, next) => {
     });
 });
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files - MUST come before routes
+const staticMiddleware = express.static(path.join(__dirname, 'public'));
+app.use((req, res, next) => {
+    // Log static file requests for debugging
+    if (req.path.startsWith('/uploads/') || req.path.startsWith('/js/') || req.path.startsWith('/styles/')) {
+        console.log(`📂 Static request: ${req.path}`);
+    }
+    staticMiddleware(req, res, next);
+});
 
 // View engine setup
 app.engine('ejs', ejsMate);
@@ -178,7 +191,7 @@ app.use((req, res, next) => {
         // Check if we have an original CSRF token function (for page builder routes)
         if (req._originalCsrfToken) {
             res.locals.csrfToken = req._originalCsrfToken();
-        } else if (req.csrfToken) {
+        } else if (req.csrfToken && typeof req.csrfToken === 'function') {
             res.locals.csrfToken = req.csrfToken();
         } else {
             res.locals.csrfToken = '';

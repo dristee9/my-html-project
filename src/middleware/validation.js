@@ -53,16 +53,8 @@ exports.validateRegistration = [
     
     body('university')
         .notEmpty().withMessage('University is required')
-        .isIn(['BUET', 'Dhaka University', 'North South University', 'BRAC University', 'Other'])
-        .withMessage('Please select a valid university'),
-    
-    body('confirmPassword')
-        .custom((value, { req }) => {
-            if (value !== req.body.password) {
-                throw new Error('Passwords do not match');
-            }
-            return true;
-        }),
+        .trim()
+        .isLength({ min: 2, max: 100 }).withMessage('University name must be 2-100 characters'),
     
     exports.handleValidationErrors
 ];
@@ -179,8 +171,8 @@ exports.validateProfileUpdate = [
     
     body('university')
         .optional({ checkFalsy: true })
-        .isIn(['BUET', 'Dhaka University', 'North South University', 'BRAC University', 'Other'])
-        .withMessage('Please select a valid university'),
+        .trim()
+        .isLength({ min: 2, max: 100 }).withMessage('University name must be 2-100 characters'),
     
     exports.handleValidationErrors
 ];

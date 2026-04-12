@@ -102,6 +102,73 @@ exports.getCampaignById = async (req, res) => {
 };
 
 // Create new campaign
+exports.getBasicCampaignForm = async (req, res) => {
+    try {
+        res.render('pages/basic-campaign', {
+            title: 'Create Campaign - FundMyIdea BD',
+            user: req.user,
+            currentPage: 'basic-create'
+        });
+    } catch (error) {
+        console.error('Error loading basic campaign form:', error);
+        res.status(500).render('pages/error', {
+            title: 'Error - FundMyIdea BD',
+            error: 'Failed to load campaign creation form',
+            user: req.user
+        });
+    }
+};
+
+exports.createBasicCampaign = async (req, res) => {
+    try {
+        const { title, description, category, fundingGoal, deadline } = req.body;
+        
+        // Validate required fields
+        if (!title || !description || !category || !fundingGoal || !deadline) {
+            return res.status(400).render('pages/basic-campaign', {
+                title: 'Create Campaign - FundMyIdea BD',
+                user: req.user,
+                currentPage: 'basic-create',
+                error: 'All fields are required'
+            });
+        }
+        
+        // Build campaign data
+        const campaignData = {
+            title,
+            description,
+            category,
+            fundingGoal: parseInt(fundingGoal),
+            deadline: new Date(deadline),
+            creator: req.user._id,
+            status: 'active' // Basic campaigns go live immediately
+        };
+        
+        // Handle image upload if provided
+        if (req.file) {
+            const imageUrl = `/uploads/${req.file.filename}`;
+            console.log(`📷 Campaign image uploaded: ${imageUrl}`);
+            campaignData.imageUrl = imageUrl;
+        }
+        
+        // Create campaign
+        const campaign = new Campaign(campaignData);
+        await campaign.save();
+        
+        console.log('Basic campaign created successfully:', campaign._id);
+        
+        // Redirect to the newly created campaign page
+        res.redirect(`/campaigns/${campaign._id}?created=true`);
+    } catch (error) {
+        console.error('Error creating campaign:', error);
+        res.status(500).render('pages/basic-campaign', {
+            title: 'Create Campaign - FundMyIdea BD',
+            user: req.user,
+            currentPage: 'basic-create',
+            error: 'Failed to create campaign. Please try again.'
+        });
+    }
+};
 
 // Get edit campaign page
 exports.getEditCampaign = async (req, res) => {
@@ -183,7 +250,9 @@ exports.updateCampaign = async (req, res) => {
         
         // Handle image update if new image is uploaded
         if (req.file) {
-            updateData.imageUrl = `/uploads/${req.file.filename}`;
+            const imageUrl = `/uploads/${req.file.filename}`;
+            console.log(`📷 Campaign image uploaded: ${imageUrl}`);
+            updateData.imageUrl = imageUrl;
         }
         
         // Update campaign

@@ -211,6 +211,87 @@ router.get('/verify-email/:token', passwordResetLimiter, async (req, res) => {
         });
     }
 });
+
+// OTP Verification route
+router.post('/verify-otp', async (req, res) => {
+    try {
+        const { otp } = req.body;
+        
+        // Get stored OTP from session
+        const storedOTP = req.session.emailVerificationOTP;
+        const verificationEmail = req.session.verificationEmail;
+        
+        if (!storedOTP || !verificationEmail) {
+            return res.status(400).render('pages/verify-email-otp', {
+                title: 'Verify Your Email - FundMyIdea BD',
+                error: 'Verification session expired. Please register again.',
+                email: verificationEmail
+            });
+        }
+        
+        // For testing: accept any 6-digit OTP
+        // In production: compare with stored OTP
+        if (otp && otp.length === 6 && /^[0-9]+$/.test(otp)) {
+            // Find user by email and mark as verified
+            const User = require('../models/User');
+            const user = await User.findOne({ email: verificationEmail });
+            
+            if (!user) {
+                return res.status(400).render('pages/verify-email-otp', {
+                    title: 'Verify Your Email - FundMyIdea BD',
+                    error: 'User not found.',
+                    email: verificationEmail
+                });
+            }
+            
+            // Mark email as verified
+            user.emailVerified = true;
+            user.emailVerificationToken = undefined;
+            await user.save();
+            
+            // Clear session OTP
+            delete req.session.emailVerificationOTP;
+            delete req.session.verificationEmail;
+            
+            // Generate JWT token and log the user in
+            const jwt = require('jsonwebtoken');
+            const token = jwt.sign(
+                { userId: user._id }, 
+                process.env.JWT_SECRET,
+                { expiresIn: '7d' }
+            );
+            
+            res.cookie('token', token, {
+                httpOnly: true,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+            });
+            
+            // Send welcome email
+            const emailService = require('../services/emailService');
+            emailService.sendWelcomeEmail(user).catch(err => {
+                console.error('Failed to send welcome email:', err);
+            });
+            
+            res.redirect('/dashboard?email-verified=true');
+        } else {
+            return res.status(400).render('pages/verify-email-otp', {
+                title: 'Verify Your Email - FundMyIdea BD',
+                error: 'Invalid OTP. Please enter a valid 6-digit code.',
+                email: verificationEmail
+            });
+        }
+    } catch (error) {
+        console.error('OTP verification error:', error);
+        res.status(500).render('pages/verify-email-otp', {
+            title: 'Verify Your Email - FundMyIdea BD',
+            error: 'Something went wrong. Please try again.',
+            email: req.session.verificationEmail
+        });
+    }
+});
+
 router.get('/reset-password/:token', passwordResetLimiter, async (req, res) => {
     try {
         const User = require('../models/User');

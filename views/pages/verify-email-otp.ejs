@@ -1,0 +1,184 @@
+<% layout('layouts/main') -%>
+<% title = 'Verify Your Email - FundMyIdea BD' -%>
+
+<div class="verify-container">
+    <div class="verify-card">
+        <div class="verify-icon">📧</div>
+        <h1 class="verify-title">Enter Verification Code</h1>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-banner" style="background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem; text-align: center;">
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <p class="verify-message">
+            We've sent a 6-digit verification code to <strong><%= typeof email !== 'undefined' ? email : 'your email address' %></strong>.
+        </p>
+        
+        <form method="POST" action="/verify-otp" class="otp-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            
+            <div class="otp-input-container">
+                <input 
+                    type="text" 
+                    name="otp" 
+                    id="otpInput"
+                    class="otp-input"
+                    placeholder="000000"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                    required
+                    autofocus
+                >
+            </div>
+            
+            <button type="submit" class="btn btn--primary btn--full">
+                Verify Email
+            </button>
+        </form>
+        
+        <div class="verify-tips">
+            <p><strong>💡 Tips:</strong></p>
+            <ul>
+                <li>Check your email inbox for the 6-digit code</li>
+                <li>The code is case-sensitive (numbers only)</li>
+                <li>The code will expire after 10 minutes</li>
+            </ul>
+        </div>
+        
+        <div class="verify-actions">
+            <div style="margin-top: 1rem;">
+                <p style="color: var(--gray-600); font-size: 0.875rem;">
+                    Didn't receive the code? <a href="/resend-verification" class="form-link">Resend</a>
+                </p>
+                <p style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">
+                    Already verified? <a href="/login" class="form-link">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .verify-container {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 2rem 1rem;
+    }
+    
+    .verify-card {
+        background: white;
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--shadow-lg);
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+    
+    .verify-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .verify-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin-bottom: 1rem;
+    }
+    
+    .verify-message {
+        font-size: 1.125rem;
+        color: var(--gray-700);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    
+    .otp-input-container {
+        margin: 2rem 0;
+    }
+    
+    .otp-input {
+        width: 100%;
+        max-width: 300px;
+        padding: 1rem;
+        font-size: 2rem;
+        text-align: center;
+        letter-spacing: 0.5rem;
+        border: 2px solid var(--gray-300);
+        border-radius: var(--border-radius-lg);
+        transition: all 0.2s;
+    }
+    
+    .otp-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .otp-form {
+        margin-bottom: 2rem;
+    }
+    
+    .verify-tips {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 1.5rem;
+        border-radius: var(--border-radius-md);
+        margin: 2rem 0;
+        text-align: left;
+    }
+    
+    .verify-tips p {
+        color: #92400e;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .verify-tips ul {
+        color: #78350f;
+        line-height: 1.8;
+        padding-left: 1.5rem;
+    }
+    
+    .verify-actions {
+        margin-top: 2rem;
+    }
+    
+    @media (max-width: 640px) {
+        .verify-card {
+            padding: 2rem 1rem;
+        }
+        
+        .verify-icon {
+            font-size: 3rem;
+        }
+        
+        .verify-title {
+            font-size: 1.5rem;
+        }
+        
+        .otp-input {
+            font-size: 1.5rem;
+            padding: 0.75rem;
+        }
+    }
+</style>
+
+<script>
+    // Auto-format OTP input
+    document.addEventListener('DOMContentLoaded', function() {
+        const otpInput = document.getElementById('otpInput');
+        
+        otpInput.addEventListener('input', function(e) {
+            // Remove any non-digit characters
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+        
+        otpInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pasteData = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
+            this.value = pasteData.substring(0, 6);
+        });
+    });
+</script>

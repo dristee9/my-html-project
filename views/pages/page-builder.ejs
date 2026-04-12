@@ -10,6 +10,9 @@
 }) %>
 
 <div class="page-builder-container" id="pageBuilderContainer" data-campaign-id="<%= typeof campaign !== 'undefined' && campaign ? campaign._id : '' %>">
+    <!-- CSRF Token for AJAX requests -->
+    <meta name="csrf-token" content="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+    
     <!-- Top Toolbar -->
     <div class="builder-toolbar">
         <div class="toolbar-left">

@@ -68,26 +68,28 @@ exports.register = [
                 });
             }
 
-            // Create new user
+            // Create new user (not verified yet)
             const user = new User({
                 username,
                 email,
                 password,
-                university
+                university,
+                emailVerified: false
             });
 
             await user.save();
 
-            // Generate email verification token
-            const verificationToken = await user.generateEmailVerificationToken();
+            // Generate 6-digit OTP for verification
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
             
-            // Send verification email (non-blocking)
-            emailService.sendEmailVerification(user, verificationToken).catch(err => {
-                console.error('Failed to send verification email:', err);
-            });
-
-            // Render "check your email" page instead of logging in
-            return res.render('pages/verify-email-pending', {
+            // Store OTP in session for testing (in production, store hashed OTP in DB)
+            req.session.emailVerificationOTP = otp;
+            req.session.verificationEmail = email;
+            
+            console.log(`📧 Email Verification OTP for ${email}: ${otp}`);
+            
+            // Render OTP verification page
+            return res.render('pages/verify-email-otp', {
                 title: 'Verify Your Email - FundMyIdea BD',
                 email: user.email
             });

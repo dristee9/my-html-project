@@ -1052,11 +1052,15 @@ class PageBuilder {
         const formData = this.collectFormData();
         formData.status = status;
         
+        // Get CSRF token from cookie or meta tag
+        const csrfToken = this.getCsrfToken();
+        
         try {
             const response = await fetch(`/builder/save/${this.campaignId || ''}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(csrfToken ? { 'x-csrf-token': csrfToken } : {})
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify(formData)
@@ -1453,6 +1457,41 @@ class PageBuilder {
         return 'section_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
+    getCsrfToken() {
+        // Try to get CSRF token from cookie
+        const name = 'csrf_token';
+        let value = null;
+        
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    value = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        
+        // Fallback: try to get from meta tag
+        if (!value) {
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag) {
+                value = metaTag.getAttribute('content');
+            }
+        }
+        
+        // Fallback: try to get from hidden input
+        if (!value) {
+            const input = document.querySelector('input[name="_csrf"]');
+            if (input) {
+                value = input.value;
+            }
+        }
+        
+        return value;
+    }
+
     getSectionIcon(type) {
         const icons = {
             hero: '🏔️',
@@ -1628,13 +1667,17 @@ class PageBuilder {
         const formData = new FormData();
         formData.append('image', file);
         
+        // Get CSRF token
+        const csrfToken = this.getCsrfToken();
+        
         try {
             this.showMessage('Uploading image...', 'info');
             
             const response = await fetch('/builder/upload-image', {
                 method: 'POST',
-                body: formData,
-                credentials: 'same-origin'
+                headers: csrfToken ? { 'x-csrf-token': csrfToken } : {},
+                credentials: 'same-origin',
+                body: formData
             });
             
             const result = await response.json();
@@ -1682,6 +1725,9 @@ class PageBuilder {
             }
         }
         
+        // Get CSRF token
+        const csrfToken = this.getCsrfToken();
+        
         try {
             this.showMessage(`Uploading ${files.length} image(s)...`, 'info');
             
@@ -1691,8 +1737,9 @@ class PageBuilder {
                 
                 const response = await fetch('/builder/upload-image', {
                     method: 'POST',
-                    body: formData,
-                    credentials: 'same-origin'
+                    headers: csrfToken ? { 'x-csrf-token': csrfToken } : {},
+                    credentials: 'same-origin',
+                    body: formData
                 });
                 
                 const result = await response.json();
