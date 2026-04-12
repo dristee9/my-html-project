@@ -1,0 +1,74 @@
+<% layout('layouts/main') -%>
+<% title = 'My Profile - FundMyIdea BD' -%>
+<%- include('../partials/breadcrumbs', {
+    breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Profile' }
+    ]
+}) %>
+<div class="dashboard-header">
+    <h1 class="heading-1">My Profile</h1>
+    <p class="dashboard-subtitle">Manage your account information</p>
+</div>
+<% if (typeof saved !== 'undefined' && saved) { %>
+<div class="success-banner mb-6 p-4 bg-green-50 border border-green-200 rounded-lg" style="background: #f0fdf4; border-color: #bbf7d0; border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1.5rem;">
+    <h3 class="font-semibold text-green-800" style="color: #166534; font-weight: 600; margin-bottom: 0.25rem;">✓ Profile Updated Successfully!</h3>
+    <p class="text-green-700 text-sm" style="color: #15803d; font-size: 0.875rem;">Your profile information has been saved.</p>
+</div>
+<% } %>
+<div class="dashboard-grid">
+    <%- include('../partials/dashboard-sidebar', { currentPage: 'profile' }) %>
+    <div class="card-shadow">
+        <form method="POST" action="/dashboard/profile" class="js-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-input" value="<%= user.username %>" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-input" value="<%= user.email %>" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">University</label>
+                <select name="university" class="form-input" required>
+                    <option value="BUET" <%= user.university === 'BUET' ? 'selected' : '' %>>BUET</option>
+                    <option value="Dhaka University" <%= user.university === 'Dhaka University' ? 'selected' : '' %>>Dhaka University</option>
+                    <option value="North South University" <%= user.university === 'North South University' ? 'selected' : '' %>>North South University</option>
+                    <option value="BRAC University" <%= user.university === 'BRAC University' ? 'selected' : '' %>>BRAC University</option>
+                    <option value="Other" <%= user.university === 'Other' ? 'selected' : '' %>>Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Profile Image</label>
+                <% if (user.profileImage) { %>
+                    <div class="mb-4">
+                        <img src="<%= user.profileImage %>" alt="Profile image" class="profile-image-preview" id="profilePreview" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; display: block; margin-bottom: 1rem;">
+                    </div>
+                <% } %>
+                <input type="file" name="profileImage" class="form-input" accept="image/*" id="profileImageInput">
+                <small class="form-help-text">Upload a profile picture (JPG, PNG, max 2MB)</small>
+            </div>
+            <script>
+                // Profile image preview
+                document.addEventListener('DOMContentLoaded', function() {
+                    const imageInput = document.getElementById('profileImageInput');
+                    const previewElement = document.getElementById('profilePreview');
+                    if (imageInput && previewElement) {
+                        imageInput.addEventListener('change', function() {
+                            const file = this.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    previewElement.src = e.target.result;
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        });
+                    }
+                });
+            </script>
+            <button type="submit" class="btn btn--primary btn--full">Update Profile</button>
+        </form>
+    </div>
+</div>

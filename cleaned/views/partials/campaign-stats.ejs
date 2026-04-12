@@ -1,0 +1,14 @@
+<div class="funding-summary">
+    <div class="progress-container">
+        <div class="progress-track">
+            <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
+        </div>
+    </div>
+    <div class="funding-amount">
+        <span><%= campaign.currentFunding %> BDT raised</span>
+        <span>of <%= campaign.fundingGoal %> BDT goal</span>
+    </div>
+    <div class="supporters-count">
+        <%= campaign.backers.length %> <%= campaign.backers.length === 1 ? 'backer' : 'backers' %>
+    </div>
+</div>

@@ -1,0 +1,311 @@
+<% layout('layouts/main') -%>
+<% title = typeof campaign !== 'undefined' && campaign ? 'Edit Campaign - Page Builder' : 'Create Campaign - Page Builder' -%>
+<% extraStyles = ['page-builder'] -%>
+<%- include('../partials/breadcrumbs', {
+    breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: typeof campaign !== 'undefined' && campaign ? 'Edit Campaign' : 'Create Campaign' }
+    ]
+}) %>
+<div class="page-builder-container" id="pageBuilderContainer" data-campaign-id="<%= typeof campaign !== 'undefined' && campaign ? campaign._id : '' %>">
+    <meta name="csrf-token" content="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+    <div class="builder-toolbar">
+        <div class="toolbar-left">
+            <h1 class="toolbar-title">
+                <%= typeof campaign !== 'undefined' && campaign ? 'Edit Campaign' : 'Create New Campaign' %>
+            </h1>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-secondary" id="previewBtn">
+                <i class="icon"><i class="fa fa-eye"></i></i> Preview
+            </button>
+            <button class="btn btn-outline" id="saveDraftBtn">
+                <i class="icon"><i class="fa fa-save"></i></i> Save Draft
+            </button>
+            <button class="btn btn-outline" id="versionHistoryBtn" onclick="toggleVersionHistory()">
+                <i class="icon"><i class="fa fa-history"></i></i> Version History
+            </button>
+            <button class="btn btn-primary" id="publishBtn">
+                <i class="icon"><i class="fa fa-rocket"></i></i> <%= typeof campaign !== 'undefined' && campaign ? 'Update' : 'Publish' %> Campaign
+            </button>
+        </div>
+    </div>
+    <div class="builder-layout">
+        <div class="builder-panel builder-panel-left">
+            <div class="panel-header">
+                <h3>Sections</h3>
+            </div>
+            <div class="panel-content">
+                <div class="section-categories">
+                    <button class="category-btn active" data-category="all">All Sections</button>
+                    <button class="category-btn" data-category="hero">Hero Sections</button>
+                    <button class="category-btn" data-category="content">Content</button>
+                    <button class="category-btn" data-category="media">Media</button>
+                    <button class="category-btn" data-category="interactive">Interactive</button>
+                </div>
+                <div class="templates-grid">
+                    <div class="template-category-header">Popular Templates</div>
+                    <div class="template-category">
+                        <h4>Hero</h4>
+                        <div class="template-items">
+                            <div class="template-card" data-template="hero-basic" data-type="hero" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-header"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Basic Hero</h4>
+                                    <p class="template-desc">Simple hero with title and CTA</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="hero-basic" data-type="hero" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-image"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Hero with Image</h4>
+                                    <p class="template-desc">Hero section with background image</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="template-category">
+                        <h4>Content</h4>
+                        <div class="template-items">
+                            <div class="template-card" data-template="features-three-col" data-type="features" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-star"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Three Features</h4>
+                                    <p class="template-desc">Three-column feature showcase</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="testimonial-slider" data-type="testimonials" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-comments"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Testimonial Slider</h4>
+                                    <p class="template-desc">Rotating customer testimonials</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="text-basic" data-type="text" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-pencil"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Text Block</h4>
+                                    <p class="template-desc">Headings and paragraphs</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="cta-basic" data-type="cta" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-bullseye"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Call to Action</h4>
+                                    <p class="template-desc">Bold CTA with button</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="faq-basic" data-type="faq" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">❓</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>FAQ</h4>
+                                    <p class="template-desc">Questions and answers</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="template-category">
+                        <h4>Media</h4>
+                        <div class="template-items">
+                            <div class="template-card" data-template="image-basic" data-type="image" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-image"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Image</h4>
+                                    <p class="template-desc">Single image with caption</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="gallery-grid" data-type="gallery" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-paint-brush"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Photo Gallery</h4>
+                                    <p class="template-desc">Grid of images</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="video-youtube" data-type="video" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-video-camera"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Video</h4>
+                                    <p class="template-desc">YouTube or Vimeo embed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="template-category">
+                        <h4>Interactive</h4>
+                        <div class="template-items">
+                            <div class="template-card" data-template="form-contact" data-type="form" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-clipboard"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Contact Form</h4>
+                                    <p class="template-desc">Customizable contact form</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="form-donation" data-type="form" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview"><i class="fa fa-money"></i></div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Donation Form</h4>
+                                    <p class="template-desc">Built-in donation collection</p>
+                                </div>
+                            </div>
+                            <div class="template-card" data-template="divider-simple" data-type="divider" draggable="true">
+                                <div class="template-thumbnail">
+                                    <div class="template-preview">➖</div>
+                                </div>
+                                <div class="template-info">
+                                    <h4>Divider</h4>
+                                    <p class="template-desc">Horizontal line separator</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="builder-panel builder-panel-center">
+            <div class="panel-header">
+                <h3>Campaign Canvas</h3>
+                <div class="canvas-actions">
+                    <button class="btn btn-sm btn-outline" id="undoBtn">Undo</button>
+                    <button class="btn btn-sm btn-outline" id="redoBtn">Redo</button>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div class="canvas-area" id="canvasArea">
+                    <div class="basic-info-section">
+                        <h2>Basic Campaign Information</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="campaignTitle">Campaign Title *</label>
+                                <input type="text" id="campaignTitle" class="form-control" 
+                                       value="<%= typeof campaign !== 'undefined' && campaign ? campaign.title : '' %>" 
+                                       placeholder="Enter your campaign title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="campaignCategory">Category *</label>
+                                <select id="campaignCategory" class="form-control" required>
+                                    <option value="">Select a category</option>
+                                    <option value="Technology" <%= typeof campaign !== 'undefined' && campaign && campaign.category === 'Technology' ? 'selected' : '' %>>Technology</option>
+                                    <option value="Education" <%= typeof campaign !== 'undefined' && campaign && campaign.category === 'Education' ? 'selected' : '' %>>Education</option>
+                                    <option value="Social Impact" <%= typeof campaign !== 'undefined' && campaign && campaign.category === 'Social Impact' ? 'selected' : '' %>>Social Impact</option>
+                                    <option value="Arts & Culture" <%= typeof campaign !== 'undefined' && campaign && campaign.category === 'Arts & Culture' ? 'selected' : '' %>>Arts & Culture</option>
+                                    <option value="Research" <%= typeof campaign !== 'undefined' && campaign && campaign.category === 'Research' ? 'selected' : '' %>>Research</option>
+                                    <option value="Other" <%= typeof campaign !== 'undefined' && campaign && campaign.category === 'Other' ? 'selected' : '' %>>Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fundingGoal">Funding Goal (BDT) *</label>
+                                <input type="number" id="fundingGoal" class="form-control" 
+                                       value="<%= typeof campaign !== 'undefined' && campaign ? campaign.fundingGoal : '' %>" 
+                                       placeholder="e.g. 50000" min="1000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="campaignDeadline">Deadline *</label>
+                                <input type="date" id="campaignDeadline" class="form-control" 
+                                       value="<%= typeof campaign !== 'undefined' && campaign ? campaign.deadline.toISOString().split('T')[0] : '' %>" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="campaignDescription">Description *</label>
+                            <textarea id="campaignDescription" class="form-control" rows="4" 
+                                      placeholder="Describe your campaign, its goals, and how the funds will be used..." required><%= typeof campaign !== 'undefined' && campaign ? campaign.description : '' %></textarea>
+                        </div>
+                    </div>
+                    <div class="drop-zone" id="sectionsDropZone">
+                        <div class="drop-zone-placeholder" id="dropZonePlaceholder">
+                            <i class="icon">➕</i>
+                            <h3>Drag sections here to build your campaign</h3>
+                            <p>Start by adding a hero section, then customize with content, media, and interactive elements</p>
+                        </div>
+                        <div class="sections-container" id="sectionsContainer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="builder-panel builder-panel-right">
+            <div class="panel-header">
+                <h3>Properties</h3>
+                <button class="btn btn-sm btn-outline" id="closeProperties">×</button>
+            </div>
+            <div class="panel-content">
+                <div class="properties-content" id="propertiesPanel">
+                    <div class="no-selection">
+                        <i class="icon"><i class="fa fa-cog"></i></i>
+                        <p>Select a section to edit its properties</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="builder-panel builder-panel-right" id="versionHistoryPanel" style="display: none;">
+            <div class="panel-header">
+                <h3><i class="fa fa-history"></i> Version History</h3>
+                <button class="btn btn-sm btn-outline" onclick="toggleVersionHistory()">×</button>
+            </div>
+            <div class="panel-content">
+                <div class="properties-content" id="versionHistoryContent">
+                    <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        <p>Loading version history...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<form id="campaignForm" style="display: none;">
+    <input type="hidden" id="pageBuilderData" name="pageBuilderData">
+    <input type="hidden" id="campaignStatus" name="status" value="draft">
+</form>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="/js/page-builder.js"></script>
+<script>
+    // Inject campaign ID and template data
+    window.campaignId = '<%= typeof campaign !== "undefined" && campaign ? campaign._id : "" %>';
+    window.sectionTemplates = <%- JSON.stringify(templates || []) %>;
+    // Inject existing campaign data for editing (if applicable)
+    <% if (typeof campaign !== 'undefined' && campaign) { %>
+        window.existingCampaign = <%- JSON.stringify(campaign) %>;
+    <% } %>
+    // Toggle version history panel
+    function toggleVersionHistory() {
+        const panel = document.getElementById('versionHistoryPanel');
+        const propertiesPanel = document.getElementById('propertiesPanel').closest('.builder-panel');
+        if (panel.style.display === 'none') {
+            propertiesPanel.style.display = 'none';
+            panel.style.display = 'block';
+            if (window.pageBuilder && window.pageBuilder.showVersionHistory) {
+                window.pageBuilder.showVersionHistory();
+            }
+        } else {
+            panel.style.display = 'none';
+            propertiesPanel.style.display = 'block';
+        }
+    }
+    // Initialize page builder
+    document.addEventListener('DOMContentLoaded', function() {
+        window.pageBuilder = new PageBuilder();
+    });
+</script>

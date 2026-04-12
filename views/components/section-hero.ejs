@@ -1,0 +1,29 @@
+<% if (typeof content !== 'undefined') { %>
+<div class="hero-section">
+    <div class="hero-content">
+        <% if (content.image) { %>
+        <div class="hero-image">
+            <img src="<%= content.image %>" alt="<%= content.title %>" />
+        </div>
+        <% } %>
+        <div class="hero-text">
+            <h1 class="heading-1"><%= content.title %></h1>
+            <% if (content.subtitle) { %>
+            <p class="hero-subtitle"><%= content.subtitle %></p>
+            <% } %>
+            <% if (content.description) { %>
+            <div class="hero-description">
+                <%= content.description %>
+            </div>
+            <% } %>
+            <% if (content.ctaText) { %>
+            <div class="hero-actions">
+                <a href="<%= content.ctaLink || '#donate' %>" class="hero-cta-button">
+                    <%= content.ctaText %>
+                </a>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+<% } %>

@@ -1,0 +1,20 @@
+<div class="image-section" style="background: <%= settings.backgroundColor || '#ffffff' %>; color: <%= settings.textColor || '#000000' %>; padding: <%= settings.padding.top %>px <%= settings.padding.right %>px <%= settings.padding.bottom %>px <%= settings.padding.left %>px; margin: <%= settings.margin.top %>px 0 <%= settings.margin.bottom %>px 0; border-radius: <%= settings.borderRadius %>px; box-shadow: <%= settings.boxShadow || 'none' %>;">
+    <div class="container">
+        <% if (content.src) { %>
+            <figure style="margin: 0;">
+                <img 
+                    src="<%= content.src %>" 
+                    alt="<%= content.alt || 'Section image' %>"
+                    style="max-width: 100%; height: auto; display: block; margin: 0 auto;"
+                >
+                <% if (content.caption) { %>
+                    <figcaption style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;"><%= content.caption %></figcaption>
+                <% } %>
+            </figure>
+        <% } else { %>
+            <div style="text-align: center; padding: 2rem; background: #f2fedc; border-radius: 8px;">
+                <p style="color: #6b7280;">Image placeholder - add an image URL in the editor</p>
+            </div>
+        <% } %>
+    </div>
+</div>

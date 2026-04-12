@@ -1,0 +1,171 @@
+<% layout('layouts/main') -%>
+<% title = 'FundMyIdea BD - Student Crowdfunding Platform' -%>
+<section class="landing-hero">
+    <canvas id="particleCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+    <div class="hero-content" style="position:relative;z-index:1;">
+        <h1 class="heading-1">Empower Student Innovation</h1>
+        <p class="hero-subtitle">FundMyIdea BD connects passionate students with supporters to bring groundbreaking ideas to life. Join our community of innovators and changemakers today.</p>
+        <form action="/campaigns/search" method="GET" class="search-form" style="max-width: 600px; margin: 2rem auto; display: flex; gap: 0.5rem;">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Search campaigns..." 
+                class="form-control" 
+                style="flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--gray-300); border-radius: var(--border-radius-lg); font-size: 1rem;"
+            >
+            <button type="submit" class="btn btn--primary" style="padding: 0.75rem 2rem;">Search</button>
+        </form>
+        <div class="hero-actions">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/campaigns" class="btn btn--primary">Explore Campaigns</a>
+                <a href="/builder/create" class="btn btn--secondary">Start a Campaign</a>
+            <% } else { %>
+                <a href="/campaigns" class="btn btn--primary">Explore Campaigns</a>
+                <a href="/register" class="btn btn--secondary">Get Started</a>
+            <% } %>
+        </div>
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-value count-up" data-target="<%= stats.activeCampaigns %>">0</div>
+                <div class="stat-label">Active Campaigns</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value count-up" data-target="<%= Math.round(stats.totalRaised / 1000) %>">0</div>
+                <div class="stat-label">BDT Raised (K)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value count-up" data-target="<%= stats.universities %>">0</div>
+                <div class="stat-label">Universities</div>
+            </div>
+        </div>
+    </div>
+</section>
+<% if (typeof recommendedCampaigns !== 'undefined' && recommendedCampaigns.length > 0) { %>
+<section class="page-section">
+    <div class="section-header">
+        <h2 class="heading-2">Recommended For You</h2>
+        <a href="/campaigns" class="view-all-link">View All →</a>
+    </div>
+    <div class="campaign-grid stagger-children" style="perspective: 1000px; transform-style: preserve-3d;">
+        <% recommendedCampaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <a href="/campaigns/<%= campaign._id %>">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <div class="campaign-content">
+                        <h3 class="heading-3"><%= campaign.title %></h3>
+                        <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                        <div class="campaign-meta">
+                            <span class="campaign-category"><%= campaign.category %></span>
+                            <span class="campaign-creator">by <%= campaign.creator?.username || 'Unknown' %></span>
+                        </div>
+                        <div class="campaign-stats">
+                            <div class="funding-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
+                                </div>
+                                <div class="funding-amount">
+                                    <span><%= campaign.currentFunding %> BDT</span>
+                                    <span>of <%= campaign.fundingGoal %> BDT</span>
+                                </div>
+                            </div>
+                            <div class="days-left"><%= campaign.daysLeftText %></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <% }) %>
+    </div>
+</section>
+<% } %>
+<section class="page-section">
+    <div class="section-header">
+        <h2 class="heading-2"><i class="fa fa-fire"></i> Trending Campaigns</h2>
+        <a href="/campaigns" class="view-all-link">View All →</a>
+    </div>
+    <div class="campaign-grid stagger-children" style="perspective: 1000px; transform-style: preserve-3d;">
+        <% trendingCampaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <a href="/campaigns/<%= campaign._id %>">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <div class="campaign-content">
+                        <h3 class="heading-3"><%= campaign.title %></h3>
+                        <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                        <div class="campaign-meta">
+                            <span class="campaign-category"><%= campaign.category %></span>
+                            <span class="campaign-creator">by <%= campaign.creator?.username || 'Unknown' %></span>
+                        </div>
+                        <div class="campaign-stats">
+                            <div class="funding-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
+                                </div>
+                                <div class="funding-amount">
+                                    <span><%= campaign.currentFunding %> BDT</span>
+                                    <span>of <%= campaign.fundingGoal %> BDT</span>
+                                </div>
+                            </div>
+                            <div class="days-left"><%= campaign.daysLeftText %></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <% }) %>
+    </div>
+</section>
+<section class="universities-section" style="padding: 3rem 0; background: linear-gradient(135deg, #f2fedc, #fdf9ee);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+        <h2 style="text-align: center; font-size: 2rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem;"><i class="fa fa-graduation-cap"></i> Universities on Platform</h2>
+        <p style="text-align: center; color: var(--gray-600); margin-bottom: 2rem;">Supporting student innovators across Bangladesh</p>
+        <% if (typeof stats.universities !== 'undefined' && stats.universities > 0) { %>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-blue);"><%= stats.universities %>+</div>
+                    <div style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">Universities Represented</div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--secondary-green);"><%= stats.activeCampaigns %>+</div>
+                    <div style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">Active Campaigns</div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--brand-accent);"><%= stats.totalCampaigns %>+</div>
+                    <div style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">Total Campaigns</div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</section>
+<section class="page-section">
+    <div class="section-header">
+        <h2 class="heading-2"><i class="fa fa-star"></i> Newest Campaigns</h2>
+        <a href="/campaigns" class="view-all-link">View All →</a>
+    </div>
+    <div class="campaign-grid stagger-children" style="perspective: 1000px; transform-style: preserve-3d;">
+        <% newestCampaigns.forEach(campaign => { %>
+            <div class="campaign-card">
+                <a href="/campaigns/<%= campaign._id %>">
+                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-image">
+                    <div class="campaign-content">
+                        <h3 class="heading-3"><%= campaign.title %></h3>
+                        <p class="campaign-description"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                        <div class="campaign-meta">
+                            <span class="campaign-category"><%= campaign.category %></span>
+                            <span class="campaign-creator">by <%= campaign.creator?.username || 'Unknown' %></span>
+                        </div>
+                        <div class="campaign-stats">
+                            <div class="funding-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" data-width="<%= campaign.fundingPercentage %>"></div>
+                                </div>
+                                <div class="funding-amount">
+                                    <span><%= campaign.currentFunding %> BDT</span>
+                                    <span>of <%= campaign.fundingGoal %> BDT</span>
+                                </div>
+                            </div>
+                            <div class="days-left"><%= campaign.daysLeftText %></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <% }) %>
+    </div>
+</section>

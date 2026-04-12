@@ -1,0 +1,134 @@
+<% if (typeof content !== 'undefined') { %>
+<div class="form-section">
+    <% if (content.title) { %>
+    <h2 class="heading-2"><%= content.title %></h2>
+    <% } %>
+    <% if (content.description) { %>
+    <p class="form-description"><%= content.description %></p>
+    <% } %>
+    <form class="custom-form" id="campaignForm_<%= Math.random().toString(36).substr(2, 9) %>">
+        <% if (content.fields && content.fields.length > 0) { %>
+            <% content.fields.forEach(function(field, index) { %>
+            <div class="form-field" data-field-type="<%= field.type %>">
+                <label for="field_<%= index %>"><%= field.label %><% if (field.required) { %> *<% } %></label>
+                <% if (field.type === 'text' || field.type === 'email' || field.type === 'number') { %>
+                    <input type="<%= field.type %>" 
+                           id="field_<%= index %>" 
+                           name="<%= field.name %>" 
+                           placeholder="<%= field.placeholder || '' %>"
+                           <% if (field.required) { %>required<% } %>
+                           <% if (field.min) { %>min="<%= field.min %>"<% } %>
+                           <% if (field.max) { %>max="<%= field.max %>"<% } %>
+                           class="form-input">
+                <% } else if (field.type === 'textarea') { %>
+                    <textarea id="field_<%= index %>" 
+                              name="<%= field.name %>" 
+                              placeholder="<%= field.placeholder || '' %>"
+                              rows="<%= field.rows || 4 %>"
+                              <% if (field.required) { %>required<% } %>
+                              class="form-textarea"></textarea>
+                <% } else if (field.type === 'select') { %>
+                    <select id="field_<%= index %>" 
+                            name="<%= field.name %>"
+                            <% if (field.required) { %>required<% } %>
+                            class="form-select">
+                        <% if (field.placeholder) { %>
+                            <option value=""><%= field.placeholder %></option>
+                        <% } %>
+                        <% if (field.options && field.options.length > 0) { %>
+                            <% field.options.forEach(function(option) { %>
+                                <option value="<%= option.value %>"><%= option.label %></option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                <% } else if (field.type === 'checkbox') { %>
+                    <div class="checkbox-group">
+                        <% if (field.options && field.options.length > 0) { %>
+                            <% field.options.forEach(function(option, optIndex) { %>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" 
+                                           name="<%= field.name %>" 
+                                           value="<%= option.value %>"
+                                           class="form-checkbox">
+                                    <span class="checkbox-text"><%= option.label %></span>
+                                </label>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                <% } else if (field.type === 'radio') { %>
+                    <div class="radio-group">
+                        <% if (field.options && field.options.length > 0) { %>
+                            <% field.options.forEach(function(option, optIndex) { %>
+                                <label class="radio-label">
+                                    <input type="radio" 
+                                           name="<%= field.name %>" 
+                                           value="<%= option.value %>"
+                                           <% if (optIndex === 0 && field.required) { %>required<% } %>
+                                           class="form-radio">
+                                    <span class="radio-text"><%= option.label %></span>
+                                </label>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                <% } %>
+                <% if (field.helpText) { %>
+                    <small class="help-text"><%= field.helpText %></small>
+                <% } %>
+            </div>
+            <% }); %>
+        <% } %>
+        <% if (content.submitText) { %>
+            <div class="form-actions">
+                <button type="submit" class="btn btn--success btn--full">
+                    <%= content.submitText %>
+                </button>
+            </div>
+        <% } %>
+    </form>
+</div>
+<script>
+// Form submission handling
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.custom-form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Collect form data
+            const formData = new FormData(form);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                if (data[key]) {
+                    // Handle multiple values (checkboxes)
+                    if (Array.isArray(data[key])) {
+                        data[key].push(value);
+                    } else {
+                        data[key] = [data[key], value];
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+            // Show success message or handle submission
+            const submitButton = form.querySelector('[type="submit"]');
+            if (!submitButton) return;
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+            // Simulate form submission
+            setTimeout(() => {
+                submitButton.textContent = 'Submitted!';
+                submitButton.style.background = 'var(--secondary-green)';
+                // Reset after delay
+                setTimeout(() => {
+                    submitButton.textContent = originalText;
+                    submitButton.disabled = false;
+                    submitButton.style.background = '';
+                    form.reset();
+                }, 2000);
+            }, 1000);
+            console.log('Form submitted:', data);
+        });
+    });
+});
+</script>
+<% } %>

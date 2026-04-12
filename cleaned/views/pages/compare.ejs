@@ -1,0 +1,242 @@
+<% layout("layouts/main") -%>
+<% title = 'Compare Campaigns - FundMyIdea BD' -%>
+<div class="compare-page">
+    <div class="page-header" style="text-align: center; margin-bottom: 2rem;">
+        <h1 class="heading-1" style="font-size: 2.5rem; margin-bottom: 0.5rem;"><i class="fa fa-bar-chart"></i> Compare Campaigns</h1>
+        <p class="page-subtitle" style="color: var(--gray-600); font-size: 1.125rem;">Side-by-side comparison to help you decide where to donate</p>
+    </div>
+    <% if (typeof campaigns !== 'undefined' && campaigns.length > 0) { %>
+        <div class="comparison-container" style="overflow-x: auto; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); padding: 2rem;">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th style="min-width: 200px; text-align: left;">Feature</th>
+                        <% campaigns.forEach(campaign => { %>
+                            <th style="min-width: 300px; vertical-align: top;">
+                                <div style="position: relative;">
+                                    <img src="<%= campaign.imageUrl || 'https://placehold.co/400x200/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 20).replace(/\s+/g, '+')) %>" 
+                                         alt="<%= campaign.title %>" 
+                                         style="width: 100%; height: 180px; object-fit: cover; border-radius: var(--border-radius-lg); margin-bottom: 1rem;">
+                                    <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem; line-height: 1.4;"><%= campaign.title %></h3>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; color: var(--gray-600);">
+                                        <span>by</span>
+                                        <strong><%= campaign.creator.username %></strong>
+                                        <% if (campaign.creator.university) { %>
+                                            <span>, <%= campaign.creator.university %></span>
+                                        <% } %>
+                                    </div>
+                                    <a href="/campaigns/<%= campaign._id %>" class="btn btn--primary btn--sm" style="width: 100%;">View Campaign →</a>
+                                </div>
+                            </th>
+                        <% }); %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-money"></i> Funding Progress</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td>
+                                <div style="margin-bottom: 0.5rem;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--secondary-green);"><%= campaign.currentFunding.toLocaleString() %> BDT</div>
+                                    <div style="font-size: 0.875rem; color: var(--gray-600);">of <%= campaign.fundingGoal.toLocaleString() %> BDT goal</div>
+                                </div>
+                                <div style="background: var(--gray-200); height: 10px; border-radius: 5px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, var(--secondary-green), #34d399); height: 100%; width: <%= campaign.fundingPercentage %>%; transition: width 0.5s ease;"></div>
+                                </div>
+                                <div style="text-align: center; margin-top: 0.5rem; font-weight: 700; color: var(--primary-blue);"><%= campaign.fundingPercentage %>% Funded</div>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-users"></i> Backers</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: center; font-size: 1.25rem; font-weight: 700; color: var(--gray-800);">
+                                <%= campaign.backers.length %>
+                                <span style="font-size: 0.875rem; color: var(--gray-600); display: block; margin-top: 0.25rem;">supporters</span>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-clock-o"></i> Time Remaining</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: center;">
+                                <% const daysLeft = Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24)); %>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: <%= daysLeft <= 3 ? '#dc2626' : daysLeft <= 7 ? '#f59e0b' : 'var(--secondary-green)' %>;">
+                                    <%= daysLeft === 0 ? 'Ends Today!' : daysLeft === 1 ? '1 Day' : daysLeft + ' Days' %>
+                                </div>
+                                <div style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.25rem;">left</div>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-folder"></i> Category</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: center;">
+                                <span class="status-badge badge-category" style="padding: 0.5rem 1rem; font-size: 0.875rem;"><%= campaign.category %></span>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-bar-chart"></i> Status</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: center;">
+                                <span class="status-badge badge-<%= campaign.status %>" style="padding: 0.5rem 1rem; font-size: 0.875rem; text-transform: capitalize;"><%= campaign.status %></span>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-graduation-cap"></i> University</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: center; color: var(--gray-700);">
+                                <%= campaign.creator.university || 'Not specified' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-file-text-o"></i> About</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: left; color: var(--gray-700); line-height: 1.6;">
+                                <%= campaign.description.substring(0, 200) %><%= campaign.description.length > 200 ? '...' : '' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-gift"></i> Rewards</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: center;">
+                                <% if (campaign.rewards && campaign.rewards.length > 0) { %>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--secondary-green);"><%= campaign.rewards.length %> Tiers</div>
+                                    <div style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.25rem;">
+                                        Starting from ৳<%= Math.min(...campaign.rewards.map(r => r.minAmount)).toLocaleString() %>
+                                    </div>
+                                <% } else { %>
+                                    <div style="color: var(--gray-500);">No rewards offered</div>
+                                <% } %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-bullhorn"></i> Recent Updates</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: center;">
+                                <% if (campaign.updates && campaign.updates.length > 0) { %>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary-blue);"><%= campaign.updates.length %></div>
+                                    <div style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.25rem;">
+                                        Latest: <%= new Date(campaign.updates[0].postedAt).toLocaleDateString() %>
+                                    </div>
+                                <% } else { %>
+                                    <div style="color: var(--gray-500);">No updates yet</div>
+                                <% } %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td class="feature-label"><strong><i class="fa fa-rocket"></i> Take Action</strong></td>
+                        <% campaigns.forEach(campaign => { %>
+                            <td style="text-align: center; padding: 1.5rem 0;">
+                                <a href="/campaigns/<%= campaign._id %>/donate" class="btn btn--success-gradient" style="width: 100%; padding: 1rem; font-size: 1rem; font-weight: 700;">
+                                    <i class="fa fa-heart"></i> Donate Now
+                                </a>
+                                <div style="margin-top: 0.75rem;">
+                                    <button onclick="toggleSaveCampaign('<%= campaign._id %>')" class="btn btn--secondary btn--sm" style="width: 100%;">
+                                        <i class="fa fa-heart"></i> Save for Later
+                                    </button>
+                                </div>
+                            </td>
+                        <% }); %>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/campaigns" class="btn btn--secondary">← Browse More Campaigns</a>
+        </div>
+    <% } else { %>
+        <div class="empty-state" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); max-width: 600px; margin: 2rem auto;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;"><i class="fa fa-bar-chart"></i></div>
+            <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">No Campaigns Selected</h3>
+            <p style="color: var(--gray-600); margin-bottom: 1.5rem;">Select up to 3 campaigns from the explore page to compare them side-by-side.</p>
+            <a href="/campaigns" class="btn btn--primary">Browse Campaigns</a>
+        </div>
+    <% } %>
+</div>
+<script>
+    // Toggle save campaign (requires authentication)
+    async function toggleSaveCampaign(campaignId) {
+        try {
+            const csrfToken = document.querySelector('[name="_csrf"]')?.value || '';
+            const response = await fetch(`/campaigns/${campaignId}/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'CSRF-Token': csrfToken
+                },
+                credentials: 'same-origin'
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.saved ? 'Campaign saved to your wishlist!' : 'Campaign removed from wishlist');
+            } else {
+                alert('Please login to save campaigns');
+            }
+        } catch (error) {
+            console.error('Error saving campaign:', error);
+            alert('Failed to save campaign. Please try again.');
+        }
+    }
+</script>
+<style>
+    .compare-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .comparison-table th,
+    .comparison-table td {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: middle;
+    }
+    .comparison-table th {
+        background: var(--gray-50);
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+    .comparison-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+    .comparison-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .feature-label {
+        background: var(--gray-50);
+        font-weight: 600;
+        color: var(--gray-800);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    @media (max-width: 1024px) {
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            min-width: 280px;
+        }
+    }
+    @media (max-width: 768px) {
+        .compare-page {
+            padding: 1rem;
+        }
+        .comparison-container {
+            overflow-x: scroll;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            min-width: 250px;
+        }
+    }
+</style>

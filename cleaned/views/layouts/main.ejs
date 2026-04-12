@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'FundMyIdea BD' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/font-awesome-4.7.0/css/font-awesome.min.css?v=1">
+    <link rel="stylesheet" href="/styles/main.css">
+    <% if (typeof extraStyles !== 'undefined' || typeof pageStyles !== 'undefined') { %>
+        <% const styles = typeof pageStyles !== 'undefined' ? pageStyles : (typeof extraStyles !== 'undefined' ? extraStyles : []); %>
+        <% styles.forEach(function(style) { %>
+    <link rel="stylesheet" href="/styles/<%= style %>.css">
+        <% }); %>
+    <% } %>
+</head>
+<body class="app-container">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <%- include('../partials/header') %>
+    <main id="main-content" class="main-content <%= typeof fullBleed !== 'undefined' && fullBleed ? 'main-content--full' : '' %>">
+        <%- body %>
+    </main>
+    <%- include('../partials/footer') %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const siteNav = document.querySelector('.site-navigation');
+            if (navToggle) {
+                navToggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    siteNav.classList.toggle('nav-open');
+                });
+            }
+        });
+    </script>
+    <script src="/js/main.js"></script>
+    <script src="/js/forms.js"></script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+<% layout('layouts/main') -%>
+<% title = typeof campaign !== 'undefined' && campaign ? campaign.title + ' - FundMyIdea BD' : 'Campaign Details - FundMyIdea BD' -%>
+<div class="campaign-detail-page">
+    <% if (typeof campaign !== 'undefined' && campaign) { %>
+        <%- include('../partials/breadcrumbs', {
+            breadcrumbs: [
+                { label: 'Campaigns', href: '/campaigns' },
+                { label: campaign.title }
+            ]
+        }) %>
+        <div class="campaign-header-image">
+            <img src="<%= campaign.imageUrl || 'https://placehold.co/1200x400/e5e7eb/1f2937?text=' + encodeURIComponent(campaign.title.substring(0, 30).replace(/\s+/g, '+')) %>" alt="<%= campaign.title %>" class="campaign-main-image">
+        </div>
+        <div class="campaign-content">
+            <% if (typeof req !== 'undefined' && req.query.created === 'true') { %>
+                <div class="campaign-success-banner" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #86efac; padding: 1.5rem; border-radius: var(--border-radius-lg); margin-bottom: 2rem; text-align: center; box-shadow: var(--shadow-md);">
+                    <span style="font-size: 3rem; display: block; margin-bottom: 0.5rem;"><i class="fa fa-trophy"></i></span>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; color: #166534; margin-bottom: 0.5rem;">Campaign Created Successfully!</h3>
+                    <p style="font-size: 1rem; color: #15803d;">Your campaign is now live and ready to receive donations. Share it with your network!</p>
+                </div>
+            <% } %>
+            <div class="campaign-info">
+                <% if (typeof user !== 'undefined' && user && campaign.creator?._id?.toString() === user._id.toString()) { %>
+                <div class="creator-tools-section" style="background: #eff6ff; border: 2px solid #bfdbfe; border-radius: var(--border-radius-lg); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                            <span style="font-weight: 600; color: var(--primary-blue); font-size: 1.125rem;"><i class="fa fa-wrench"></i> Creator Tools</span>
+                            <a href="/builder/<%= campaign._id %>/edit" class="btn btn--primary btn--sm">Edit Campaign</a>
+                            <a href="/campaigns/<%= campaign._id %>/analytics" class="btn btn--secondary btn--sm"><i class="fa fa-bar-chart"></i> Analytics</a>
+                            <button onclick="showDeleteModal(this)" class="btn btn--danger btn--sm">Delete</button>
+                        </div>
+                        <div style="color: var(--gray-600); font-size: 0.875rem;">
+                            <%= campaign.backers.length %> backers • <%= campaign.currentFunding %> BDT raised
+                        </div>
+                    </div>
+                    <div style="border-top: 1px solid #bfdbfe; padding-top: 1rem;">
+                        <h4 style="font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.75rem;">Recent Supporters (<%= campaign.backers.length %>)</h4>
+                        <% if (campaign.backers.length > 0) { %>
+                            <div style="max-h-60 overflow-y-auto; space-y: 0.5rem;">
+                                <% campaign.backers.slice(-5).reverse().forEach(backer => { %>
+                                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: white; border-radius: var(--border-radius-md); margin-bottom: 0.5rem;">
+                                        <div>
+                                            <div style="font-weight: 500; color: var(--gray-800);"><%= backer.user.username || 'Anonymous' %></div>
+                                            <div style="font-size: 0.875rem; color: var(--gray-600);"><%= backer.message || 'No message' %></div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-weight: 600; color: var(--secondary-green);"><%= backer.amount %> BDT</div>
+                                            <div style="font-size: 0.75rem; color: var(--gray-500);"><%= new Date(backer.donatedAt).toLocaleDateString() %></div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        <% } else { %>
+                            <p style="text-align: center; color: var(--gray-600); font-size: 0.875rem; padding: 1rem;">No supporters yet. Share your campaign to start receiving donations!</p>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+                <div class="campaign-header">
+                    <span class="status-badge badge-<%= campaign.status === 'active' ? 'active' : 'completed' %>"> <%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %> • <%= campaign.daysLeftText %></span>
+                    <span class="status-badge badge-category"><%= campaign.category %></span>
+                </div>
+                <% if (typeof user !== 'undefined' && user && campaign.creator?._id?.toString() !== user._id.toString() && campaign.status === 'active') { %>
+                <div class="donate-button-section" style="text-align: center; margin: 2rem 0;">
+                    <a href="/campaigns/<%= campaign._id %>/donate" class="btn btn--success btn--lg" style="display: inline-flex; flex-direction: column; align-items: center; padding: 1.5rem 2.5rem; background: linear-gradient(135deg, var(--secondary-green), var(--secondary-green-dark)); color: white; text-decoration: none; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); transition: all var(--transition-fast); min-width: 250px;">
+                        <span style="font-size: 2rem; margin-bottom: 0.5rem;"><i class="fa fa-money"></i></span>
+                        <span style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">Donate Funds</span>
+                        <span style="font-size: 0.9rem; opacity: 0.9; font-weight: 400;">Support this campaign</span>
+                    </a>
+                </div>
+                <% } %>
+                <% if (typeof hasDonated !== 'undefined' && hasDonated) { %>
+                <div class="already-donated-banner">
+                    <span class="donated-icon"><i class="fa fa-check-circle"></i></span>
+                    <span class="donated-text">You've already supported this campaign</span>
+                </div>
+                <% } %>
+                <% if (typeof donationSuccess !== 'undefined' && donationSuccess) { %>
+                <div class="donation-success-banner" style="background: #dcfce7; color: #166534; padding: 1.5rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem; border: 2px solid #86efac; text-align: center;">
+                    <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"><i class="fa fa-trophy"></i></span>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Thank You for Your Donation!</h3>
+                    <p style="font-size: 1rem; color: #15803d;"><%= donationSuccess %></p>
+                </div>
+                <% } %>
+                <% if (campaign.status !== 'active') { %>
+                <div class="campaign-status-banner <%= campaign.status === 'completed' ? 'status-completed' : 'status-expired' %>">
+                    <span class="status-icon"><%= campaign.status === 'completed' ? '<i class="fa fa-trophy"></i>' : '<i class="fa fa-clock-o"></i>' %></span>
+                    <span class="status-text">
+                        <%= campaign.status === 'completed' ? 'This campaign has reached its funding goal!' : 'This campaign is no longer accepting donations' %>
+                    </span>
+                </div>
+                <% } %>
+                <% if (campaign.status === 'active' && campaign.daysRemaining <= 3 && campaign.daysRemaining > 0) { %>
+                <div class="urgent-warning">
+                    <span class="warning-icon"><i class="fa fa-bolt"></i></span>
+                    <span class="warning-text">Only <%= campaign.daysRemaining %> <%= campaign.daysRemaining === 1 ? 'day' : 'days' %> left! Donate now to support this campaign.</span>
+                </div>
+                <% } %>
+                <% if (campaign.status === 'active' && campaign.daysRemaining === 0) { %>
+                <div class="last-day-warning">
+                    <span class="warning-icon"><i class="fa fa-exclamation-triangle"></i></span>
+                    <span class="warning-text">Final day! This is your last chance to support this campaign.</span>
+                </div>
+                <% } %>
+                <h1 class="heading-1"><%= campaign.title %></h1>
+                <p class="campaign-author-detail">by <%= campaign.creator.username %>, <%= campaign.creator.university %> Student</p>
+                <div class="funding-summary">
+                    <%- include('../partials/campaign-stats', { campaign: campaign }) %>
+                </div>
+                <% if (campaign.milestones && campaign.milestones.length > 0) { %>
+                <div class="milestone-progress-track" style="background: white; border-radius: var(--border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; box-shadow: var(--shadow-md);">
+                    <h4 style="color: var(--gray-800); font-size: 1.125rem; margin-bottom: 1.5rem; font-weight: 700; text-align: center;"><i class="fa fa-bullseye"></i> Funding Milestones</h4>
+                    <div style="position: relative; padding: 2rem 0;">
+                        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: var(--gray-200); transform: translateY(-50%); border-radius: 2px;">
+                            <div id="milestone-progress-line" style="height: 100%; background: linear-gradient(90deg, var(--secondary-green), var(--primary-blue)); width: <%= campaign.fundingPercentage %>%; border-radius: 2px; transition: width 1s ease;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; position: relative;">
+                            <% campaign.milestones.slice().sort((a, b) => a.percentage - b.percentage).forEach((ms, index) => { 
+                                const isReached = ms.reachedAt || campaign.fundingPercentage >= ms.percentage;
+                            %>
+                                <div class="milestone-node" data-milestone="<%= index %>" style="flex: 1; text-align: center; position: relative;">
+                                    <div class="milestone-dot <%= isReached ? 'reached' : '' %>" style="width: 40px; height: 40px; border-radius: 50%; background: <%= isReached ? 'var(--secondary-green)' : 'var(--gray-300)' %>; border: 4px solid <%= isReached ? 'var(--secondary-green)' : 'var(--gray-200)' %>; margin: 0 auto 0.75rem; transition: all 0.5s ease; box-shadow: <%= isReached ? '0 0 20px rgba(16, 185, 129, 0.4)' : 'none' %>;">
+                                        <% if (isReached) { %>
+                                            <span style="color: white; font-size: 1.25rem; line-height: 32px;">✓</span>
+                                        <% } else { %>
+                                            <span style="color: var(--gray-500); font-size: 0.875rem; line-height: 32px; font-weight: 700;"><%= ms.percentage %>%</span>
+                                        <% } %>
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-600); font-weight: 600;"><%= ms.title || ms.percentage + '% Goal' %></div>
+                                    <% if (ms.description) { %>
+                                        <div style="font-size: 0.625rem; color: var(--gray-500); margin-top: 0.25rem; max-width: 150px; margin-left: auto; margin-right: auto;"><%= ms.description.substring(0, 50) %><%= ms.description.length > 50 ? '...' : '' %></div>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                <% if (campaign.status === 'active' && campaign.daysRemaining > 0) { %>
+                    <div id="countdown-timer" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: var(--border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; text-align: center; box-shadow: var(--shadow-md);">
+                        <h4 style="color: #1e40af; font-size: 1.125rem; margin-bottom: 1rem; font-weight: 600;"><i class="fa fa-clock-o"></i> Time Remaining</h4>
+                        <div id="countdown-display" style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                            <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 80px; box-shadow: var(--shadow-sm);">
+                                <div id="days-left" style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);"><%= campaign.daysRemaining %></div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); text-transform: uppercase;">Days</div>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 80px; box-shadow: var(--shadow-sm);">
+                                <div id="hours-left" style="font-size: 2rem; font-weight: 700; color: var(--secondary-green);">0</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); text-transform: uppercase;">Hours</div>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 80px; box-shadow: var(--shadow-sm);">
+                                <div id="minutes-left" style="font-size: 2rem; font-weight: 700; color: #8b5cf6;">0</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); text-transform: uppercase;">Minutes</div>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 80px; box-shadow: var(--shadow-sm);">
+                                <div id="seconds-left" style="font-size: 2rem; font-weight: 700; color: #ec4899;">0</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); text-transform: uppercase;">Seconds</div>
+                            </div>
+                        </div>
+                        <% if (campaign.daysRemaining <= 3) { %>
+                            <p style="color: #dc2626; font-size: 0.875rem; margin-top: 1rem; font-weight: 600;"><i class="fa fa-bolt"></i> Hurry! Only a few days left!</p>
+                        <% } %>
+                    </div>
+                    <script>
+                        // Countdown timer
+                        (function() {
+                            const deadline = new Date('<%= campaign.deadline.toISOString() %>').getTime();
+                            function updateCountdown() {
+                                const now = new Date().getTime();
+                                const distance = deadline - now;
+                                if (distance < 0) {
+                                    document.getElementById('countdown-display').innerHTML = '<div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">Campaign Ended</div>';
+                                    return;
+                                }
+                                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                                const daysEl = document.getElementById('days-left');
+                                const hoursEl = document.getElementById('hours-left');
+                                const minutesEl = document.getElementById('minutes-left');
+                                const secondsEl = document.getElementById('seconds-left');
+                                if (daysEl) daysEl.textContent = days;
+                                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+                                if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+                                if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+                            }
+                            updateCountdown();
+                            setInterval(updateCountdown, 1000);
+                        })();
+                    </script>
+                <% } %>
+                <% if (campaign.rewards && campaign.rewards.length > 0) { %>
+                <div class="rewards-section" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: var(--border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; box-shadow: var(--shadow-md);">
+                    <h4 style="color: #92400e; font-size: 1.125rem; margin-bottom: 1rem; font-weight: 700;"><i class="fa fa-gift"></i> Earn Rewards</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <% campaign.rewards.slice().sort((a, b) => a.minAmount - b.minAmount).forEach(reward => { 
+                            const isAvailable = !reward.limitedQuantity || reward.claimedCount < reward.limitedQuantity;
+                            const remaining = reward.limitedQuantity ? reward.limitedQuantity - reward.claimedCount : null;
+                        %>
+                            <div style="background: white; border-radius: var(--border-radius-md); padding: 1rem; border-left: 3px solid <%= isAvailable ? 'var(--secondary-green)' : '#dc2626' %>;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div style="font-weight: 700; color: var(--gray-800); font-size: 0.875rem;"><%= reward.title %></div>
+                                    <div style="color: var(--secondary-green); font-weight: 700; font-size: 0.75rem;">${<%= reward.minAmount.toLocaleString() %>+</div>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--gray-600); line-height: 1.4; margin-bottom: 0.5rem;"><%= reward.description %></div>
+                                <% if (remaining !== null) { %>
+                                    <div style="font-size: 0.625rem; color: <%= remaining < 10 ? '#dc2626' : '#16a34a' %>; font-weight: 600;">
+                                        <%= remaining < 10 ? '<i class="fa fa-exclamation-triangle"></i> Only ' + remaining + ' left!' : remaining + ' available' %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+                <% } %>
+                <% if (campaign.backers.length > 0) { %>
+                    <% 
+                        const totalBackers = campaign.backers.length;
+                        const averageDonation = totalBackers > 0 ? Math.round(campaign.currentFunding / totalBackers) : 0;
+                        const sortedBackers = campaign.backers.slice().sort((a, b) => b.amount - a.amount);
+                        const topDonors = sortedBackers.slice(0, 3);
+                    %>
+                    <div class="top-donors-section" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: var(--border-radius-lg); padding: 1.5rem; margin: 2rem 0;">
+                        <h3 class="heading-4" style="text-align: center; margin-bottom: 1rem; color: #92400e;"><i class="fa fa-trophy"></i> Top Supporters</h3>
+                        <div style="display: flex; justify-content: center; gap: 2rem; align-items: flex-end;">
+                            <% if (topDonors[1]) { %>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem;"><i class="fa fa-trophy" style="color: #c0c0c0;"></i></div>
+                                    <div style="font-weight: 600; color: var(--gray-800);"><%= topDonors[1].user?.username || 'Anonymous' %></div>
+                                    <div style="color: var(--secondary-green); font-weight: 700;"><%= topDonors[1].amount %> BDT</div>
+                                </div>
+                            <% } %>
+                            <% if (topDonors[0]) { %>
+                                <div style="text-align: center; transform: scale(1.2);">
+                                    <div style="font-size: 2.5rem;"><i class="fa fa-trophy" style="color: #ffd700;"></i></div>
+                                    <div style="font-weight: 700; color: var(--gray-800);"><%= topDonors[0].user?.username || 'Anonymous' %></div>
+                                    <div style="color: var(--secondary-green); font-weight: 700; font-size: 1.25rem;"><%= topDonors[0].amount %> BDT</div>
+                                </div>
+                            <% } %>
+                            <% if (topDonors[2]) { %>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem;"><i class="fa fa-trophy" style="color: #cd7f32;"></i></div>
+                                    <div style="font-weight: 600; color: var(--gray-800);"><%= topDonors[2].user?.username || 'Anonymous' %></div>
+                                    <div style="color: var(--secondary-green); font-weight: 700;"><%= topDonors[2].amount %> BDT</div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                        <div style="background: var(--primary-blue-light); color: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700;"><%= totalBackers %></div>
+                            <div style="font-size: 0.875rem; opacity: 0.9;">Total Supporters</div>
+                        </div>
+                        <div style="background: var(--secondary-green); color: white; padding: 1.5rem; border-radius: var(--border-radius-lg); text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700;"><%= averageDonation %></div>
+                            <div style="font-size: 0.875rem; opacity: 0.9;">Avg Donation (BDT)</div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+            <div class="campaign-description">
+                <h2 class="heading-3">About this Campaign</h2>
+                <div class="description-content">
+                    <p><%= campaign.description %></p>
+                    <div class="bg-gray-50 rounded-lg p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Campaign Details</h3>
+                        <div class="grid grid-cols-1 md-grid-cols-2 gap-4">
+                            <div>
+                                <strong>Category:</strong> <%= campaign.category %>
+                            </div>
+                            <div>
+                                <% 
+                                    const launchedDays = Math.floor((new Date() - new Date(campaign.createdAt)) / (1000 * 60 * 60 * 24));
+                                %>
+                                <strong>Launched:</strong> <%= campaign.createdAt.toLocaleDateString() %> 
+                                <span style="color: var(--gray-600); font-size: 0.875rem;">(<%= launchedDays %> <%= launchedDays === 1 ? 'day' : 'days' %> ago)</span>
+                            </div>
+                            <div>
+                                <strong>Deadline:</strong> <%= campaign.deadline.toLocaleDateString() %>
+                            </div>
+                            <div>
+                                <strong>Status:</strong> 
+                                <span class="<%= campaign.status === 'active' ? 'bg-secondary-green' : 'bg-gray-500' %> text-white px-3 py-1 rounded-full text-xs">
+                                    <%= campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1) %>
+                                </span>
+                            </div>
+                            <% if (campaign.updatedAt && campaign.updatedAt > campaign.createdAt) { %>
+                                <div>
+                                    <% 
+                                        const updatedHours = Math.floor((new Date() - new Date(campaign.updatedAt)) / (1000 * 60 * 60));
+                                        const timeAgo = updatedHours < 1 ? 'less than an hour' : updatedHours + ' ' + (updatedHours === 1 ? 'hour' : 'hours');
+                                    %>
+                                    <strong>Last Updated:</strong> <span style="color: var(--gray-600); font-size: 0.875rem;"><%= timeAgo %> ago</span>
+                                </div>
+                            <% } %>
+                        </div>
+                        <% if (campaign.backers.length > 0) { %>
+                            <div class="backer-wall-section" style="margin-top: 3rem;">
+                                <h2 class="heading-3" style="text-align: center; margin-bottom: 1.5rem;"><i class="fa fa-star"></i> Our Amazing Supporters</h2>
+                                <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: var(--border-radius-lg); padding: 1.5rem; margin-bottom: 2rem; overflow: hidden;">
+                                    <h4 style="color: #1e40af; margin-bottom: 1rem; font-size: 1.125rem;"><i class="fa fa-heart"></i> Recent Support Activity</h4>
+                                    <div class="supporter-ticker" style="display: flex; gap: 1.5rem; animation: scroll-left 30s linear infinite; white-space: nowrap;">
+                                        <% campaign.backers.slice(-5).reverse().forEach(backer => { %>
+                                            <div style="flex-shrink: 0; background: white; padding: 1rem; border-radius: var(--border-radius-md); min-width: 200px; box-shadow: var(--shadow-sm);">
+                                                <div style="font-weight: 600; color: var(--primary-blue);"><%= backer.user?.username || 'Anonymous' %></div>
+                                                <div style="font-size: 0.875rem; color: var(--gray-600);">Donated <%= backer.amount %> BDT</div>
+                                                <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;"><%= new Date(backer.donatedAt).toLocaleDateString() %></div>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                                <div style="background: white; border-radius: var(--border-radius-lg); padding: 2rem; box-shadow: var(--shadow-md);">
+                                    <h3 class="heading-4" style="margin-bottom: 1rem;">All Supporters (<%= campaign.backers.length %>)</h3>
+                                    <div style="max-height: 600px; overflow-y: auto; padding-right: 1rem;">
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+                                            <% const orderedBackers = campaign.backers.slice().sort((a, b) => new Date(b.donatedAt) - new Date(a.donatedAt)); %>
+                                            <% orderedBackers.forEach(backer => { %>
+                                                <div style="border: 1px solid var(--gray-200); border-radius: var(--border-radius-md); padding: 1rem; transition: all var(--transition-fast); hover: transform: translateY(-2px); box-shadow: var(--shadow-sm);">
+                                                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem;">
+                                                            <%= (backer.user?.username || 'A').charAt(0).toUpperCase() %>
+                                                        </div>
+                                                        <div>
+                                                            <div style="font-weight: 600; color: var(--gray-800);"><%= backer.user?.username || 'Anonymous' %></div>
+                                                            <div style="font-size: 0.75rem; color: var(--gray-500);">
+                                                                <% if (backer.paymentMethod === 'bkash') { %>
+                                                                    <i class="fa fa-mobile-phone"></i> bKash
+                                                                <% } else { %>
+                                                                    <i class="fa fa-money"></i> Manual
+                                                                <% } %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--secondary-green); margin-bottom: 0.5rem;"><%= backer.amount %> BDT</div>
+                                                    <% if (backer.message) { %>
+                                                        <div style="font-size: 0.875rem; color: var(--gray-600); font-style: italic; line-height: 1.4;">"<%= backer.message %>"</div>
+                                                    <% } %>
+                                                    <div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.5rem; text-align: right;">
+                                                        <%= new Date(backer.donatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                    </div>
+                                                </div>
+                                            <% }); %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <% if (typeof user !== 'undefined' && user && campaign.creator?._id?.toString() !== user._id.toString()) { %>
+            <div class="donation-section">
+                <h2 class="heading-3">Support this Project</h2>
+                <% if (typeof hasDonated !== 'undefined' && hasDonated) { %>
+                    <div class="success-banner mb-6 text-center">
+                        <h3 class="mb-2">Thank You for Your Support!</h3>
+                        <p>You've already contributed to this campaign. Your support means the world to the creator.</p>
+                    </div>
+                <% } else if (campaign.status === 'active') { %>
+                    <div class="donate-cta-card" style="background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light)); color: white; padding: 2.5rem; border-radius: var(--border-radius-xl); text-align: center; margin: 2rem 0; box-shadow: var(--shadow-lg);">
+                        <h3 class="heading-4" style="margin-bottom: 1rem;">Ready to Make a Difference?</h3>
+                        <p style="margin-bottom: 1.5rem; opacity: 0.95;">Your contribution can help bring this student's innovative idea to life.</p>
+                        <a href="/campaigns/<%= campaign._id %>/donate" class="btn btn--success btn--lg" style="display: inline-flex; align-items: center; gap: 0.75rem; background: white; color: var(--primary-blue); font-weight: 700; padding: 1rem 2.5rem; border-radius: var(--border-radius-full); text-decoration: none; transition: all var(--transition-fast);">
+                            <span style="font-size: 1.5rem;"><i class="fa fa-money"></i></span>
+                            <span>Donate Now via bKash</span>
+                        </a>
+                        <p style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.85;">
+                            <i class="security-icon"><i class="fa fa-lock"></i></i> Secure payment processing
+                        </p>
+                    </div>
+                <% } else { %>
+                    <p style="text-align: center; color: var(--gray-600); margin: 2rem 0;">This campaign is no longer accepting donations.</p>
+                <% } %>
+            </div>
+            <% } %>
+        </div>
+    <% } else { %>
+        <div class="page-404">
+            <h1 class="page-404-title">Campaign Not Found</h1>
+            <p class="page-404-text">The campaign you're looking for doesn't exist or has been removed.</p>
+            <a href="/campaigns" class="btn btn--primary">Browse Other Campaigns</a>
+        </div>
+    <% } %>
+    <% if (typeof user !== 'undefined' && user && campaign.creator?._id?.toString() === user._id.toString()) { %>
+        <%- include('../partials/modal-delete-campaign', { campaignId: campaign._id }) %>
+    <% } %>
+</div>
+<div id="donationToast" style="position: fixed; bottom: 2rem; right: 2rem; background: white; padding: 1.5rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-xl); transform: translateX(400px); transition: transform 0.4s ease-in-out; z-index: 10000; max-width: 400px; border-left: 4px solid var(--secondary-green);">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="font-size: 2rem;"><i class="fa fa-trophy"></i></div>
+        <div>
+            <div id="toastMessage" style="font-weight: 600; color: var(--gray-800); margin-bottom: 0.25rem;"></div>
+            <div id="toastAmount" style="color: var(--secondary-green); font-weight: 700; font-size: 1.125rem;"></div>
+        </div>
+    </div>
+</div>
+<script>
+    // WebSocket connection for live donation updates
+    (function() {
+        const ws = new WebSocket(`ws://${location.host}?campaign=<%= campaign._id %>`);
+        ws.onmessage = ({ data }) => {
+            const msg = JSON.parse(data);
+            if (msg.type === 'donation') {
+                // Update funding amount
+                const currentFundingEl = document.querySelector('.current-funding');
+                if (currentFundingEl) {
+                    currentFundingEl.textContent = msg.newTotal.toLocaleString('en-BD') + ' BDT';
+                }
+                // Update progress bar
+                const progressFill = document.querySelector('.progress-fill[data-width]');
+                if (progressFill) {
+                    progressFill.style.width = msg.percentage + '%';
+                }
+                // Update milestone progress line
+                const milestoneLine = document.getElementById('milestone-progress-line');
+                if (milestoneLine) {
+                    milestoneLine.style.width = msg.percentage + '%';
+                }
+                // Show toast notification
+                showToast(msg.donor, msg.amount);
+            }
+        };
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+        function showToast(donor, amount) {
+            const toast = document.getElementById('donationToast');
+            const message = document.getElementById('toastMessage');
+            const amountEl = document.getElementById('toastAmount');
+            message.textContent = `${donor} just donated!`;
+            amountEl.textContent = `${amount.toLocaleString('en-BD')} BDT`;
+            // Slide in
+            toast.style.transform = 'translateX(0)';
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                toast.style.transform = 'translateX(400px)';
+            }, 4000);
+        }
+    })();
+</script>
+<div class="tabbed-content-section" style="margin-top: 3rem;">
+    <div style="display: flex; gap: 1rem; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem;">
+        <button class="tab-button active" data-tab="about" style="padding: 1rem 2rem; background: transparent; border: none; border-bottom: 3px solid var(--primary-blue); color: var(--primary-blue); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">
+            <i class="fa fa-book"></i> About
+        </button>
+        <button class="tab-button" data-tab="updates" style="padding: 1rem 2rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--gray-600); font-weight: 600; cursor: pointer; transition: all var(--transition-fast); position: relative;">
+            <i class="fa fa-bullhorn"></i> Updates
+            <% if (campaign.updates && campaign.updates.length > 0) { %>
+                <span style="position: absolute; top: 0.5rem; right: 0.5rem; background: var(--secondary-green); color: white; font-size: 0.625rem; padding: 0.125rem 0.5rem; border-radius: 9999px; font-weight: 700;"><%= campaign.updates.length %></span>
+            <% } %>
+        </button>
+        <button class="tab-button" data-tab="supporters" style="padding: 1rem 2rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--gray-600); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">
+            <i class="fa fa-heart"></i> Supporters
+        </button>
+    </div>
+    <div id="about-tab" class="tab-content active" style="display: block;">
+        <div style="background: white; border-radius: var(--border-radius-xl); padding: 2rem; box-shadow: var(--shadow-md);">
+            <h2 class="heading-3"><i class="fa fa-book"></i> About this Campaign</h2>
+            <p><%= campaign.description %></p>
+        </div>
+    </div>
+    <div id="updates-tab" class="tab-content" style="display: none;">
+        <div style="background: white; border-radius: var(--border-radius-xl); padding: 2rem; box-shadow: var(--shadow-md);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 class="heading-3"><i class="fa fa-bullhorn"></i> Campaign Updates</h2>
+                <% if (typeof user !== 'undefined' && user && campaign.creator?._id?.toString() === user._id.toString()) { %>
+                    <button onclick="showUpdateModal()" class="btn btn--primary btn--sm">+ Post Update</button>
+                <% } %>
+            </div>
+            <% if (campaign.updates && campaign.updates.length > 0) { %>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <% campaign.updates.slice().sort((a, b) => new Date(b.postedAt) - new Date(a.postedAt)).forEach(update => { %>
+                        <div style="border: 1px solid var(--gray-200); border-radius: var(--border-radius-lg); padding: 1.5rem; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="font-size: 1.25rem; font-weight: 700; color: #92400e;"><%= update.title %></h3>
+                                <span style="font-size: 0.75rem; color: var(--gray-600);"><%= new Date(update.postedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+                            </div>
+                            <div style="white-space: pre-wrap; line-height: 1.8; color: var(--gray-800);">
+                                <%= update.content %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div style="text-align: center; padding: 3rem 2rem; color: var(--gray-600);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;"><i class="fa fa-inbox"></i></div>
+                    <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">No updates yet</h3>
+                    <p>The campaign creator hasn't posted any updates yet.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    <div id="supporters-tab" class="tab-content" style="display: none;">
+        <% if (campaign.backers.length > 0) { %>
+            <div style="text-align: center; padding: 3rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;"><i class="fa fa-heart"></i></div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">Our Amazing Supporters</h3>
+                <p style="color: var(--gray-600);">Thank you to all our backers for your support!</p>
+            </div>
+        <% } else { %>
+            <div style="text-align: center; padding: 3rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;"><i class="fa fa-heart"></i></div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">No supporters yet</h3>
+                <p style="color: var(--gray-600);">Be the first to support this campaign!</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            // Remove active class from all buttons and tabs
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.style.borderBottomColor = 'transparent';
+                btn.style.color = 'var(--gray-600)';
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            // Add active class to clicked button and corresponding tab
+            this.style.borderBottomColor = 'var(--primary-blue)';
+            this.style.color = 'var(--primary-blue)';
+            document.getElementById(tabName + '-tab').style.display = 'block';
+        });
+    });
+    // Check if we should show milestone celebration
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('milestone') === 'true' && <%= campaign.milestones ? campaign.milestones.filter(m => m.reachedAt).length : 0 %> > 0) {
+        // Trigger confetti celebration
+        triggerConfetti();
+    }
+    // Confetti celebration for milestones
+    function triggerConfetti() {
+        const colors = ['#10b981', '#34d399', '#f59e0b', '#fbbf24', '#4f46e5', '#6366f1'];
+        for (let i = 0; i < 150; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: fixed;
+                width: ${10 + Math.random() * 10}px;
+                height: ${10 + Math.random() * 10}px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                left: ${Math.random() * 100}vw;
+                top: -20px;
+                z-index: 9999;
+                border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                animation: confettiFall ${2 + Math.random() * 2}s ease-in ${Math.random() * 2}s forwards,
+                           confettiSpin ${3 + Math.random() * 2}s linear infinite;
+                pointer-events: none;
+            `;
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 6000);
+        }
+        // Add keyframes if not already present
+        if (!document.getElementById('confetti-styles')) {
+            const style = document.createElement('style');
+            style.id = 'confetti-styles';
+            style.innerHTML = `
+                @keyframes confettiFall {
+                    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+                }
+                @keyframes confettiSpin {
+                    0% { transform: rotate(0deg) scale(1, 1); }
+                    50% { transform: rotate(180deg) scale(1.2, 0.8); }
+                    100% { transform: rotate(360deg) scale(1, 1); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    // Show update modal
+    function showUpdateModal() {
+        const modal = document.createElement('dialog');
+        modal.innerHTML = `
+            <div style="padding: 2rem; max-width: 600px; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl);">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;"><i class="fa fa-bullhorn"></i> Post Campaign Update</h3>
+                <form method="POST" action="/campaigns/<%= campaign._id %>/updates">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Title</label>
+                        <input type="text" name="title" required maxlength="200" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--border-radius-md); font-size: 1rem;" placeholder="Enter update title">
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Content</label>
+                        <textarea name="content" required maxlength="5000" rows="6" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--border-radius-md); font-size: 1rem; resize: vertical;" placeholder="Share your progress with backers..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button type="button" onclick="this.closest('dialog').close()" class="btn btn--secondary">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Post Update</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        modal.style.background = 'white';
+        modal.style.border = 'none';
+        document.body.appendChild(modal);
+        modal.showModal();
+    }
+</script>
