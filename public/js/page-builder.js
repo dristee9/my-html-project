@@ -188,11 +188,11 @@ class PageBuilder {
                     <span>${this.formatSectionType(section.type)}</span>
                 </div>
                 <div class="section-actions">
-                    <button class="btn-icon" onclick="pageBuilder.editSection('${section.id}')" aria-label="Edit section">✏️</button>
-                    <button class="btn-icon" onclick="pageBuilder.copySection('${section.id}')" aria-label="Copy section">📋</button>
-                    <button class="btn-icon" onclick="pageBuilder.pasteSection('${section.id}')" aria-label="Paste section after">📄</button>
-                    <button class="btn-icon" onclick="pageBuilder.duplicateSection('${section.id}')" aria-label="Duplicate section">🔄</button>
-                    <button class="btn-icon" onclick="pageBuilder.deleteSection('${section.id}')" aria-label="Delete section">🗑️</button>
+                    <button class="btn-icon" onclick="pageBuilder.editSection('${section.id}')" aria-label="Edit section"><i class="fa fa-pencil"></i></button>
+                    <button class="btn-icon" onclick="pageBuilder.copySection('${section.id}')" aria-label="Copy section"><i class="fa fa-clipboard"></i></button>
+                    <button class="btn-icon" onclick="pageBuilder.pasteSection('${section.id}')" aria-label="Paste section after"><i class="fa fa-file-o"></i></button>
+                    <button class="btn-icon" onclick="pageBuilder.duplicateSection('${section.id}')" aria-label="Duplicate section"><i class="fa fa-repeat"></i></button>
+                    <button class="btn-icon" onclick="pageBuilder.deleteSection('${section.id}')" aria-label="Delete section"><i class="fa fa-trash-o"></i></button>
                 </div>
             </div>
             <div class="section-content">
@@ -331,7 +331,7 @@ class PageBuilder {
                         <div class="faq-list">
                             ${section.content.faqs.map(faq => `
                                 <div class="faq-item" style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.75rem;">
-                                    <h4 style="font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">❓ ${this.sanitize(faq.question)}</h4>
+                                    <h4 style="font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;"><i class="fa fa-question-circle"></i> ${this.sanitize(faq.question)}</h4>
                                     <p style="color: #4b5563; line-height: 1.5;">${this.sanitize(faq.answer)}</p>
                                 </div>
                             `).join('')}
@@ -349,7 +349,7 @@ class PageBuilder {
             case 'custom':
                 return `
                     <div class="custom-preview" style="padding: 2rem; border: 2px dashed #9ca3af; border-radius: 0.5rem; text-align: center;">
-                        <h4>⚙️ Custom Section</h4>
+                        <h4><i class="fa fa-cog"></i> Custom Section</h4>
                         <p style="color: #6b7280;">Custom HTML or embedded content</p>
                     </div>
                 `;
@@ -382,7 +382,7 @@ class PageBuilder {
         const panel = document.getElementById('propertiesPanel');
         panel.innerHTML = `
             <div class="no-selection">
-                <i class="icon">⚙️</i>
+                <i class="icon"><i class="fa fa-cog"></i></i>
                 <p>Select a section to edit its properties</p>
             </div>
         `;
@@ -496,7 +496,7 @@ class PageBuilder {
                                     <div class="feature-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <strong>Feature ${index + 1}</strong>
-                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFeature(${index})" aria-label="Remove feature" title="Remove feature">🗑️</button>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFeature(${index})" aria-label="Remove feature" title="Remove feature"><i class="fa fa-trash-o"></i></button>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 8px;">
                                             <label style="font-size: 12px;">Icon</label>
@@ -534,7 +534,7 @@ class PageBuilder {
                                     <div class="testimonial-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <strong>Testimonial ${index + 1}</strong>
-                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeTestimonial(${index})" aria-label="Remove testimonial" title="Remove testimonial">🗑️</button>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeTestimonial(${index})" aria-label="Remove testimonial" title="Remove testimonial"><i class="fa fa-trash-o"></i></button>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 8px;">
                                             <label style="font-size: 12px;">Name</label>
@@ -580,7 +580,7 @@ class PageBuilder {
                                     <div class="field-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <strong>Field ${index + 1}</strong>
-                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFormField(${index})" aria-label="Remove field" title="Remove field">🗑️</button>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFormField(${index})" aria-label="Remove field" title="Remove field"><i class="fa fa-trash-o"></i></button>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 8px;">
                                             <label style="font-size: 12px;">Label</label>
@@ -694,7 +694,7 @@ class PageBuilder {
                                     <div class="faq-item-editable" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <strong>Q&A ${index + 1}</strong>
-                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFaq(${index})" aria-label="Remove FAQ" title="Remove FAQ">🗑️</button>
+                                            <button type="button" class="btn-icon" onclick="pageBuilder.removeFaq(${index})" aria-label="Remove FAQ" title="Remove FAQ"><i class="fa fa-trash-o"></i></button>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 8px;">
                                             <label style="font-size: 12px;">Question</label>
@@ -737,7 +737,7 @@ class PageBuilder {
                                         <div style="flex: 1;">
                                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                                 <strong>Image ${index + 1}</strong>
-                                                <button type="button" class="btn-icon" onclick="pageBuilder.removeGalleryImage(${index})" aria-label="Remove image" title="Remove image">🗑️</button>
+                                                <button type="button" class="btn-icon" onclick="pageBuilder.removeGalleryImage(${index})" aria-label="Remove image" title="Remove image"><i class="fa fa-trash-o"></i></button>
                                             </div>
                                             <div class="form-group" style="margin-bottom: 8px;">
                                                 <label style="font-size: 12px;">Image URL</label>
@@ -1147,8 +1147,8 @@ class PageBuilder {
                             <span class="version-time">${new Date(version.timestamp).toLocaleString()}</span>
                         </div>
                         <div class="version-actions">
-                            <button class="btn-icon" onclick="pageBuilder.restoreVersion(${index})" aria-label="Restore this version" title="Restore this version">🔄</button>
-                            <button class="btn-icon" onclick="pageBuilder.compareVersion(${index})" aria-label="Compare with current" title="Compare with current">🔍</button>
+                            <button class="btn-icon" onclick="pageBuilder.restoreVersion(${index})" aria-label="Restore this version" title="Restore this version"><i class="fa fa-undo"></i></button>
+                            <button class="btn-icon" onclick="pageBuilder.compareVersion(${index})" aria-label="Compare with current" title="Compare with current"><i class="fa fa-search"></i></button>
                         </div>
                     </div>
                 `).reverse().join('')}
@@ -1391,9 +1391,9 @@ class PageBuilder {
             features: {
                 title: 'Key Features',
                 features: [
-                    { icon: '💡', title: 'Feature One', description: 'First feature description' },
-                    { icon: '🚀', title: 'Feature Two', description: 'Second feature description' },
-                    { icon: '🎯', title: 'Feature Three', description: 'Third feature description' }
+                    { icon: '<i class="fa fa-lightbulb-o"></i>', title: 'Feature One', description: 'First feature description' },
+                    { icon: '<i class="fa fa-rocket"></i>', title: 'Feature Two', description: 'Second feature description' },
+                    { icon: '<i class="fa fa-bullseye"></i>', title: 'Feature Three', description: 'Third feature description' }
                 ]
             },
             testimonials: {
@@ -1494,20 +1494,20 @@ class PageBuilder {
 
     getSectionIcon(type) {
         const icons = {
-            hero: '🏔️',
-            text: '📝',
-            image: '🖼️',
-            gallery: '🎨',
-            video: '🎥',
-            features: '⭐',
-            testimonials: '💬',
-            faq: '❓',
-            cta: '🎯',
-            form: '📋',
+            hero: '<i class="fa fa-header"></i>',
+            text: '<i class="fa fa-file-text-o"></i>',
+            image: '<i class="fa fa-image"></i>',
+            gallery: '<i class="fa fa-images"></i>',
+            video: '<i class="fa fa-video-camera"></i>',
+            features: '<i class="fa fa-star"></i>',
+            testimonials: '<i class="fa fa-comments"></i>',
+            faq: '<i class="fa fa-question-circle"></i>',
+            cta: '<i class="fa fa-bullseye"></i>',
+            form: '<i class="fa fa-clipboard"></i>',
             divider: '---',
-            custom: '⚙️'
+            custom: '<i class="fa fa-cog"></i>'
         };
-        return icons[type] || '📄';
+        return icons[type] || '<i class="fa fa-file-o"></i>';
     }
 
     formatSectionType(type) {
@@ -1546,7 +1546,7 @@ class PageBuilder {
     addFeature() {
         if (!this.selectedSection) return;
         this.selectedSection.content.features.push({
-            icon: '✨',
+            icon: '<i class="fa fa-magic"></i>',
             title: 'New Feature',
             description: 'Feature description here'
         });

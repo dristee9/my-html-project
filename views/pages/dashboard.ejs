@@ -39,19 +39,19 @@
     <h2 class="heading-2 text-lg font-semibold mb-4">Quick Actions</h2>
     <div class="flex gap-4 flex-wrap">
         <a href="/builder/create" class="btn btn--primary inline-flex items-center gap-2">
-            <span class="text-xl">➕</span>
+            <span class="text-xl"><i class="fa fa-plus"></i></span>
             Create New Campaign
         </a>
         <a href="/campaigns" class="btn btn--secondary inline-flex items-center gap-2">
-            <span class="text-xl">🔍</span>
+            <span class="text-xl"><i class="fa fa-search"></i></span>
             Browse Campaigns
         </a>
         <a href="/dashboard/my-donations" class="btn btn--secondary inline-flex items-center gap-2">
-            <span class="text-xl">💰</span>
+            <span class="text-xl"><i class="fa fa-money"></i></span>
             View All Donations
         </a>
         <a href="/dashboard/profile" class="btn btn--secondary inline-flex items-center gap-2">
-            <span class="text-xl">👤</span>
+            <span class="text-xl"><i class="fa fa-user"></i></span>
             Edit Profile
         </a>
     </div>
@@ -60,7 +60,7 @@
 <!-- Expiring Soon Alert -->
 <% if (typeof expiringSoon !== 'undefined' && expiringSoon.length > 0) { %>
 <section class="expiring-alerts-section mb-8">
-    <h2 class="heading-2 text-lg font-semibold mb-4 text-error">⚠️ Campaigns Expiring Soon</h2>
+    <h2 class="heading-2 text-lg font-semibold mb-4 text-error"><i class="fa fa-exclamation-triangle"></i> Campaigns Expiring Soon</h2>
     <div class="grid grid-cols-1 md-grid-cols-2 gap-4">
         <% expiringSoon.forEach(campaign => { 
             const daysLeft = Math.ceil((campaign.deadline - new Date()) / (1000 * 60 * 60 * 24));
@@ -112,15 +112,15 @@
                     if (daysLeft <= 1) {
                         urgencyLevel = 'critical';
                         urgencyColor = '#dc2626'; // Red
-                        urgencyLabel = '🚨 Final Day!';
+                        urgencyLabel = '<i class="fa fa-exclamation-triangle"></i> Final Day!';
                     } else if (daysLeft <= 3) {
                         urgencyLevel = 'high';
                         urgencyColor = '#f59e0b'; // Orange
-                        urgencyLabel = '⚡ ' + daysLeft + ' Days Left';
+                        urgencyLabel = '<i class="fa fa-bolt"></i> ' + daysLeft + ' Days Left';
                     } else if (daysLeft <= 7) {
                         urgencyLevel = 'medium';
                         urgencyColor = '#eab308'; // Yellow
-                        urgencyLabel = '⏰ ' + daysLeft + ' Days';
+                        urgencyLabel = '<i class="fa fa-clock-o"></i> ' + daysLeft + ' Days';
                     } else {
                         urgencyLevel = 'low';
                         urgencyColor = 'var(--secondary-green)'; // Green
@@ -129,7 +129,7 @@
                 } else {
                     urgencyLevel = 'completed';
                     urgencyColor = 'var(--gray-500)';
-                    urgencyLabel = campaign.status === 'completed' ? '✅ Completed' : '⏰ Ended';
+                    urgencyLabel = campaign.status === 'completed' ? '<i class="fa fa-check-circle"></i> Completed' : '<i class="fa fa-clock-o"></i> Ended';
                 }
             %>
             <div class="campaign-card" style="border-left: 4px solid <%= urgencyColor %>;">
@@ -258,16 +258,10 @@
         <div class="space-y-4">
             <% recentActivities.forEach(activity => { %>
             <div class="activity-item flex items-start gap-4 pb-4 border-b border-gray-200 last:border-b-0">
-                <div class="text-2xl"><%= activity.icon %></div>
+                <div class="text-2xl"><%- activity.icon %></div>
                 <div class="flex-1">
                     <p class="font-medium text-gray-800">
-                        <% if (activity.type === 'donation_received') { %>
-                            💰 Received <%= activity.amount %> BDT donation from <%= activity.donorName %> for "<%= activity.campaignTitle %>"
-                        <% } else if (activity.type === 'campaign_completed') { %>
-                            ✅ <%= activity.message %>: "<%= activity.campaignTitle %>"
-                        <% } else if (activity.type === 'campaign_expired') { %>
-                            ⏰ <%= activity.message %>: "<%= activity.campaignTitle %>"
-                        <% } %>
+                        <%= activity.message %>: "<%= activity.campaignTitle %>"
                     </p>
                     <p class="text-sm text-gray-500 mt-1">
                         <%= new Date(activity.date).toLocaleDateString('en-US', { 

@@ -4,14 +4,14 @@
 <div class="leaderboard-page">
     <!-- Page Header -->
     <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
-        <h1 class="heading-1" style="font-size: 2.5rem; margin-bottom: 1rem;">🏆 Creator Leaderboard</h1>
+        <h1 class="heading-1" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fa fa-trophy"></i> Creator Leaderboard</h1>
         <p class="page-subtitle" style="color: var(--gray-600); font-size: 1.125rem;">Celebrating our top student entrepreneurs</p>
     </div>
 
     <!-- Top Creators Section -->
     <section class="top-creators-section" style="margin-bottom: 4rem;">
         <h2 class="heading-2" style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
-            🥇 Top 20 Creators by Total Funds Raised
+            <i class="fa fa-trophy"></i> Top 20 Creators by Total Funds Raised
         </h2>
 
         <% if (typeof topCreators !== 'undefined' && topCreators.length > 0) { %>
@@ -35,19 +35,19 @@
                             let rowClass = '';
                             
                             if (rank === 1) {
-                                medalIcon = '🥇';
+                                medalIcon = '<i class="fa fa-trophy" style="color: #ffd700;"></i>';
                                 rowClass = 'gold-medal';
                             } else if (rank === 2) {
-                                medalIcon = '🥈';
+                                medalIcon = '<i class="fa fa-trophy" style="color: #c0c0c0;"></i>';
                                 rowClass = 'silver-medal';
                             } else if (rank === 3) {
-                                medalIcon = '🥉';
+                                medalIcon = '<i class="fa fa-trophy" style="color: #cd7f32;"></i>';
                                 rowClass = 'bronze-medal';
                             }
                         %>
                             <tr class="leaderboard-row <%= rowClass %>" style="<%= rank <= 3 ? 'background: linear-gradient(90deg, rgba(255,215,0,0.05) 0%, transparent 100%);' : '' %>">
                                 <td style="text-align: center; font-size: 1.5rem; font-weight: 700;">
-                                    <%= medalIcon || '#' + rank %>
+                                    <%- medalIcon || '#' + rank %>
                                 </td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -80,7 +80,7 @@
             </div>
         <% } else { %>
             <div class="empty-state" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
+                <div style="font-size: 4rem; margin-bottom: 1rem;"><i class="fa fa-trophy"></i></div>
                 <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">No creators yet</h3>
                 <p style="color: var(--gray-600);">Be the first to create a campaign and climb the leaderboard!</p>
             </div>
@@ -90,7 +90,7 @@
     <!-- Rising Stars Section -->
     <section class="rising-stars-section">
         <h2 class="heading-2" style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
-            ⭐ Rising Stars (Last 30 Days)
+            <i class="fa fa-star"></i> Rising Stars (Last 30 Days)
         </h2>
 
         <% if (typeof risingStars !== 'undefined' && risingStars.length > 0) { %>
@@ -101,7 +101,7 @@
                     <div class="rising-star-card" style="background: white; border-radius: var(--border-radius-lg); padding: 1.5rem; box-shadow: var(--shadow-md); border-top: 4px solid <%= rank <= 3 ? '#fbbf24' : '#60a5fa' %>;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                             <span style="font-size: 1.5rem; font-weight: 700; color: var(--gray-700);">#<%= rank %></span>
-                            <span style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 0.25rem 0.75rem; border-radius: var(--border-radius-full); font-size: 0.75rem; font-weight: 700;">🔥 HOT</span>
+                            <span style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 0.25rem 0.75rem; border-radius: var(--border-radius-full); font-size: 0.75rem; font-weight: 700;"><i class="fa fa-fire"></i> HOT</span>
                         </div>
                         
                         <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem; line-height: 1.4;">
@@ -138,7 +138,7 @@
             </div>
         <% } else { %>
             <div class="empty-state" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">⭐</div>
+                <div style="font-size: 4rem; margin-bottom: 1rem;"><i class="fa fa-star"></i></div>
                 <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">No rising stars yet</h3>
                 <p style="color: var(--gray-600);">Check back soon for emerging creators!</p>
             </div>

@@ -154,11 +154,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const next = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
-            themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+            themeToggle.innerHTML = next === 'dark' ? '<i class="fa fa-sun-o"></i>' : '<i class="fa fa-moon-o"></i>';
         });
         
         // Set initial icon
-        themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        themeToggle.innerHTML = theme === 'dark' ? '<i class="fa fa-sun-o"></i>' : '<i class="fa fa-moon-o"></i>';
     }
     
     // Scroll-triggered entrance animations

@@ -22,16 +22,16 @@
         </div>
         <div class="toolbar-right">
             <button class="btn btn-secondary" id="previewBtn">
-                <i class="icon">👁️</i> Preview
+                <i class="icon"><i class="fa fa-eye"></i></i> Preview
             </button>
             <button class="btn btn-outline" id="saveDraftBtn">
-                <i class="icon">💾</i> Save Draft
+                <i class="icon"><i class="fa fa-save"></i></i> Save Draft
             </button>
             <button class="btn btn-outline" id="versionHistoryBtn" onclick="toggleVersionHistory()">
-                <i class="icon">📜</i> Version History
+                <i class="icon"><i class="fa fa-history"></i></i> Version History
             </button>
             <button class="btn btn-primary" id="publishBtn">
-                <i class="icon">🚀</i> <%= typeof campaign !== 'undefined' && campaign ? 'Update' : 'Publish' %> Campaign
+                <i class="icon"><i class="fa fa-rocket"></i></i> <%= typeof campaign !== 'undefined' && campaign ? 'Update' : 'Publish' %> Campaign
             </button>
         </div>
     </div>
@@ -60,7 +60,7 @@
                         <div class="template-items">
                             <div class="template-card" data-template="hero-basic" data-type="hero" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">🏔️</div>
+                                    <div class="template-preview"><i class="fa fa-header"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Basic Hero</h4>
@@ -70,7 +70,7 @@
                             
                             <div class="template-card" data-template="hero-basic" data-type="hero" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">🌄</div>
+                                    <div class="template-preview"><i class="fa fa-image"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Hero with Image</h4>
@@ -86,7 +86,7 @@
                         <div class="template-items">
                             <div class="template-card" data-template="features-three-col" data-type="features" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">⭐</div>
+                                    <div class="template-preview"><i class="fa fa-star"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Three Features</h4>
@@ -96,7 +96,7 @@
                             
                             <div class="template-card" data-template="testimonial-slider" data-type="testimonials" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">💬</div>
+                                    <div class="template-preview"><i class="fa fa-comments"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Testimonial Slider</h4>
@@ -106,7 +106,7 @@
                             
                             <div class="template-card" data-template="text-basic" data-type="text" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">📝</div>
+                                    <div class="template-preview"><i class="fa fa-pencil"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Text Block</h4>
@@ -116,7 +116,7 @@
                             
                             <div class="template-card" data-template="cta-basic" data-type="cta" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">🎯</div>
+                                    <div class="template-preview"><i class="fa fa-bullseye"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Call to Action</h4>
@@ -142,7 +142,7 @@
                         <div class="template-items">
                             <div class="template-card" data-template="image-basic" data-type="image" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">🖼️</div>
+                                    <div class="template-preview"><i class="fa fa-image"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Image</h4>
@@ -152,7 +152,7 @@
                             
                             <div class="template-card" data-template="gallery-grid" data-type="gallery" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">🎨</div>
+                                    <div class="template-preview"><i class="fa fa-paint-brush"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Photo Gallery</h4>
@@ -162,7 +162,7 @@
                             
                             <div class="template-card" data-template="video-youtube" data-type="video" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">🎥</div>
+                                    <div class="template-preview"><i class="fa fa-video-camera"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Video</h4>
@@ -178,7 +178,7 @@
                         <div class="template-items">
                             <div class="template-card" data-template="form-contact" data-type="form" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">📋</div>
+                                    <div class="template-preview"><i class="fa fa-clipboard"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Contact Form</h4>
@@ -188,7 +188,7 @@
                             
                             <div class="template-card" data-template="form-donation" data-type="form" draggable="true">
                                 <div class="template-thumbnail">
-                                    <div class="template-preview">💰</div>
+                                    <div class="template-preview"><i class="fa fa-money"></i></div>
                                 </div>
                                 <div class="template-info">
                                     <h4>Donation Form</h4>
@@ -287,7 +287,7 @@
             <div class="panel-content">
                 <div class="properties-content" id="propertiesPanel">
                     <div class="no-selection">
-                        <i class="icon">⚙️</i>
+                        <i class="icon"><i class="fa fa-cog"></i></i>
                         <p>Select a section to edit its properties</p>
                     </div>
                 </div>
@@ -297,7 +297,7 @@
         <!-- Version History Sidebar (Hidden by default) -->
         <div class="builder-panel builder-panel-right" id="versionHistoryPanel" style="display: none;">
             <div class="panel-header">
-                <h3>📜 Version History</h3>
+                <h3><i class="fa fa-history"></i> Version History</h3>
                 <button class="btn btn-sm btn-outline" onclick="toggleVersionHistory()">×</button>
             </div>
             <div class="panel-content">

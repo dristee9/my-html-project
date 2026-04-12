@@ -237,9 +237,9 @@ exports.getTemplates = async () => {
             content: {
                 title: 'Key Features',
                 features: [
-                    { icon: '💡', title: 'Feature One', description: 'Description of your first feature' },
-                    { icon: '🚀', title: 'Feature Two', description: 'Description of your second feature' },
-                    { icon: '🎯', title: 'Feature Three', description: 'Description of your third feature' }
+                    { icon: '<i class="fa fa-lightbulb-o"></i>', title: 'Feature One', description: 'Description of your first feature' },
+                    { icon: '<i class="fa fa-rocket"></i>', title: 'Feature Two', description: 'Description of your second feature' },
+                    { icon: '<i class="fa fa-bullseye"></i>', title: 'Feature Three', description: 'Description of your third feature' }
                 ]
             }
         },

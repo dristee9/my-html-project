@@ -3,7 +3,7 @@
 
 <div class="saved-campaigns-page">
     <div class="page-header">
-        <h1 class="heading-1">💝 My Saved Campaigns</h1>
+        <h1 class="heading-1"><i class="fa fa-heart"></i> My Saved Campaigns</h1>
         <p class="page-subtitle">Campaigns you've bookmarked for later</p>
     </div>
 
@@ -44,17 +44,17 @@
                     
                     <div class="campaign-stats-row">
                         <div class="stat-item">
-                            <span class="stat-icon">🎯</span>
+                            <span class="stat-icon"><i class="fa fa-bullseye"></i></span>
                             <span class="stat-value"><%= campaign.fundingPercentage %>%</span>
                             <span class="stat-label">Funded</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-icon">👥</span>
+                            <span class="stat-icon"><i class="fa fa-users"></i></span>
                             <span class="stat-value"><%= campaign.backers.length %></span>
                             <span class="stat-label">Backers</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-icon">⏰</span>
+                            <span class="stat-icon"><i class="fa fa-clock-o"></i></span>
                             <span class="stat-value"><%= Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24)) %></span>
                             <span class="stat-label">Days Left</span>
                         </div>
@@ -63,7 +63,7 @@
                     <div class="campaign-footer">
                         <a href="/campaigns/<%= campaign._id %>" class="btn btn--primary">View Campaign</a>
                         <button onclick="toggleSave('<%= campaign._id %>')" class="btn btn--secondary" style="padding: 0.5rem 1rem;">
-                            <span style="font-size: 1.25rem;">❤️</span>
+                            <span style="font-size: 1.25rem;"><i class="fa fa-heart"></i></span>
                             <span style="margin-left: 0.25rem;">Remove</span>
                         </button>
                     </div>
@@ -73,7 +73,7 @@
         </div>
     <% } else { %>
         <div class="empty-state" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md);">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">💝</div>
+            <div style="font-size: 4rem; margin-bottom: 1rem;"><i class="fa fa-heart"></i></div>
             <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">No saved campaigns yet</h3>
             <p style="color: var(--gray-600); margin-bottom: 1.5rem;">Start exploring and save campaigns that interest you!</p>
             <a href="/campaigns" class="btn btn--primary">Browse Campaigns</a>

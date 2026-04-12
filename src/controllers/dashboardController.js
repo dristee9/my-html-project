@@ -35,7 +35,8 @@ exports.getDashboard = async (req, res) => {
                     donorName: backer.user?.username || 'Anonymous',
                     amount: backer.amount,
                     date: backer.donatedAt || new Date(0), // Handle undefined dates
-                    icon: '💰'
+                    message: `Received ${backer.amount} BDT donation from ${backer.user?.username || 'Anonymous'}`,
+                    icon: '<i class="fa fa-money"></i>'
                 });
             });
         });
@@ -48,7 +49,7 @@ exports.getDashboard = async (req, res) => {
                     campaignTitle: campaign.title,
                     message: 'Campaign completed successfully',
                     date: campaign.updatedAt,
-                    icon: '✅'
+                    icon: '<i class="fa fa-check-circle"></i>'
                 });
             } else if (campaign.status === 'expired') {
                 recentActivity.push({
@@ -56,7 +57,7 @@ exports.getDashboard = async (req, res) => {
                     campaignTitle: campaign.title,
                     message: 'Campaign deadline passed',
                     date: campaign.updatedAt,
-                    icon: '⏰'
+                    icon: '<i class="fa fa-clock-o"></i>'
                 });
             }
         });

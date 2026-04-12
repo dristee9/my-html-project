@@ -3,7 +3,7 @@
 
 <div class="compare-page">
     <div class="page-header" style="text-align: center; margin-bottom: 2rem;">
-        <h1 class="heading-1" style="font-size: 2.5rem; margin-bottom: 0.5rem;">📊 Compare Campaigns</h1>
+        <h1 class="heading-1" style="font-size: 2.5rem; margin-bottom: 0.5rem;"><i class="fa fa-bar-chart"></i> Compare Campaigns</h1>
         <p class="page-subtitle" style="color: var(--gray-600); font-size: 1.125rem;">Side-by-side comparison to help you decide where to donate</p>
     </div>
 
@@ -36,7 +36,7 @@
                 <tbody>
                     <!-- Funding Progress -->
                     <tr>
-                        <td class="feature-label"><strong>💰 Funding Progress</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-money"></i> Funding Progress</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td>
                                 <div style="margin-bottom: 0.5rem;">
@@ -53,7 +53,7 @@
 
                     <!-- Backers -->
                     <tr>
-                        <td class="feature-label"><strong>👥 Backers</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-users"></i> Backers</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: center; font-size: 1.25rem; font-weight: 700; color: var(--gray-800);">
                                 <%= campaign.backers.length %>
@@ -64,7 +64,7 @@
 
                     <!-- Time Remaining -->
                     <tr>
-                        <td class="feature-label"><strong>⏰ Time Remaining</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-clock-o"></i> Time Remaining</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: center;">
                                 <% const daysLeft = Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24)); %>
@@ -78,7 +78,7 @@
 
                     <!-- Category -->
                     <tr>
-                        <td class="feature-label"><strong>📁 Category</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-folder"></i> Category</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: center;">
                                 <span class="status-badge badge-category" style="padding: 0.5rem 1rem; font-size: 0.875rem;"><%= campaign.category %></span>
@@ -88,7 +88,7 @@
 
                     <!-- Status -->
                     <tr>
-                        <td class="feature-label"><strong>📊 Status</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-bar-chart"></i> Status</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: center;">
                                 <span class="status-badge badge-<%= campaign.status %>" style="padding: 0.5rem 1rem; font-size: 0.875rem; text-transform: capitalize;"><%= campaign.status %></span>
@@ -98,7 +98,7 @@
 
                     <!-- University -->
                     <tr>
-                        <td class="feature-label"><strong>🎓 University</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-graduation-cap"></i> University</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: center; color: var(--gray-700);">
                                 <%= campaign.creator.university || 'Not specified' %>
@@ -108,7 +108,7 @@
 
                     <!-- Description Preview -->
                     <tr>
-                        <td class="feature-label"><strong>📝 About</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-file-text-o"></i> About</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: left; color: var(--gray-700); line-height: 1.6;">
                                 <%= campaign.description.substring(0, 200) %><%= campaign.description.length > 200 ? '...' : '' %>
@@ -118,7 +118,7 @@
 
                     <!-- Rewards -->
                     <tr>
-                        <td class="feature-label"><strong>🎁 Rewards</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-gift"></i> Rewards</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: center;">
                                 <% if (campaign.rewards && campaign.rewards.length > 0) { %>
@@ -135,7 +135,7 @@
 
                     <!-- Recent Updates -->
                     <tr>
-                        <td class="feature-label"><strong>📢 Recent Updates</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-bullhorn"></i> Recent Updates</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: center;">
                                 <% if (campaign.updates && campaign.updates.length > 0) { %>
@@ -152,15 +152,15 @@
 
                     <!-- Action Buttons -->
                     <tr>
-                        <td class="feature-label"><strong>🚀 Take Action</strong></td>
+                        <td class="feature-label"><strong><i class="fa fa-rocket"></i> Take Action</strong></td>
                         <% campaigns.forEach(campaign => { %>
                             <td style="text-align: center; padding: 1.5rem 0;">
                                 <a href="/campaigns/<%= campaign._id %>/donate" class="btn btn--success-gradient" style="width: 100%; padding: 1rem; font-size: 1rem; font-weight: 700;">
-                                    💝 Donate Now
+                                    <i class="fa fa-heart"></i> Donate Now
                                 </a>
                                 <div style="margin-top: 0.75rem;">
                                     <button onclick="toggleSaveCampaign('<%= campaign._id %>')" class="btn btn--secondary btn--sm" style="width: 100%;">
-                                        ❤️ Save for Later
+                                        <i class="fa fa-heart"></i> Save for Later
                                     </button>
                                 </div>
                             </td>
@@ -176,7 +176,7 @@
         </div>
     <% } else { %>
         <div class="empty-state" style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); max-width: 600px; margin: 2rem auto;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
+            <div style="font-size: 4rem; margin-bottom: 1rem;"><i class="fa fa-bar-chart"></i></div>
             <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">No Campaigns Selected</h3>
             <p style="color: var(--gray-600); margin-bottom: 1.5rem;">Select up to 3 campaigns from the explore page to compare them side-by-side.</p>
             <a href="/campaigns" class="btn btn--primary">Browse Campaigns</a>

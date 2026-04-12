@@ -33,7 +33,7 @@ const templates = {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>Welcome to FundMyIdea BD! 🎉</h1>
+                    <h1>Welcome to FundMyIdea BD! <i class="fa fa-trophy"></i></h1>
                 </div>
                 <div class="content">
                     <p>Hi ${user.username},</p>
@@ -245,7 +245,7 @@ const templates = {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🎉 Milestone Reached!</h1>
+                    <h1><i class="fa fa-trophy"></i> Milestone Reached!</h1>
                     <div style="font-size: 3rem; margin-top: 1rem;">
                         <span class="confetti">🎊</span>
                         <span class="confetti">🎈</span>
