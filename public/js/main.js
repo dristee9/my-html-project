@@ -6,6 +6,15 @@
 const theme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', theme);
 
+// Particle color based on theme
+function getParticleColors() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+        particle: isDark ? 'rgba(253, 249, 238, 0.6)' : 'rgba(228, 202, 0, 0.7)',
+        line: isDark ? 'rgba(253, 249, 238, 0.2)' : 'rgba(228, 202, 0, 0.25)'
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Particle System for Hero Background
     const heroCanvas = document.getElementById('particleCanvas');
@@ -44,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             loop() {
                 const ctx = this.ctx;
+                const colors = getParticleColors();
                 ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 this.particles.forEach(p => {
                     // Mouse repulsion
@@ -55,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     p.y = (p.y + p.vy + this.canvas.height) % this.canvas.height;
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+                    ctx.fillStyle = colors.particle.replace('0.5', p.alpha.toFixed(2)).replace('0.6', p.alpha.toFixed(2));
                     ctx.fill();
                 });
                 // Draw connecting lines
@@ -65,7 +75,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (d < 120) {
                             ctx.beginPath();
                             ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-                            ctx.strokeStyle = `rgba(255,255,255,${0.15 * (1 - d/120)})`;
+                            const opacity = (0.15 * (1 - d/120)).toFixed(2);
+                            ctx.strokeStyle = colors.line.replace('0.15', opacity).replace('0.2', opacity);
                             ctx.lineWidth = 0.5;
                             ctx.stroke();
                         }
@@ -155,6 +166,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
             themeToggle.innerHTML = next === 'dark' ? '<i class="fa fa-sun-o"></i>' : '<i class="fa fa-moon-o"></i>';
+            
+            // Force canvas redraw with new colors by triggering a resize
+            const heroCanvas = document.getElementById('particleCanvas');
+            if (heroCanvas) {
+                const event = new Event('resize');
+                window.dispatchEvent(event);
+            }
         });
         
         // Set initial icon

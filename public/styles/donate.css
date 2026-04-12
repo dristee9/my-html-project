@@ -266,7 +266,7 @@
 
 .donation-submit-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 10px 25px rgba(19, 166, 106, 0.3);
 }
 
 .donation-submit-button:disabled {
@@ -307,14 +307,14 @@
 }
 
 .error-message {
-    background: #fee2e2;
-    color: #dc2626;
+    background: #fef2f2;
+    color: var(--brand-danger);
     border: 1px solid #fecaca;
 }
 
 .success-message {
     background: #dcfce7;
-    color: #166534;
+    color: #065f46;
     border: 1px solid #bbf7d0;
 }
 

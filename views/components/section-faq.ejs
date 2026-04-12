@@ -7,8 +7,8 @@
         <div class="faq-list">
             <% if (content.faqs && content.faqs.length > 0) { %>
                 <% content.faqs.forEach((faq, index) => { %>
-                    <details class="faq-item" style="margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-                        <summary style="padding: 1rem; background: #f9fafb; cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                    <details class="faq-item" style="margin-bottom: 1rem; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;">
+                        <summary style="padding: 1rem; background: #f2fedc; cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center;">
                             <%= faq.question %>
                             <span style="font-size: 1.25rem;">+</span>
                         </summary>
@@ -18,8 +18,8 @@
                     </details>
                 <% }); %>
             <% } else { %>
-                <div style="text-align: center; padding: 2rem; background: #f3f4f6; border-radius: 8px;">
-                    <p style="color: #9ca3af;">No FAQs yet - add questions and answers in the editor</p>
+                <div style="text-align: center; padding: 2rem; background: #f2fedc; border-radius: 8px;">
+                    <p style="color: #6b7280;">No FAQs yet - add questions and answers in the editor</p>
                 </div>
             <% } %>
         </div>

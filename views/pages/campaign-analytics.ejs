@@ -28,15 +28,15 @@
             <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.5rem;">Views to donations</div>
         </div>
         
-        <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); border-left: 4px solid #f59e0b;">
+        <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); border-left: 4px solid #e4ca00;">
             <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">Avg Donation</div>
-            <div style="font-size: 2.5rem; font-weight: 700; color: #f59e0b;"><%= avgDonation.toLocaleString() %> BDT</div>
+            <div style="font-size: 2.5rem; font-weight: 700; color: #e4ca00;"><%= avgDonation.toLocaleString() %> BDT</div>
             <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.5rem;">Per backer</div>
         </div>
         
-        <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); border-left: 4px solid #dc2626;">
+        <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); border-left: 4px solid var(--brand-danger);">
             <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">Days Remaining</div>
-            <div style="font-size: 2.5rem; font-weight: 700; color: #dc2626;"><%= campaign.daysRemaining %></div>
+            <div style="font-size: 2.5rem; font-weight: 700; color: var(--brand-danger);"><%= campaign.daysRemaining %></div>
             <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.5rem;"><%= campaign.deadline.toLocaleDateString() %></div>
         </div>
     </div>
@@ -59,7 +59,7 @@
             </div>
             <div>
                 <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">Total Backers</div>
-                <div style="font-size: 2rem; font-weight: 700; color: #8b5cf6;"><%= campaign.backers.length %></div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--brand-accent);"><%= campaign.backers.length %></div>
             </div>
         </div>
         <div style="width: 100%; background: var(--gray-200); height: 12px; border-radius: 9999px; overflow: hidden;">
